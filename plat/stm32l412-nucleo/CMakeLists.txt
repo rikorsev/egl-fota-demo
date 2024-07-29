@@ -12,3 +12,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/cmsi
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/cmsis/Core/Include)
 
 add_subdirectory(pio_led_green)
+add_subdirectory(iface_trace)
+add_subdirectory(timer_sys)

@@ -17,15 +17,13 @@ static const char *m_level_str[] =
 
 static egl_trace_t *default_tracer = NULL;
 
-egl_result_t egl_trace_init(egl_trace_t *trace, egl_interface_t *iface)
+egl_result_t egl_trace_init(egl_trace_t *trace, egl_interface_t *iface, egl_timer_t *timer)
 {
-    egl_result_t result = EGL_UNKNOWN;
-
     EGL_ASSERT_CHECK(trace);
     EGL_ASSERT_CHECK(iface);
 
-    trace->level = EGL_TRACE_LEVEL_DEBUG;
     trace->iface = iface;
+    trace->timer = timer;
 
     return EGL_SUCCESS;
 }
@@ -36,42 +34,50 @@ egl_result_t egl_trace_default_set(egl_trace_t *trace)
     return EGL_SUCCESS;
 }
 
-egl_trace_t *egl_trace_default_get(egl_trace_t *trace)
+egl_trace_t *egl_trace_default_get()
 {
     return default_tracer;
 }
 
-egl_trace_t egl_trace(egl_trace_t *trace, egl_trace_level_t lvl, char *module, char *format, ...)
+egl_result_t egl_trace(egl_trace_t *trace, egl_trace_level_t lvl, char *module, char *format, ...)
 {
     va_list arg;
-    int offset = 0;
+    unsigned int offset = 0;
+    int result;
 
     EGL_ASSERT_CHECK(trace);
     EGL_ASSERT_CHECK(format);
     EGL_ASSERT_CHECK(lvl < EGL_TRACE_LEVEL_LAST);
     EGL_ASSERT_CHECK(trace->iface);
 
-    offset += snprintf(trace->buff, sizeof(trace->buff)"[%08u] ",
-                         (unsigned int)egl_plat_time_get(trace->timer));
-        EGL_ASSERT_CHECK(offset < 0);
+    if(trace->timer)
+    {
+        result = snprintf(trace->buff, sizeof(trace->buff),"[%08u]",
+                                            (unsigned int)egl_timer_get(trace->timer));
+        EGL_ASSERT_CHECK(result > 0);
+        offset += result;
+    }
 
+    result = snprintf(trace->buff + offset, sizeof(trace->buff) - offset, "[%s]", m_level_str[lvl]);
+    EGL_ASSERT_CHECK(result > 0);
+    offset += result;
 
     if(module != NULL)
     {
-        offset += snprintf(trace->buff + offset, sizeof(trace->buff) - offset, "%s:", module);
-        EGL_ASSERT_CHECK(offset < 0);
+        result = snprintf(trace->buff + offset, sizeof(trace->buff) - offset, "%s: ", module);
+        EGL_ASSERT_CHECK(result > 0);
+        offset += result;
     }
 
-    offset += snprintf(trace->buff + offset, sizeof(trace->buff) - offset, "[%s]", m_level_str[lvl]);
-    EGL_ASSERT_CHECK(offset < 0);
-
     va_start(arg, format);
-    offset += vsnprintf(trace->buff + offset, sizeof(trace->buff) - offset, format, arg);
-    EGL_ASSERT_CHECK(offset < 0);
+    result = vsnprintf(trace->buff + offset, sizeof(trace->buff) - offset, format, arg);
+    EGL_ASSERT_CHECK(result > 0);
+    offset += result;
     va_end(arg);
 
-    offset += snprintf(trace->buff + offset, sizeof(trace->buff) - offset, "\r\n");
-    EGL_ASSERT_CHECK(offset < 0);
+    result = snprintf(trace->buff + offset, sizeof(trace->buff) - offset, "\r\n");
+    EGL_ASSERT_CHECK(result > 0);
+    offset += result;
 
-    return egl_itf_write(trace->iface, trace->buff, offset);
+    return egl_itf_write(trace->iface, trace->buff, &offset);
 }

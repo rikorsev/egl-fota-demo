@@ -1,5 +1,5 @@
 #ifndef EGL_PLAT_H
-#define EFL_PLAT_H
+#define EGL_PLAT_H
 
 #include <stdint.h>
 
@@ -8,7 +8,6 @@
 typedef struct
 {
     egl_result_t (*init)(void);
-    uint32_t     (*time)(void);
     egl_result_t (*sleep)(uint32_t delay);
     egl_result_t (*reboot)(void);
     egl_result_t (*shutdown)(void);
@@ -17,7 +16,6 @@ typedef struct
 }egl_platform_t;
 
 egl_result_t egl_plat_init(egl_platform_t *plat);
-uint32_t egl_plat_time(egl_platform_t *plat);
 egl_result_t egl_plat_sleep(egl_platform_t *plat, uint32_t delay);
 egl_result_t egl_plat_reboot(egl_platform_t *plat);
 egl_result_t egl_plat_shutdown(egl_platform_t *plat);

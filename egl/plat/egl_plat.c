@@ -11,16 +11,6 @@ egl_result_t egl_plat_init(egl_platform_t *plat)
     return plat->init();
 }
 
-uint32_t egl_plat_time(egl_platform_t *plat)
-{
-    if(plat == NULL || plat->time == NULL)
-    {
-        return 0;
-    }
-
-    return plat->time();
-}
-
 egl_result_t egl_plat_sleep(egl_platform_t *plat, uint32_t delay)
 {
     EGL_ASSERT_CHECK(plat);

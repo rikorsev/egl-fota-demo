@@ -11,7 +11,7 @@ egl_result_t egl_timer_init(egl_timer_t *timer)
     return timer->init();
 }
 
-uint32_t egl_counter_get(egl_timer_t *timer)
+uint32_t egl_timer_get(egl_timer_t *timer)
 {
     if(timer == NULL)
     {
@@ -26,7 +26,7 @@ uint32_t egl_counter_get(egl_timer_t *timer)
     return timer->get();
 }
 
-egl_result_t egl_counter_update(egl_timer_t *timer)
+egl_result_t egl_timer_update(egl_timer_t *timer)
 {
     EGL_ASSERT_CHECK(timer);
     EGL_ASSERT_CHECK(timer->update);
@@ -34,7 +34,7 @@ egl_result_t egl_counter_update(egl_timer_t *timer)
     return timer->update();
 }
 
-egl_result_t egl_counter_set(egl_timer_t *timer, uint32_t val)
+egl_result_t egl_timer_set(egl_timer_t *timer, uint32_t val)
 {
     EGL_ASSERT_CHECK(timer);
     EGL_ASSERT_CHECK(timer->set);
@@ -42,7 +42,7 @@ egl_result_t egl_counter_set(egl_timer_t *timer, uint32_t val)
     return timer->set(val);
 }
 
-egl_result_t egl_counter_deinit(egl_timer_t *timer)
+egl_result_t egl_timer_deinit(egl_timer_t *timer)
 {
     EGL_ASSERT_CHECK(timer);
     EGL_ASSERT_CHECK(timer->deinit);

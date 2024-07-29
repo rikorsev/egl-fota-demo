@@ -4,20 +4,19 @@
 #include "plat.h"
 
 #define EGL_MODULE_NAME "main"
-#define MAIN_BLINCK_PERIOD_MS (1000U)
 
-#if 0
+#if CONFIG_EGL_TRACE_ENABLED
 static egl_result_t init_trace(void)
 {
     egl_result_t result;
     static egl_trace_t trace = {0};
 
-    /* Init stdio interface */
-    result = egl_itf_init(STDIO);
+    /* Init trace iface */
+    result = egl_itf_init(TRACE_IFACE);
     EGL_RESULT_CHECK(result);
 
     /* Init tracer */
-    result = egl_trace_init(&trace, STDIO);
+    result = egl_trace_init(&trace, TRACE_IFACE, SYSTIMER);
     EGL_RESULT_CHECK(result);
 
     /* Set default tracer */
@@ -32,16 +31,17 @@ static egl_result_t init(void)
 {
     egl_result_t result;
 
-    /* Init platform */
     result = egl_plat_init(PLATFORM);
     EGL_RESULT_CHECK(result);
 
-#if 0
+    result = egl_timer_init(SYSTIMER);
+    EGL_RESULT_CHECK(result);
+
+#if CONFIG_EGL_TRACE_ENABLED
     result = init_trace();
     EGL_RESULT_CHECK(result);
 #endif
 
-    /* Init led */
     result = egl_pio_init(LED_GREEN);
     if(result != EGL_SUCCESS)
     {
@@ -54,16 +54,10 @@ static egl_result_t init(void)
 
 static void blink(void)
 {
-    egl_result_t result;
-
-    result = egl_pio_toggle(LED_GREEN);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_TRACE_ERROR("Fail to toggle led. Result %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
-    }
-
-    egl_plat_sleep(PLATFORM, MAIN_BLINCK_PERIOD_MS);
+    egl_pio_set(LED_GREEN, true);
+    egl_plat_sleep(PLATFORM, 50);
+    egl_pio_set(LED_GREEN, false);
+    egl_plat_sleep(PLATFORM, 950);
 }
 
 static void loop(void)
