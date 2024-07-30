@@ -8,7 +8,8 @@ VERBOSE=""
 # Script command parameters
 usage() {
     echo "Usage: $0 
-    [ -p TARGET_PLATFORM ]"
+    [ -p TARGET_PLATFORM ]
+    [ -v VERBOSE ]"
 }
 
 while getopts ":p:v" opt; do
