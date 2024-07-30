@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24.1 FATAL_ERROR)
 
-project(afd_main LANGUAGES C ASM)
+project(afd_boot LANGUAGES C ASM)
 
 add_executable(${PROJECT_NAME})
 set(CMAKE_EXECUTABLE_SUFFIX ".${TARGET_SLOT}.elf")

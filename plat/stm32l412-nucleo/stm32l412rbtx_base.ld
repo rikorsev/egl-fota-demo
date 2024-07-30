@@ -49,7 +49,6 @@ MEMORY
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 40K
   SRAM1    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 32K
   SRAM2    (xrw)    : ORIGIN = 0x20008000,   LENGTH = 8K
-  ROM    (rx)    : ORIGIN = 0x08000000,   LENGTH = 128K
 }
 
 /* Sections */

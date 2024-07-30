@@ -9,6 +9,13 @@
 
 #define PLATFORM platform_get()
 
+enum
+{
+    PLAT_SLOT_BOOT,
+    PLAT_SLOT_A,
+    PLAT_SLOT_B
+};
+
 egl_platform_t *platform_get(void);
 
 #endif

@@ -3,7 +3,7 @@
 #include "egl_lib.h"
 #include "plat.h"
 
-#define EGL_MODULE_NAME "main"
+#define EGL_MODULE_NAME "boot"
 
 #if CONFIG_EGL_TRACE_ENABLED
 static egl_result_t init_trace(void)
@@ -55,9 +55,9 @@ static egl_result_t init(void)
 static void blink(void)
 {
     egl_pio_set(LED_GREEN, true);
-    egl_plat_sleep(PLATFORM, 50);
-    egl_pio_set(LED_GREEN, false);
     egl_plat_sleep(PLATFORM, 950);
+    egl_pio_set(LED_GREEN, false);
+    egl_plat_sleep(PLATFORM, 50);
 }
 
 static void loop(void)
@@ -74,7 +74,9 @@ int main(void)
         EGL_RESULT_FATAL();
     }
 
-    EGL_TRACE_INFO("Welcome from %s application", egl_plat_info(PLATFORM));
+    EGL_TRACE_INFO("Welcome from %s bootloader", egl_plat_info(PLATFORM));
+    result = egl_plat_boot(PLATFORM, PLAT_SLOT_A);
+    EGL_TRACE_INFO("Exit from application. Result %d", EGL_RESULT(result));
 
     while(1)
     {

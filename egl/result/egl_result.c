@@ -5,6 +5,7 @@
 static char *egl_result_str[] =
 {
     "EGL_SUCCESS",
+    "EGL_UNKNOWN",
     "EGL_FAIL",
     "EGL_SET",
     "EGL_RESET",
@@ -12,7 +13,8 @@ static char *egl_result_str[] =
     "EGL_NOT_SUPPORTED",
     "EGL_OUT_OF_BOUNDARY",
     "EGL_INVALID_PARAM",
-    "EGL_INVALID_STATE"
+    "EGL_INVALID_STATE",
+    "EGL_ASSERT_FAIL",
 };
 
 char *egl_result_str_get(egl_result_t result)

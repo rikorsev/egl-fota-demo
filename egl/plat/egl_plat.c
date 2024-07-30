@@ -19,6 +19,14 @@ egl_result_t egl_plat_sleep(egl_platform_t *plat, uint32_t delay)
     return plat->sleep(delay);
 }
 
+egl_result_t egl_plat_boot(egl_platform_t *plat, unsigned int slot_idx)
+{
+    EGL_ASSERT_CHECK(plat);
+    EGL_ASSERT_CHECK(plat->boot);
+
+    return plat->boot(slot_idx);
+}
+
 egl_result_t egl_plat_reboot(egl_platform_t *plat)
 {
     EGL_ASSERT_CHECK(plat);

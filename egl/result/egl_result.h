@@ -2,7 +2,7 @@
 #define EGL_RESULT_H
 
 typedef enum
-  {
+{
     EGL_SUCCESS,
     EGL_UNKNOWN,
     EGL_FAIL,
@@ -16,7 +16,7 @@ typedef enum
     EGL_ASSERT_FAIL,
 
     EGL_LAST
-  }egl_result_t;
+}egl_result_t;
 
 #define EGL_RESULT(x) egl_result_str_get((x))
 #define EGL_ASSERT_CHECK(x) if(!(x)) { return EGL_ASSERT_FAIL; }

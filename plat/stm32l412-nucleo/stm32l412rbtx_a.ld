@@ -1,0 +1,4 @@
+MEMORY
+{
+    ROM(rx): ORIGIN = 0x08010000, LENGTH = 32K
+}
