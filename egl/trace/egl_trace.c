@@ -11,6 +11,7 @@ static const char *m_level_str[] =
 {
     "DEBUG",
     "INFO",
+    "WARN",
     "ERROR",
     "FAIL"
 };

@@ -74,7 +74,16 @@ int main(void)
         EGL_RESULT_FATAL();
     }
 
-    EGL_TRACE_INFO("Welcome from %s bootloader", egl_plat_info(PLATFORM));
+    egl_plat_info_t *info = egl_plat_info(PLATFORM);
+    if(info != NULL)
+    {
+        EGL_TRACE_INFO("Welcome from %s", info->name);
+    }
+    else
+    {
+        EGL_TRACE_WARN("No platform info found");
+    }
+
     result = egl_plat_boot(PLATFORM, PLAT_SLOT_A);
     EGL_TRACE_INFO("Exit from application. Result %d", EGL_RESULT(result));
 

@@ -72,9 +72,9 @@ static egl_result_t shutdown(void)
     return EGL_SUCCESS;
 }
 
-static char *info(void)
+static egl_plat_info_t *info(void)
 {
-    return "NUCLEO64 (STM32L412)";
+    return plat_info_inst_get();
 }
 
 static egl_platform_t platform_inst =

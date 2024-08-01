@@ -1,0 +1,20 @@
+#include "egl_lib.h"
+
+static const egl_plat_info_t plat_info_inst =
+{
+    .size             = 0, /* The value will be written directly to binary */
+    .checksum         = 0, /* The value will be written directly to binary */
+    .name             = "@CMAKE_PROJECT_NAME@",
+    .buildtime        = "@PLAT_BUILD_TIME@",
+    .version.major    = @CONFIG_APP_VERSION_MAJOR@,
+    .version.minor    = @CONFIG_APP_VERSION_MINOR@,
+    .version.revision = @CONFIG_APP_VERSION_REVISION@,
+    .version.sufix    = "@CONFIG_APP_VERSION_SUFIX@",
+    .git.branch       = "@PLAT_GIT_BRANCH@",
+    .git.commit       = "@PLAT_GIT_HASH@"
+};
+
+egl_plat_info_t *plat_info_inst_get(void)
+{
+    return (egl_plat_info_t *)&plat_info_inst;
+}

@@ -8,6 +8,7 @@ typedef enum
 {
     EGL_TRACE_LEVEL_DEBUG,
     EGL_TRACE_LEVEL_INFO,
+    EGL_TRACE_LEVEL_WARN,
     EGL_TRACE_LEVEL_ERROR,
     EGL_TRACE_LEVEL_FAIL,
     EGL_TRACE_LEVEL_LAST
@@ -23,6 +24,7 @@ typedef struct
 #if CONFIG_EGL_TRACE_ENABLED
 #define EGL_TRACE_DEBUG(fmt, ...) egl_trace(egl_trace_default_get(), EGL_TRACE_LEVEL_DEBUG, EGL_MODULE_NAME, fmt, ##__VA_ARGS__)
 #define EGL_TRACE_INFO(fmt, ...)  egl_trace(egl_trace_default_get(), EGL_TRACE_LEVEL_INFO,  EGL_MODULE_NAME, fmt, ##__VA_ARGS__)
+#define EGL_TRACE_WARN(fmt, ...)  egl_trace(egl_trace_default_get(), EGL_TRACE_LEVEL_WARN,  EGL_MODULE_NAME, fmt, ##__VA_ARGS__)
 #define EGL_TRACE_ERROR(fmt, ...) egl_trace(egl_trace_default_get(), EGL_TRACE_LEVEL_ERROR, EGL_MODULE_NAME, fmt, ##__VA_ARGS__)
 #define EGL_TRACE_FAIL(fmt, ...)  egl_trace(egl_trace_default_get(), EGL_TRACE_LEVEL_FAIL,  EGL_MODULE_NAME, fmt, ##__VA_ARGS__)
 
@@ -33,6 +35,7 @@ egl_trace_t *egl_trace_default_get(void);
 #else
 #define EGL_TRACE_DEBUG(fmt, ...)
 #define EGL_TRACE_INFO(fmt, ...)
+#define EFL_TRACE_WARN(fmt, ...)
 #define EGL_TRACE_ERROR(fmt, ...)
 #define EGL_TRACE_FAIL(fmt, ...)
 

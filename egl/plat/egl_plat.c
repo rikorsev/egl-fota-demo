@@ -43,7 +43,7 @@ egl_result_t egl_plat_shutdown(egl_platform_t *plat)
     return plat->shutdown();
 }
 
-char *egl_plat_info(egl_platform_t *plat)
+egl_plat_info_t *egl_plat_info(egl_platform_t *plat)
 {
     if(plat == NULL || plat->info == NULL)
     {
