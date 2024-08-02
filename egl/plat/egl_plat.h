@@ -5,6 +5,8 @@
 
 #include "egl_result.h"
 
+#pragma pack(push, 4)
+
 typedef struct
 {
     uint8_t major;
@@ -37,8 +39,11 @@ typedef struct
     egl_result_t    (*reboot)(void);
     egl_result_t    (*shutdown)(void);
     egl_plat_info_t *(*info)(void);
+    egl_plat_info_t *(*slot_info)(unsigned int slot_idx);
     uint32_t        (*clock)(void);
 }egl_platform_t;
+
+#pragma pack(pop)
 
 egl_result_t egl_plat_init(egl_platform_t *plat);
 egl_result_t egl_plat_sleep(egl_platform_t *plat, uint32_t delay);
@@ -46,6 +51,7 @@ egl_result_t egl_plat_boot(egl_platform_t *plat, unsigned int slot_idx);
 egl_result_t egl_plat_reboot(egl_platform_t *plat);
 egl_result_t egl_plat_shutdown(egl_platform_t *plat);
 egl_plat_info_t *egl_plat_info(egl_platform_t *plat);
+egl_plat_info_t *egl_plat_slot_info(egl_platform_t *plat, unsigned int slot_idx);
 uint32_t egl_plat_clock(egl_platform_t *plat);
 
 #endif

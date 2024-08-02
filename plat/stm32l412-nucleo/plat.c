@@ -15,38 +15,53 @@ static egl_result_t init(void)
 
 static egl_result_t boot(unsigned int slot_idx)
 {
-    static const uint32_t slot_table[] = 
+    if(slot_idx == PLAT_SLOT_BOOT)
     {
-        0x08000000,
-        0x08010000,
-        0x08020000
-    };
-
-    if(slot_idx >= sizeof(slot_table)/sizeof(slot_table[0]))
-    {
-        return EGL_OUT_OF_BOUNDARY;
+        return EGL_INVALID_PARAM;
     }
 
-    const uint32_t app_start = slot_table[slot_idx];
+    const uint32_t slot_addr = plat_info_slot_addr_get(slot_idx);
+
+    if(slot_addr == 0)
+    {
+        return EGL_FAIL;
+    }
 
     /* Disable interrupts */
     __disable_irq();
 
     /* Set the vector table address */
-    SCB->VTOR = (volatile uint32_t)app_start;
+    SCB->VTOR = (volatile uint32_t)(slot_addr + CONFIG_PLAT_INFO_SECTION_SIZE);
 
     /* Set the main stack pointer to the application stack pointer */
-    uint32_t app_stack = *(volatile uint32_t*)app_start;
+    uint32_t app_stack = *(volatile uint32_t*)(slot_addr + CONFIG_PLAT_INFO_SECTION_SIZE);
     __set_MSP(app_stack);
 
     /* Get the application's reset handler address */
-    uint32_t app_entry = *(volatile uint32_t*)(app_start + 4);
+    uint32_t app_entry = *(volatile uint32_t*)(slot_addr + CONFIG_PLAT_INFO_SECTION_SIZE + 4);
     void (*app_reset_handler)(void) = (void (*)(void))app_entry;
 
     /* Start the application */
     app_reset_handler();
 
     return EGL_SUCCESS;
+}
+
+static egl_plat_info_t *slot_info(unsigned int slot_idx)
+{
+    if(slot_idx == PLAT_SLOT_BOOT)
+    {
+        return NULL;
+    }
+
+    const uint32_t slot_addr = plat_info_slot_addr_get(slot_idx);
+
+    if(slot_addr == 0)
+    {
+        return NULL;
+    }
+
+    return (egl_plat_info_t *)slot_addr;
 }
 
 static egl_result_t sleep(uint32_t delay)
@@ -79,13 +94,14 @@ static egl_plat_info_t *info(void)
 
 static egl_platform_t platform_inst =
 {
-    .init     = init,
-    .boot     = boot,
-    .reboot   = reboot,
-    .sleep    = sleep,
-    .shutdown = shutdown,
-    .info     = info,
-    .clock    = clock
+    .init      = init,
+    .boot      = boot,
+    .reboot    = reboot,
+    .sleep     = sleep,
+    .shutdown  = shutdown,
+    .info      = info,
+    .slot_info = slot_info,
+    .clock     = clock
 };
 
 egl_platform_t *platform_get(void)

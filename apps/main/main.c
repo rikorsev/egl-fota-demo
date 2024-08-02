@@ -65,28 +65,6 @@ static void loop(void)
     blink();
 }
 
-static void info(void)
-{
-    egl_plat_info_t *info = egl_plat_info(PLATFORM);
-    if(info != NULL)
-    {
-        EGL_TRACE_INFO("Application: %s (v%d.%d.%d%s)", info->name,
-                                                      info->version.major,
-                                                      info->version.minor,
-                                                      info->version.revision,
-                                                      info->version.sufix);
-        EGL_TRACE_INFO("Buildtime:   %s", info->buildtime);
-        EGL_TRACE_INFO("Branch:      %s", info->git.branch);
-        EGL_TRACE_INFO("Commit:      %s", info->git.commit);
-        EGL_TRACE_INFO("Size:        %u", info->size);
-        EGL_TRACE_INFO("Checksum:    %u", info->checksum);
-    }
-    else
-    {
-        EGL_TRACE_WARN("No platform info found");
-    }
-}
-
 int main(void)
 {
     egl_result_t result = init();
@@ -95,8 +73,6 @@ int main(void)
         EGL_TRACE_FAIL("Fatal error");
         EGL_RESULT_FATAL();
     }
-
-    info();
 
     while(1)
     {

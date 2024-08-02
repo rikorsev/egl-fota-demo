@@ -1,6 +1,6 @@
 #include "egl_lib.h"
 
-static const egl_plat_info_t plat_info_inst =
+__attribute__((section(".info"))) static const egl_plat_info_t plat_info_inst =
 {
     .size             = 0, /* The value will be written directly to binary */
     .checksum         = 0, /* The value will be written directly to binary */
@@ -14,7 +14,24 @@ static const egl_plat_info_t plat_info_inst =
     .git.commit       = "@PLAT_GIT_HASH@"
 };
 
-egl_plat_info_t *plat_info_inst_get(void)
+const egl_plat_info_t *plat_info_inst_get(void)
 {
-    return (egl_plat_info_t *)&plat_info_inst;
+    return &plat_info_inst;
+}
+
+__attribute__((section(".info"))) static const  uint32_t plat_info_slot_table[] = 
+{
+    @CONFIG_PLAT_SLOT_BOOT_ADDR@,
+    @CONFIG_PLAT_SLOT_A_ADDR@,
+    @CONFIG_PLAT_SLOT_B_ADDR@,
+};
+
+const uint32_t plat_info_slot_addr_get(unsigned int slot_idx)
+{
+    if(slot_idx >= sizeof(plat_info_slot_table)/sizeof(plat_info_slot_table[0]))
+    {
+        return 0;
+    }
+
+    return plat_info_slot_table[slot_idx];
 }
