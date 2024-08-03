@@ -23,6 +23,7 @@ typedef struct
 
 typedef struct
 {
+    uint32_t magic;
     uint32_t size;
     uint32_t checksum;
     char name[CONFIG_EGL_PLAT_INFO_NAME_BUFF_SIZE];

@@ -1,4 +1,6 @@
 CMD=$1
+
+# TBD: Workaround. Shall be reimplemented
 TARGET_PLATFORM=$3
 
 shift 1

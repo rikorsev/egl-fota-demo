@@ -61,6 +61,12 @@ static egl_plat_info_t *slot_info(unsigned int slot_idx)
         return NULL;
     }
 
+    /* Check magic value */
+    if(((egl_plat_info_t *)slot_addr)->magic != CONFIG_PLAT_INFO_MAGIC_VALUE)
+    {
+        return NULL;
+    }
+
     return (egl_plat_info_t *)slot_addr;
 }
 
@@ -89,7 +95,14 @@ static egl_result_t shutdown(void)
 
 static egl_plat_info_t *info(void)
 {
-    return plat_info_inst_get();
+    egl_plat_info_t *info = plat_info_inst_get();
+
+    if(info->magic != CONFIG_PLAT_INFO_MAGIC_VALUE)
+    {
+        return NULL;
+    }
+
+    return info;
 }
 
 static egl_platform_t platform_inst =

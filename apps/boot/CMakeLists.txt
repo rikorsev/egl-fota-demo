@@ -20,7 +20,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE egl_lib)
 
 # Add platform
 add_subdirectory(${ROOT_DIR}/plat/${TARGET_PLATFORM} ${CMAKE_BINARY_DIR}/plat/${TARGET_PLATFORM})
-
-# Create .bin
-add_custom_target(${PROJECT_NAME}.${TARGET_SLOT}.bin ALL DEPENDS ${PROJECT_NAME}
-    COMMAND ${CMAKE_OBJCOPY} -v -O binary ${PROJECT_NAME}.${TARGET_SLOT}.elf ${PROJECT_NAME}.${TARGET_SLOT}.bin)

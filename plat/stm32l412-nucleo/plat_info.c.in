@@ -2,6 +2,7 @@
 
 __attribute__((section(".info"))) static const egl_plat_info_t plat_info_inst =
 {
+    .magic            = @CONFIG_PLAT_INFO_MAGIC_VALUE@,
     .size             = 0, /* The value will be written directly to binary */
     .checksum         = 0, /* The value will be written directly to binary */
     .name             = "@CMAKE_PROJECT_NAME@",

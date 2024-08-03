@@ -10,5 +10,7 @@ add_subdirectory(plat)
 add_subdirectory(result)
 add_subdirectory(timer)
 add_subdirectory(trace)
+add_subdirectory(crc)
+add_subdirectory(block)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
