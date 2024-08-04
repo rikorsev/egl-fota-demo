@@ -1,6 +1,8 @@
 #ifndef EGL_RESULT_H
 #define EGL_RESULT_H
 
+#include <assert.h>
+
 typedef enum
 {
     EGL_SUCCESS,

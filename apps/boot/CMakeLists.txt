@@ -14,9 +14,13 @@ include(app_config.cmake)
 include(egl_config.cmake)
 include(${ROOT_DIR}/plat/${TARGET_PLATFORM}/plat.cmake)
 
+add_subdirectory(radio)
+
 # Add EGL library
 add_subdirectory(${ROOT_DIR}/egl ${CMAKE_BINARY_DIR}/egl_lib)
 target_link_libraries(${PROJECT_NAME} PRIVATE egl_lib)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE m)
 
 # Add platform
 add_subdirectory(${ROOT_DIR}/plat/${TARGET_PLATFORM} ${CMAKE_BINARY_DIR}/plat/${TARGET_PLATFORM})

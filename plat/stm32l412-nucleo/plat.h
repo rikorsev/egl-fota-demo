@@ -6,6 +6,7 @@
 #include "plat_info.h"
 #include "plat_crc.h" 
 #include "plat_flash.h"
+#include "plat_radio.h"
 #include "pio_led_green.h"
 #include "iface_trace.h"
 #include "timer_sys.h"

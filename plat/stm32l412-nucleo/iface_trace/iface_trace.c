@@ -54,11 +54,11 @@ static size_t write(void *data, size_t len)
 {
     for(uint32_t i = 0; i < len; i++)
     {
-        LPUART1->TDR = ((uint8_t *)data)[i];
         while(!(LPUART1->ISR & USART_ISR_TXE))
         {
             /* Wait for character transmission */
         }
+        LPUART1->TDR = ((uint8_t *)data)[i];
     }
 
     return len;
