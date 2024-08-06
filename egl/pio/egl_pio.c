@@ -47,6 +47,15 @@ egl_result_t egl_pio_toggle(egl_pio_t *pio)
     return state;
 }
 
+egl_result_t egl_pio_callback_set(egl_pio_t *pio, egl_pio_callback_t callback)
+{
+    EGL_ASSERT_CHECK(pio);
+
+    pio->callback = callback;
+
+    return EGL_SUCCESS;
+}
+
 egl_result_t egl_pio_deinit(egl_pio_t *pio)
 {
     EGL_ASSERT_CHECK(pio);

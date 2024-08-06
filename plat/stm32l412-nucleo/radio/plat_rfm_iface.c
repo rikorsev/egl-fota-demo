@@ -125,13 +125,13 @@ static size_t write(void *data, size_t len)
         {
             /* Wait for data transmission */
         }
-        *(uint8_t*)&SPI2->DR = ((uint8_t *)data)[i];
+        *(volatile uint8_t*)&SPI2->DR = ((uint8_t *)data)[i];
 
         while(!(SPI2->SR & SPI_SR_RXNE))
         {
             /* Wait for data reception */
         }
-        dummy = *(uint8_t*)&SPI2->DR;
+        dummy = *(volatile uint8_t*)&SPI2->DR;
     }
 
     return len;
@@ -147,14 +147,14 @@ static size_t read(void *data, size_t len)
         {
             /* Wait for data transmission */
         }
-        *(uint8_t*)&SPI2->DR = 0; /* Send dummy data */
+        *(volatile uint8_t*)&SPI2->DR = 0; /* Send dummy data */
 
         while(!(SPI2->SR & SPI_SR_RXNE))
         {
             /* Wait for data reception */
         }
 
-        data_ptr[i] = *(uint8_t*)&SPI2->DR;
+        data_ptr[i] = *(volatile uint8_t*)&SPI2->DR;
     }
 
     return len;

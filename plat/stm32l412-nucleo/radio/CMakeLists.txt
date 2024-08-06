@@ -9,6 +9,8 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_dio5_pin.c
         ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_tx_led_pin.c
         ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_rx_led_pin.c
+        ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_sw1_pin.c
+        ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_sw2_pin.c
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_iface.h
         ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_nss_pin.h
@@ -19,6 +21,8 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_dio5_pin.h
         ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_tx_led_pin.h
         ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_rx_led_pin.h
+        ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_sw1_pin.h
+        ${CMAKE_CURRENT_LIST_DIR}/plat_rfm_sw2_pin.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})

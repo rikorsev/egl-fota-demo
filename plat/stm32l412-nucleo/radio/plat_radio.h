@@ -7,3 +7,5 @@
 #include "plat_rfm_dio5_pin.h"
 #include "plat_rfm_tx_led_pin.h"
 #include "plat_rfm_rx_led_pin.h"
+#include "plat_rfm_sw1_pin.h"
+#include "plat_rfm_sw2_pin.h"
