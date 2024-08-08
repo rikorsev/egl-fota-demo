@@ -23,7 +23,7 @@ while getopts "p:a:s:v" opt; do
             TARGET_APP=${OPTARG}
             ;;
         s)
-            TARGET_SLOT={OTPARG}
+            TARGET_SLOT=${OPTARG}
             ;;
         v)
             echo "Verbose mode enabled"

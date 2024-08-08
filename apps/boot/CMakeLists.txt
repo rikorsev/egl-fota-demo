@@ -8,6 +8,9 @@ set(CMAKE_EXECUTABLE_SUFFIX ".${TARGET_SLOT}.elf")
 target_sources(${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/main.c
+        ${CMAKE_CURRENT_LIST_DIR}/fota.c
+    PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}/fota.h
 )
 
 include(app_config.cmake)

@@ -1,17 +1,12 @@
 #include <assert.h>
-#include <string.h>
 
 #include "egl_lib.h"
 #include "plat.h"
-#include "radio.h"
-#include "sx1232.h"
+#include "fota.h"
 
 #define EGL_MODULE_NAME "boot"
 #define BOOT_CRC_POLY ((uint32_t)0x4C11DB7)
 #define BOOT_CRC_INIT ((uint32_t)0xFFFFFFFF)
-#define BOOT_RADIO_MESSAGE "ping"
-
-static tRadioDriver *radio;
 
 #if CONFIG_EGL_TRACE_ENABLED
 static egl_result_t init_trace(void)
@@ -34,21 +29,6 @@ static egl_result_t init_trace(void)
     return result;
 }
 #endif
-
-static egl_result_t radio_init(void)
-{
-    radio = RadioDriverInit();
-
-    if(radio == NULL)
-    {
-        return EGL_FAIL;
-    }
-
-    radio->Init();
-    radio->StartRx();
-
-    return EGL_SUCCESS;
-}
 
 static egl_result_t init(void)
 {
@@ -79,61 +59,19 @@ static egl_result_t init(void)
         return result;
     }
 
-    result = radio_init();
+    result = fota_init();
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to init radio. Result %s", EGL_RESULT(result));
+        EGL_TRACE_ERROR("Fail to init fota module. Result %s", EGL_RESULT(result));
         return result;
     }
 
     return result;
 }
 
-static void blink(egl_pio_t *pio)
-{
-    egl_pio_set(pio, true);
-    egl_plat_sleep(PLATFORM, 50);
-    egl_pio_set(pio, false);
-}
-
-static void radio_loop(void)
-{
-    char data[16] = {0};
-    uint16_t size;
-
-    uint32_t curr_state = radio->Process();
-    switch(curr_state)
-    {
-        case RF_RX_TIMEOUT:
-            size = sizeof(BOOT_RADIO_MESSAGE);
-            strncpy(data, BOOT_RADIO_MESSAGE, size);
-            radio->SetTxPacket(data, sizeof(data));
-            break;
-
-        case RF_RX_DONE:
-            size = sizeof(data);
-            radio->GetRxPacket(data, &size);
-
-            if(size > 0)
-            {
-                EGL_TRACE_INFO("Received: %s", data);
-                blink(PLAT_RFM_RX_LED);
-            }
-            break;
-
-        case RF_TX_DONE:
-            radio->StartRx();
-            blink(PLAT_RFM_TX_LED);
-            break;
-
-        default:
-            break;
-    }
-}
-
 static void loop(void)
 {
-    radio_loop();
+
 }
 
 static void print_info(egl_plat_info_t *info)
@@ -251,6 +189,7 @@ static egl_result_t validate(egl_plat_info_t *info)
 
 int main(void)
 {
+    egl_plat_info_t *slot_info;
     egl_result_t result = init();
     if(result != EGL_SUCCESS)
     {
@@ -261,20 +200,32 @@ int main(void)
     EGL_TRACE_INFO("Bootloader information:");
     print_info(egl_plat_info(PLATFORM));
 
-    /* Validate the bonary */
-    egl_plat_info_t *app_info = egl_plat_slot_info(PLATFORM, PLAT_SLOT_A);
-    result = validate(app_info);
+    fota_manager();
+
+    /* Validate the slot A */
+    slot_info = egl_plat_slot_info(PLATFORM, PLAT_SLOT_A);
+    result = validate(slot_info);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_FAIL("Application validation fail. Result: %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
+        EGL_TRACE_WARN("Slot A validation fail. Result: %s", EGL_RESULT(result));
     }
 
-    EGL_TRACE_INFO("Application to boot information:");
-    print_info(app_info);
+    EGL_TRACE_INFO("Slot A to boot information:");
+    print_info(slot_info);
 
-    result = egl_plat_boot(PLATFORM, PLAT_SLOT_A);
-    EGL_TRACE_INFO("Exit from application. Result %d", EGL_RESULT(result));
+    /* Validate the slot B */
+    slot_info = egl_plat_slot_info(PLATFORM, PLAT_SLOT_B);
+    result = validate(slot_info);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_TRACE_WARN("Slot B validation fail. Result: %s", EGL_RESULT(result));
+    }
+
+    EGL_TRACE_INFO("Slot B to boot information:");
+    print_info(slot_info);
+
+    // result = egl_plat_boot(PLATFORM, PLAT_SLOT_A);
+    // EGL_TRACE_INFO("Exit from application. Result %d", EGL_RESULT(result));
 
     while(1)
     {

@@ -9,7 +9,7 @@ while getopts "p:a:s:" opt; do
             TARGET_APP=${OPTARG}
             ;;
         s)
-            TARGET_SLOT=${OTPARG}
+            TARGET_SLOT=${OPTARG}
             ;;
     esac
 done
@@ -22,7 +22,7 @@ fi
 if [[ $TARGET_SLOT == "a" ]]; then
     TARGET_ADDR=0x08010000
 elif [[ $TARGET_SLOT == "b" ]]; then
-    TARGET_ADDR=0x08020000
+    TARGET_ADDR=0x08018000
 elif [[ $TARGET_SLOT == "boot" ]]; then
     TARGET_ADDR=0x08000000
 else

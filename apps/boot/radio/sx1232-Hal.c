@@ -8,16 +8,6 @@
 
 #define EGL_MODULE_NAME "radio-hal"
 
-static void sw1_callback(void *data)
-{
-    EGL_TRACE_INFO("SW1 pressed");
-}
-
-static void sw2_callback(void *data)
-{
-    EGL_TRACE_INFO("SW2 pressed");
-}
-
 void SX1232InitIo( void )
 {
     egl_result_t result;
@@ -68,48 +58,6 @@ void SX1232InitIo( void )
     if(result != EGL_SUCCESS)
     {
         EGL_TRACE_ERROR("Fail to init rfm dio5 pin. Result %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
-    }
-
-    result = egl_pio_init(PLAT_RFM_TX_LED);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_TRACE_ERROR("Fail to init rfm tx led pin. Result %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
-    }
-
-    result = egl_pio_init(PLAT_RFM_RX_LED);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_TRACE_ERROR("Fail to init rfm rx led pin. Result %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
-    }
-
-    result = egl_pio_init(PLAT_RFM_SW1);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_TRACE_ERROR("Fail to init sw1 pin. Result %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
-    }
-
-    result = egl_pio_callback_set(PLAT_RFM_SW1, sw1_callback);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_TRACE_ERROR("Fail to set callback for sw1 pin. Result %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
-    }
-
-    result = egl_pio_init(PLAT_RFM_SW2);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_TRACE_ERROR("Fail to init sw2 pin. Result %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
-    }
-
-    result = egl_pio_callback_set(PLAT_RFM_SW2, sw2_callback);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_TRACE_ERROR("Fail to set callback for sw2 pin. Result %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
