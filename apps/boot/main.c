@@ -95,38 +95,6 @@ static void print_info(egl_plat_info_t *info)
     EGL_TRACE_INFO(" - Checksum:    %u (0x%08x)", info->checksum, info->checksum);
 }
 
-#if 0
-static void crc_test(void)
-{
-    uint32_t result;
-    uint32_t data_a[] = { 0x11223344, 0x55667788, 0xAABBCCDD, 0xEEFF0011 };
-    uint32_t data_b[] = { 0x1100FFEE, 0xDDCCBBAA, 0x88776655, 0x44332211 };
-
-    result = egl_crc32_calc(PLAT_CRC, data_a, sizeof(data_a)/sizeof(data_a[0]));
-    result = egl_crc32_calc(PLAT_CRC, data_b, sizeof(data_b)/sizeof(data_b[0]));
-
-    EGL_TRACE_INFO("CRC: %u (0x%08x)", result, result);
-}
-#endif
-
-#if 0
-static void print_block(uint32_t addr, uint8_t buffer)
-{
-    for(int i = 0; i < (sizeof(buffer)/sizeof(uint32_t)); i+=8)
-    {
-        EGL_TRACE_INFO("%08x: %08x %08x %08x %08x %08x %08x %08x %08x", addr + i * sizeof(uint32_t),
-                                                                        ((uint32_t *)buffer)[i],
-                                                                        ((uint32_t *)buffer)[i + 1],
-                                                                        ((uint32_t *)buffer)[i + 2],
-                                                                        ((uint32_t *)buffer)[i + 3],
-                                                                        ((uint32_t *)buffer)[i + 4],
-                                                                        ((uint32_t *)buffer)[i + 5],
-                                                                        ((uint32_t *)buffer)[i + 6],
-                                                                        ((uint32_t *)buffer)[i + 7]);
-    }
-}
-#endif
-
 static egl_result_t validate(egl_plat_info_t *info)
 {
     egl_result_t result;
