@@ -15,6 +15,7 @@ static char *egl_result_str[] =
     "EGL_INVALID_PARAM",
     "EGL_INVALID_STATE",
     "EGL_ASSERT_FAIL",
+    "EGL_TIMEOUT",
 };
 
 char *egl_result_str_get(egl_result_t result)

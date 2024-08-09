@@ -9,8 +9,10 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/main.c
         ${CMAKE_CURRENT_LIST_DIR}/fota.c
+        ${CMAKE_CURRENT_LIST_DIR}/boot.c
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/fota.h
+        ${CMAKE_CURRENT_LIST_DIR}/boot.h
 )
 
 include(app_config.cmake)

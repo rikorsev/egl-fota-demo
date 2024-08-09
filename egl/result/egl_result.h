@@ -16,6 +16,7 @@ typedef enum
     EGL_INVALID_PARAM,
     EGL_INVALID_STATE,
     EGL_ASSERT_FAIL,
+    EGL_TIMEOUT,
 
     EGL_LAST
 }egl_result_t;
