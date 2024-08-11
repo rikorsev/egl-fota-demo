@@ -5,6 +5,7 @@
 #include "radio.h"
 #include "sx1232.h"
 #include "sx1232-Hal.h"
+#include "sx1232-Misc.h"
 #include "boot_mgr.h"
 
 #define EGL_MODULE_NAME "fota"
@@ -143,6 +144,9 @@ egl_result_t fota_mgr_init(void)
     reg &= RF_PACKETCONFIG1_DCFREE_MASK;
     reg |= RF_PACKETCONFIG1_DCFREE_MANCHESTER;
     SX1232Write(REG_PACKETCONFIG1, reg);
+
+    /* Set bitrate to 115200 */
+    SX1232SetBitrate(115200);
 
     return EGL_SUCCESS;
 }
@@ -419,7 +423,6 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
         {
             case RF_TX_DONE:
                 blink(PLAT_RFM_TX_LED);
-                EGL_TRACE_INFO("Req done: page %u, offset %u", curr_page, curr_offset);
                 radio->StartRx();
                 break;
 

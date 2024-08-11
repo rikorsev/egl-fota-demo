@@ -34,7 +34,7 @@
 tFskSettings FskSettings = 
 {
     870000000,      // RFFrequency
-    9600,           // Bitrate
+    9600,         // Bitrate
     50000,          // Fdev
     20,             // Power
     100000,         // RxBw

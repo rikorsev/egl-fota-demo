@@ -4,7 +4,6 @@ set(CMAKE_ASM_FLAGS "\
     -mthumb \
     -x \
     assembler-with-cpp \
-    -ggdb \
 ")
 
 # C++ flags
@@ -20,10 +19,9 @@ set(CMAKE_C_FLAGS " \
     -fdata-sections \
     -ffreestanding \
     -fno-builtin \
-    -funwind-tables \
+    -fno-exceptions \
     -mapcs \
     -std=gnu99 \
-    -ggdb \
 ")
 
 set(CMAKE_EXE_LINKER_FLAGS "\
@@ -36,9 +34,9 @@ set(CMAKE_EXE_LINKER_FLAGS "\
     -fdata-sections \
     -ffreestanding \
     -fno-builtin \
+    -fno-exceptions \
     -mthumb \
     -mapcs \
-    -ggdb \
     -Xlinker --gc-sections \
     -Xlinker -static \
     -Xlinker -z \

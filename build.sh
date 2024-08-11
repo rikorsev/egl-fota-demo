@@ -4,6 +4,7 @@ TARGET_PLATFORM="unknown"
 TARGET_APP="main"
 TARGET_SLOT="a"
 VERBOSE=""
+BUILD_TYPE="release"
 
 # Script command parameters
 usage() {
@@ -14,10 +15,13 @@ usage() {
     [ -v VERBOSE ]"
 }
 
-while getopts "p:a:s:v" opt; do
+while getopts "p:t:a:s:v" opt; do
     case "$opt" in
         p)
             TARGET_PLATFORM=${OPTARG}
+            ;;
+        t)
+            BUILD_TYPE=${OPTARG}
             ;;
         a)
             TARGET_APP=${OPTARG}
@@ -46,7 +50,7 @@ PROJ_DIR=${ROOT_DIR}/apps/${TARGET_APP}
 
 # Configure
 cmake -DCMAKE_TOOLCHAIN_FILE="${ROOT_DIR}/plat/${TARGET_PLATFORM}/toolchain.cmake" \
-      -DCMAKE_BUILD_TYPE="debug" \
+      -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
       -DROOT_DIR=${ROOT_DIR} \
       -DTARGET_PLATFORM=${TARGET_PLATFORM} \
       -DTARGET_SLOT=${TARGET_SLOT} \
