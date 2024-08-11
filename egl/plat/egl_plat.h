@@ -30,6 +30,7 @@ typedef struct
     char buildtime[CONFIG_EGL_PLAT_INFO_BUILDTIME_BUFF_SIZE];
     egl_plat_version_t version;
     egl_git_t git;
+    uint32_t boot_number;
 }egl_plat_info_t;
 
 typedef struct

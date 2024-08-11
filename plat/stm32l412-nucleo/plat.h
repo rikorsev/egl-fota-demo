@@ -12,6 +12,7 @@
 #include "timer_sys.h"
 
 #define PLATFORM platform_get()
+#define PLAT_NUM_SLOTS (3U)
 
 enum
 {

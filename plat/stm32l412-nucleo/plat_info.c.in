@@ -12,7 +12,8 @@ __attribute__((section(".info"))) static const egl_plat_info_t plat_info_inst =
     .version.revision = @CONFIG_APP_VERSION_REVISION@,
     .version.sufix    = "@CONFIG_APP_VERSION_SUFIX@",
     .git.branch       = "@PLAT_GIT_BRANCH@",
-    .git.commit       = "@PLAT_GIT_HASH@"
+    .git.commit       = "@PLAT_GIT_HASH@",
+    .boot_number      = 0
 };
 
 const egl_plat_info_t *plat_info_inst_get(void)

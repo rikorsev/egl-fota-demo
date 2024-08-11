@@ -5,6 +5,7 @@
 #include "radio.h"
 #include "sx1232.h"
 #include "sx1232-Hal.h"
+#include "boot_mgr.h"
 
 #define EGL_MODULE_NAME "fota"
 
@@ -18,7 +19,7 @@
 #define FOTA_UPDATE_TIMEOUT_MS        (600000U)    /* 10 minutes */
 #define FOTA_END_TIMEOUT_MS           (5000U)      /* 5 seconds */
 #define FOTA_ACTION_TIMEOUT_MS        (240000U)    /* 5 minutes */
-#define FOTA_PING_TIMEOUT_MS          (5000U)
+#define FOTA_PING_TIMEOUT_MS          (5000U)      /* 5 seconds */
 #define FOTA_RX_TIMEOUT_COUNT_LIMIT   (100u)
 
 typedef enum
@@ -78,7 +79,7 @@ static void fota_sw2_callback(void *data)
     update_slot_a = true;
 }
 
-egl_result_t fota_init(void)
+egl_result_t fota_mgr_init(void)
 {
     egl_result_t result;
 
@@ -475,6 +476,14 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
 
                     uint32_t addr = slot_start_addr + curr_page * PLAT_FLASH_PAGE_SIZE;
 
+                    /* Increment update number */
+                    if(curr_page == 0)
+                    {
+                        slot_info = (egl_plat_info_t *)page_buff;
+
+                        slot_info->boot_number = boot_mgr_highest_boot_number_get() + 1;
+                    }
+
                     /* Write page on flash */
                     egl_result_t result = egl_block_write(PLAT_FLASH, addr, page_buff);
                     if(result != EGL_SUCCESS)
@@ -499,6 +508,14 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
                     if(curr_page >= slot_info->size / PLAT_FLASH_PAGE_SIZE + 1)
                     {
                         EGL_TRACE_INFO("Firmware update complete");
+
+                        result = boot_mgr_init();
+                        if(result != EGL_SUCCESS)
+                        {
+                            EGL_TRACE_WARN("Fail to reinit boot manager. Result: %s",
+                                                                                EGL_RESULT(result));
+                        }
+
                         return FOTA_STATE_END;
                     }
                 }
@@ -581,6 +598,7 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
     uint8_t page_buff[PLAT_FLASH_PAGE_SIZE];
     uint32_t curr_page_num = 0xFFFFFFFF;
     uint32_t timeout = egl_timer_get(SYSTIMER) + FOTA_UPDATE_TIMEOUT_MS;
+    egl_result_t result;
 
     if(state == FOTA_STATE_SEND_FIRMWARE_SLOT_A)
     {
@@ -599,7 +617,14 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
     egl_plat_info_t *slot_info = egl_plat_slot_info(PLATFORM, slot);
     if(slot_info == NULL)
     {
-        EGL_TRACE_ERROR("Firmware validation fail");
+        EGL_TRACE_ERROR("No slot info detected");
+        return FOTA_STATE_END;
+    }
+
+    result = boot_mgr_slot_validate(slot_info);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_TRACE_ERROR("Binary validation fail. Result: %s", EGL_RESULT(result));
         return FOTA_STATE_END;
     }
 
@@ -613,6 +638,7 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
             case RF_TX_DONE:
                 blink(PLAT_RFM_TX_LED);
                 EGL_TRACE_INFO("Sent: page %u, offset %u", req.page, req.offset);
+                /* No break here */
 
             case RF_TX_TIMEOUT:
             case RF_RX_TIMEOUT:
@@ -644,7 +670,7 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
                     {
                         uint32_t addr = slot_start_addr + req.page * PLAT_FLASH_PAGE_SIZE;
 
-                        egl_result_t result = egl_block_read(PLAT_FLASH, addr, page_buff);
+                        result = egl_block_read(PLAT_FLASH, addr, page_buff);
                         if(result != EGL_SUCCESS)
                         {
                             EGL_TRACE_ERROR("Fail to read flash page. Result: %s",
@@ -665,6 +691,10 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
                 {
                     radio->StartRx();
                 }
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -698,7 +728,7 @@ static fota_state_t fota_state_end_step(fota_state_t state)
     return FOTA_STATE_END;
 }
 
-void fota_manager(void)
+void fota_mgr_process(void)
 {
     static const char *state_srt[] =
     {

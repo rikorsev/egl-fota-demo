@@ -74,6 +74,13 @@ int main(void)
         EGL_RESULT_FATAL();
     }
 
+    egl_plat_info_t *info = egl_plat_info(PLATFORM);
+    EGL_TRACE_INFO("Application %s (%u.%u.%u%s) started", info->name,
+                                                            info->version.major,
+                                                            info->version.minor,
+                                                            info->version.revision,
+                                                            info->version.sufix);
+
     while(1)
     {
         loop();

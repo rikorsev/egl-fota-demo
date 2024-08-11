@@ -2,10 +2,10 @@
 
 #include "egl_lib.h"
 #include "plat.h"
-#include "fota.h"
-#include "boot.h"
+#include "fota_mgr.h"
+#include "boot_mgr.h"
 
-#define EGL_MODULE_NAME "loader"
+#define EGL_MODULE_NAME "boot_main"
 #define BOOT_CRC_POLY ((uint32_t)0x4C11DB7)
 #define BOOT_CRC_INIT ((uint32_t)0xFFFFFFFF)
 
@@ -60,45 +60,25 @@ static egl_result_t init(void)
         return result;
     }
 
-    result = fota_init();
+    result = fota_mgr_init();
     if(result != EGL_SUCCESS)
     {
         EGL_TRACE_ERROR("Fail to init fota module. Result %s", EGL_RESULT(result));
         return result;
     }
 
-    return result;
-}
-
-static void loop(void)
-{
-
-}
-
-static void print_info(egl_plat_info_t *info)
-{
-    if(info == NULL)
+    result = boot_mgr_init();
+    if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_WARN(" - No platform info found");
-
-        return;
+        EGL_TRACE_ERROR("Fail to init boot module. Result %s", EGL_RESULT(result));
+        return result;
     }
 
-    EGL_TRACE_INFO(" - Application: %s (v%d.%d.%d%s)", info->name,
-                                                    info->version.major,
-                                                    info->version.minor,
-                                                    info->version.revision,
-                                                    info->version.sufix);
-    EGL_TRACE_INFO(" - Buildtime:   %s", info->buildtime);
-    EGL_TRACE_INFO(" - Branch:      %s", info->git.branch);
-    EGL_TRACE_INFO(" - Commit:      %s", info->git.commit);
-    EGL_TRACE_INFO(" - Size:        %u", info->size);
-    EGL_TRACE_INFO(" - Checksum:    %u (0x%08x)", info->checksum, info->checksum);
+    return result;
 }
 
 int main(void)
 {
-    egl_plat_info_t *slot_info;
     egl_result_t result = init();
     if(result != EGL_SUCCESS)
     {
@@ -106,39 +86,15 @@ int main(void)
         EGL_RESULT_FATAL();
     }
 
-    EGL_TRACE_INFO("Bootloader information:");
-    print_info(egl_plat_info(PLATFORM));
+    fota_mgr_process();
+    boot_mgr_process();
 
-    fota_manager();
-
-    /* Validate the slot A */
-    slot_info = egl_plat_slot_info(PLATFORM, PLAT_SLOT_A);
-    result = boot_slot_validate(slot_info);
+    EGL_TRACE_INFO("No bootable image detected. Reboot...");
+    result = egl_plat_reboot(PLATFORM);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_WARN("Slot A validation fail. Result: %s", EGL_RESULT(result));
-    }
-
-    EGL_TRACE_INFO("Slot A to boot information:");
-    print_info(slot_info);
-
-    /* Validate the slot B */
-    slot_info = egl_plat_slot_info(PLATFORM, PLAT_SLOT_B);
-    result = boot_slot_validate(slot_info);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_TRACE_WARN("Slot B validation fail. Result: %s", EGL_RESULT(result));
-    }
-
-    EGL_TRACE_INFO("Slot B to boot information:");
-    print_info(slot_info);
-
-    // result = egl_plat_boot(PLATFORM, PLAT_SLOT_A);
-    // EGL_TRACE_INFO("Exit from application. Result %d", EGL_RESULT(result));
-
-    while(1)
-    {
-        loop();
+        EGL_TRACE_FAIL("Fail to reboot platform. Result: %s", EGL_RESULT(result));
+        EGL_RESULT_FATAL();
     }
 
     return 0;
