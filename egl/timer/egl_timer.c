@@ -26,14 +26,6 @@ uint32_t egl_timer_get(egl_timer_t *timer)
     return timer->get();
 }
 
-egl_result_t egl_timer_update(egl_timer_t *timer)
-{
-    EGL_ASSERT_CHECK(timer);
-    EGL_ASSERT_CHECK(timer->update);
-
-    return timer->update();
-}
-
 egl_result_t egl_timer_set(egl_timer_t *timer, uint32_t val)
 {
     EGL_ASSERT_CHECK(timer);
