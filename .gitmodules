@@ -1,0 +1,3 @@
+[submodule "egl"]
+	path = egl
+	url = https://github.com/rikorsev/embedded-generic-library

@@ -1,8 +1,0 @@
-#include "egl_result.h"
-#include "egl_interface.h"
-#include "egl_pio.h"
-#include "egl_plat.h"
-#include "egl_timer.h"
-#include "egl_trace.h"
-#include "egl_crc.h"
-#include "egl_block.h"
