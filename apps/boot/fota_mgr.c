@@ -388,7 +388,7 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
     uint32_t curr_page = 0;
     uint32_t curr_offset = 0;
     fota_data_packet_t data;
-    egl_plat_info_t *slot_info = NULL;
+    slot_info_t *slot_info = NULL;
     uint32_t timeout_cnt = 0;
 
     if(state == FOTA_STATE_GET_FIRMWARE_SLOT_A)
@@ -405,7 +405,8 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
     }
 
     /* Get initial address to flash */
-    uint32_t slot_start_addr = plat_info_slot_addr_get(slot);
+    /** @todo: Direct call of palt. Should be remade with egl call */
+    uint32_t slot_start_addr = slot_info_addr_get(slot);
     if(slot_start_addr == 0)
     {
         EGL_TRACE_ERROR("Fail to get slot address");
@@ -482,7 +483,7 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
                     /* Increment update number */
                     if(curr_page == 0)
                     {
-                        slot_info = (egl_plat_info_t *)page_buff;
+                        slot_info = (slot_info_t *)page_buff;
 
                         slot_info->boot_number = boot_mgr_highest_boot_number_get() + 1;
                     }
@@ -617,7 +618,7 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
         return FOTA_STATE_END;
     }
 
-    egl_plat_info_t *slot_info = egl_plat_slot_info(PLATFORM, slot);
+    slot_info_t *slot_info = egl_plat_slot_info(PLATFORM, slot);
     if(slot_info == NULL)
     {
         EGL_TRACE_ERROR("No slot info detected");

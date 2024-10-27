@@ -20,7 +20,7 @@ static egl_result_t boot(unsigned int slot_idx)
         return EGL_INVALID_PARAM;
     }
 
-    const uint32_t slot_addr = plat_info_slot_addr_get(slot_idx);
+    const uint32_t slot_addr = slot_info_addr_get(slot_idx);
 
     if(slot_addr == 0)
     {
@@ -31,14 +31,14 @@ static egl_result_t boot(unsigned int slot_idx)
     __disable_irq();
 
     /* Set the vector table address */
-    SCB->VTOR = (volatile uint32_t)(slot_addr + CONFIG_PLAT_INFO_SECTION_SIZE);
+    SCB->VTOR = (volatile uint32_t)(slot_addr + CONFIG_PLAT_SLOT_INFO_SECTION_SIZE);
 
     /* Set the main stack pointer to the application stack pointer */
-    uint32_t app_stack = *(volatile uint32_t*)(slot_addr + CONFIG_PLAT_INFO_SECTION_SIZE);
+    uint32_t app_stack = *(volatile uint32_t*)(slot_addr + CONFIG_PLAT_SLOT_INFO_SECTION_SIZE);
     __set_MSP(app_stack);
 
     /* Get the application's reset handler address */
-    uint32_t app_entry = *(volatile uint32_t*)(slot_addr + CONFIG_PLAT_INFO_SECTION_SIZE + 4);
+    uint32_t app_entry = *(volatile uint32_t*)(slot_addr + CONFIG_PLAT_SLOT_INFO_SECTION_SIZE + 4);
     void (*app_reset_handler)(void) = (void (*)(void))app_entry;
 
     /* Start the application */
@@ -47,14 +47,14 @@ static egl_result_t boot(unsigned int slot_idx)
     return EGL_SUCCESS;
 }
 
-static egl_plat_info_t *slot_info(unsigned int slot_idx)
+static void *slot_info(unsigned int slot_idx)
 {
     if(slot_idx == PLAT_SLOT_BOOT)
     {
         return NULL;
     }
 
-    const uint32_t slot_addr = plat_info_slot_addr_get(slot_idx);
+    const uint32_t slot_addr = slot_info_addr_get(slot_idx);
 
     if(slot_addr == 0)
     {
@@ -62,12 +62,12 @@ static egl_plat_info_t *slot_info(unsigned int slot_idx)
     }
 
     /* Check magic value */
-    if(((egl_plat_info_t *)slot_addr)->magic != CONFIG_PLAT_INFO_MAGIC_VALUE)
+    if(((slot_info_t *)slot_addr)->magic != CONFIG_PLAT_SLOT_INFO_MAGIC_VALUE)
     {
         return NULL;
     }
 
-    return (egl_plat_info_t *)slot_addr;
+    return (slot_info_t *)slot_addr;
 }
 
 static egl_result_t sleep(uint32_t delay)
@@ -93,11 +93,11 @@ static egl_result_t shutdown(void)
     return EGL_SUCCESS;
 }
 
-static egl_plat_info_t *info(void)
+static void *info(void)
 {
-    egl_plat_info_t *info = plat_info_inst_get();
+    slot_info_t *info = (slot_info_t *)slot_info_inst_get();
 
-    if(info->magic != CONFIG_PLAT_INFO_MAGIC_VALUE)
+    if(info->magic != CONFIG_PLAT_SLOT_INFO_MAGIC_VALUE)
     {
         return NULL;
     }

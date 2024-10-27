@@ -3,9 +3,9 @@
 
 #define EGL_MODULE_NAME "boot_mgr"
 
-static egl_plat_info_t *slot_table[PLAT_NUM_SLOTS];
+static slot_info_t *slot_table[PLAT_NUM_SLOTS];
 
-egl_result_t boot_mgr_slot_validate(egl_plat_info_t *info)
+egl_result_t boot_mgr_slot_validate(slot_info_t *info)
 {
     egl_result_t result;
     uint32_t crc_val;
@@ -29,7 +29,7 @@ egl_result_t boot_mgr_slot_validate(egl_plat_info_t *info)
 
     EGL_TRACE_INFO("Binary len: %u", info->size);
 
-    pages_to_read = (info->size + CONFIG_PLAT_INFO_SECTION_SIZE)/PLAT_FLASH_PAGE_SIZE + 1;
+    pages_to_read = (info->size + CONFIG_PLAT_SLOT_INFO_SECTION_SIZE)/PLAT_FLASH_PAGE_SIZE + 1;
     for(int i = 0, offset = 0; i < pages_to_read; i++, offset += PLAT_FLASH_PAGE_SIZE)
     {
         uint8_t *data = buffer;
@@ -48,15 +48,15 @@ egl_result_t boot_mgr_slot_validate(egl_plat_info_t *info)
            So, just skip it */
         if(offset == 0)
         {
-            data += CONFIG_PLAT_INFO_SECTION_SIZE;
-            len -= CONFIG_PLAT_INFO_SECTION_SIZE;
+            data += CONFIG_PLAT_SLOT_INFO_SECTION_SIZE;
+            len -= CONFIG_PLAT_SLOT_INFO_SECTION_SIZE;
         }
 
         /* if number of bytes in the page more that binary size we should truncate it to 
            binary size */
-        if((offset + PLAT_FLASH_PAGE_SIZE) > (info->size + CONFIG_PLAT_INFO_SECTION_SIZE))
+        if((offset + PLAT_FLASH_PAGE_SIZE) > (info->size + CONFIG_PLAT_SLOT_INFO_SECTION_SIZE))
         {
-            len -= (offset + PLAT_FLASH_PAGE_SIZE) - (info->size + CONFIG_PLAT_INFO_SECTION_SIZE);
+            len -= (offset + PLAT_FLASH_PAGE_SIZE) - (info->size + CONFIG_PLAT_SLOT_INFO_SECTION_SIZE);
         }
 
         crc_val = egl_crc32_calc(PLAT_CRC, data, len);
@@ -70,7 +70,7 @@ egl_result_t boot_mgr_slot_validate(egl_plat_info_t *info)
     return crc_val == info->checksum ? EGL_SUCCESS : EGL_FAIL;
 }
 
-static void boot_mgr_slot_info_print(egl_plat_info_t *info)
+static void boot_mgr_slot_info_print(slot_info_t *info)
 {
     if(info == NULL)
     {
@@ -97,7 +97,7 @@ uint32_t boot_mgr_highest_boot_number_get(void)
     return slot_table[1] == NULL ? 0 : slot_table[1]->boot_number;
 }
 
-static void boot_mgr_slot_table_sort(egl_plat_info_t **slot_table, size_t size)
+static void boot_mgr_slot_table_sort(slot_info_t **slot_table, size_t size)
 {
     if(size < 2)
     {
@@ -108,7 +108,7 @@ static void boot_mgr_slot_table_sort(egl_plat_info_t **slot_table, size_t size)
     {
         for(uint32_t i = 0; i < size - step - 1; i++)
         {
-            egl_plat_info_t *tmp;
+            slot_info_t *tmp;
             uint32_t boot_number_a = slot_table[i] == NULL ? 0 : slot_table[i]->boot_number;
             uint32_t boot_number_b = slot_table[i + 1] == NULL ? 0 : slot_table[i + 1]->boot_number;
 
@@ -142,7 +142,7 @@ egl_result_t boot_mgr_init(void)
 }
 
 /* WORKAROUND */
-static unsigned int boot_mgr_slot_index_get(egl_plat_info_t *slot_info)
+static unsigned int boot_mgr_slot_index_get(slot_info_t *slot_info)
 {
     if(slot_info == egl_plat_slot_info(PLATFORM, PLAT_SLOT_A))
     {

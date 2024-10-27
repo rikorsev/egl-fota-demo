@@ -29,7 +29,7 @@ void boot_mgr_process(void);
  *
  * @return EGL_SUCCESS if slot is valid
  */
-egl_result_t boot_mgr_slot_validate(egl_plat_info_t *info);
+egl_result_t boot_mgr_slot_validate(slot_info_t *info);
 
 /**
  * @brief Provides highest boot number from all slots on device

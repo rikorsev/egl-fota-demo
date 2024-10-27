@@ -3,7 +3,7 @@
 
 #include "stm32l4xx.h"
 
-#include "plat_info.h"
+#include "slot.h"
 #include "plat_crc.h" 
 #include "plat_flash.h"
 #include "plat_radio.h"
