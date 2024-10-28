@@ -6,6 +6,7 @@
             "name": "boot-stm32l412-nucleo-debug",
             "binaryDir": "build/boot",
             "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "debug",
@@ -18,6 +19,7 @@
             "name": "boot-stm32l412-nucleo-release",
             "binaryDir": "build/boot",
             "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "release",
@@ -30,6 +32,7 @@
             "name": "main-stm32l412-nucleo-slot-a-debug",
             "binaryDir": "build/main/a",
             "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "debug",
@@ -42,6 +45,7 @@
             "name": "main-stm32l412-nucleo-slot-a-release",
             "binaryDir": "build/main/a",
             "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "release",
@@ -54,6 +58,7 @@
             "name": "main-stm32l412-nucleo-slot-b-debug",
             "binaryDir": "build/main/b",
             "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "debug",
@@ -66,6 +71,7 @@
             "name": "main-stm32l412-nucleo-slot-b-release",
             "binaryDir": "build/main/b",
             "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "release",
