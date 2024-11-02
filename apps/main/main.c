@@ -12,11 +12,11 @@ static egl_result_t init_trace(void)
     static egl_trace_t trace = {0};
 
     /* Init trace iface */
-    result = egl_itf_init(TRACE_IFACE);
+    result = egl_itf_init(SYSLOG);
     EGL_RESULT_CHECK(result);
 
     /* Init tracer */
-    result = egl_trace_init(&trace, TRACE_IFACE, SYSTIMER);
+    result = egl_trace_init(&trace, SYSLOG, SYSTIMER);
     EGL_RESULT_CHECK(result);
 
     /* Set default tracer */
@@ -42,7 +42,7 @@ static egl_result_t init(void)
     EGL_RESULT_CHECK(result);
 #endif
 
-    result = egl_pio_init(LED_GREEN);
+    result = egl_pio_init(SYSLED);
     if(result != EGL_SUCCESS)
     {
         EGL_TRACE_ERROR("Fail to init led. Result %s", EGL_RESULT(result));
@@ -54,10 +54,12 @@ static egl_result_t init(void)
 
 static void blink(void)
 {
-    egl_pio_set(LED_GREEN, true);
+    egl_pio_set(SYSLED, true);
     egl_plat_sleep(PLATFORM, 50);
-    egl_pio_set(LED_GREEN, false);
+    egl_pio_set(SYSLED, false);
     egl_plat_sleep(PLATFORM, 950);
+
+    EGL_TRACE_INFO("Tick...");
 }
 
 static void loop(void)

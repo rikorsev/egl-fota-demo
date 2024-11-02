@@ -10,7 +10,7 @@ include(plat/${TARGET_PLATFORM}/plat_config.cmake)
 add_subdirectory(apps)
 
 # Add platform
-add_subdirectory(plat/${TARGET_PLATFORM})
+add_subdirectory(plat)
 
 # Add EGL library
 add_subdirectory(egl)

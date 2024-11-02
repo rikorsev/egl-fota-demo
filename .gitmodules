@@ -1,3 +1,9 @@
 [submodule "egl"]
 	path = egl
 	url = https://github.com/rikorsev/embedded-generic-library
+[submodule "plat/stm32l073-nucleo/cmsis-device-l0"]
+	path = plat/stm32l073-nucleo/cmsis-device-l0
+	url = https://github.com/STMicroelectronics/cmsis-device-l0
+[submodule "plat/stm32l073-nucleo/cmsis-arm"]
+	path = plat/stm32l073-nucleo/cmsis-arm
+	url = https://github.com/ARM-software/CMSIS_6
