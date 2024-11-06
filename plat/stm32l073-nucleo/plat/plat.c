@@ -1,11 +1,6 @@
 #include "egl_lib.h"
 #include "plat.h"
 
-static uint32_t clock(void)
-{
-    return SystemCoreClock;
-}
-
 static egl_result_t init(void)
 {
     __enable_irq();
@@ -116,8 +111,7 @@ static egl_platform_t platform_inst =
     .sleep     = sleep,
     .shutdown  = shutdown,
     .info      = info,
-    .slot_info = slot_info,
-    .clock     = clock
+    .slot_info = slot_info
 };
 
 egl_platform_t *platform_get(void)

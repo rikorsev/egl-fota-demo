@@ -25,8 +25,6 @@ set(CMAKE_C_FLAGS " \
 set(CMAKE_EXE_LINKER_FLAGS "\
     -mcpu=cortex-m0 \
     -Wall \
-    -specs=nosys.specs \
-    -specs=nano.specs \
     -fno-common \
     -ffunction-sections \
     -fdata-sections \
@@ -44,3 +42,16 @@ set(CMAKE_EXE_LINKER_FLAGS "\
     -T${CMAKE_CURRENT_LIST_DIR}/linker/stm32l073rztx_${TARGET_SLOT}.ld \
     -T${CMAKE_CURRENT_LIST_DIR}/linker/stm32l073rztx_base.ld \
 ")
+
+if(CONFIG_APP_MINIMAL EQUAL 1)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
+        -nostdlib \
+        -nostartfiles \
+        -nolibc \
+        ")
+else()
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
+        -specs=nano.specs \
+        -specs=nosys.specs \
+    ")
+endif()

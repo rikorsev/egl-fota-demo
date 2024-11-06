@@ -7,6 +7,7 @@
 // #include "plat_flash.h"
 // #include "plat_radio.h"
 
+#include "sysclock.h"
 #include "sysled.h"
 #include "syslog.h"
 #include "systimer.h"

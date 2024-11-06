@@ -1,27 +1,12 @@
-#include <assert.h>
-
 #include "egl_lib.h"
 #include "plat.h"
 
 static volatile uint32_t timer_ms = 0;
 
-void SysTick_Handler(void)
-{
-    timer_ms++;
-}
-
 static egl_result_t init(void)
 {
-    uint32_t result;
-
-    /* TBD move to clock section */
-    SystemCoreClockUpdate();
-
     /* Init SysTick timer */
-    result = SysTick_Config(egl_plat_clock(PLATFORM) / 1000);
-    assert(result == 0);
-
-    return EGL_SUCCESS;
+    return SysTick_Config(egl_clock_get(SYSCLOCK) / 1000) == 0 ? EGL_SUCCESS : EGL_FAIL;
 }
 
 static uint32_t get(void)
@@ -38,4 +23,9 @@ static egl_timer_t plat_systimer_inst =
 egl_timer_t *plat_systimer_get(void)
 {
     return &plat_systimer_inst;
+}
+
+void plat_systimer_irq_handler(void)
+{
+    timer_ms++;
 }

@@ -92,6 +92,19 @@
                 "TARGET_PLATFORM": "stm32l073-nucleo",
                 "TARGET_SLOT": "boot"
             }
+        },
+        {
+            "name": "main-stm32l073-nucleo-slot-boot-release",
+            "binaryDir": "build/main/boot",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "release",
+                "TARGET_APP": "main",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot"
+            }
         }
     ],
     "buildPresets":
@@ -129,6 +142,11 @@
         {
             "name": "main-stm32l073-nucleo-slot-boot-debug",
             "configurePreset": "main-stm32l073-nucleo-slot-boot-debug",
+            "jobs": 4
+        },
+        {
+            "name": "main-stm32l073-nucleo-slot-boot-release",
+            "configurePreset": "main-stm32l073-nucleo-slot-boot-release",
             "jobs": 4
         }
     ]
