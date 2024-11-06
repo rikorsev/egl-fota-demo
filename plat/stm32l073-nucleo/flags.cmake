@@ -39,8 +39,7 @@ set(CMAKE_EXE_LINKER_FLAGS "\
     -Xlinker muldefs \
     -Xlinker -Map=output.map \
     -Wl,--print-memory-usage \
-    -T${CMAKE_CURRENT_LIST_DIR}/linker/stm32l073rztx_${TARGET_SLOT}.ld \
-    -T${CMAKE_CURRENT_LIST_DIR}/linker/stm32l073rztx_base.ld \
+    -T${CMAKE_BINARY_DIR}/stm32l073rztx.ld \
 ")
 
 if(CONFIG_APP_MINIMAL EQUAL 1)
@@ -48,7 +47,7 @@ if(CONFIG_APP_MINIMAL EQUAL 1)
         -nostdlib \
         -nostartfiles \
         -nolibc \
-        ")
+    ")
 else()
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
         -specs=nano.specs \

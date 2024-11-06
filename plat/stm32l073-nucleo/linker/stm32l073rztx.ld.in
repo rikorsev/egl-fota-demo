@@ -35,13 +35,16 @@ ENTRY(Reset_Handler)
 /* Highest address of the user mode stack */
 _estack = 0x20005000;    /* end of RAM */
 /* Generate a link error if heap and stack don't fit into RAM */
-_Min_Heap_Size = 0x200;      /* required amount of heap  */
-_Min_Stack_Size = 0x400; /* required amount of stack */
+_Min_Heap_Size = @CONFIG_PLAT_HEAP_SIZE@; /* required amount of heap  */
+_Min_Stack_Size = @CONFIG_PLAT_STACK_SIZE@; /* required amount of stack */
 
 /* Specify the memory areas */
 MEMORY
 {
-  RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 20K
+  IVT  (rx):  ORIGIN = @CONFIG_PLAT_SLOT_ORIGIN@, LENGTH = 256
+  META (r):   ORIGIN = ORIGIN(IVT) + LENGTH(IVT), LENGTH = @CONFIG_PLAT_SLOT_INFO_SECTION_SIZE@
+  FLASH (rx): ORIGIN = ORIGIN(META) + LENGTH(META), LENGTH = @CONFIG_PLAT_SLOT_LENGTH@
+  RAM (xrw):  ORIGIN = 0x20000000, LENGTH = 20K
 }
 
 /* Define output sections */
@@ -54,6 +57,14 @@ SECTIONS
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
   } >IVT
+
+  /* Application metadata */
+  .info :
+  {
+    . = ALIGN(4);
+    *(.info*)
+    . = ALIGN(4);
+  } >META
 
   /* The program code and other data goes into FLASH */
   .text :

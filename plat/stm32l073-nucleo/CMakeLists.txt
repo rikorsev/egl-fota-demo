@@ -9,6 +9,9 @@ if(CONFIG_APP_MINIMAL EQUAL 1)
     target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/lib.s)
 endif()
 
+# Configure linker script
+configure_file(${CMAKE_CURRENT_LIST_DIR}/linker/stm32l073rztx.ld.in ${CMAKE_BINARY_DIR}/stm32l073rztx.ld @ONLY)
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/cmsis-device-l0/Include)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/cmsis-arm/CMSIS/Core/Include)
