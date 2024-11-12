@@ -22,7 +22,7 @@ const slot_info_t *slot_info_inst_get(void)
     return &slot_info_inst;
 }
 
-__attribute__((section(".info"))) static const  uint32_t slot_info_table[] = 
+static const uint32_t slot_info_table[] =
 {
     @CONFIG_PLAT_SLOT_BOOT_ADDR@,
     @CONFIG_PLAT_SLOT_A_ADDR@,
