@@ -13,13 +13,12 @@ def process_size(args):
     stats = os.stat(args.filename)
 
     size = stats.st_size - int(args.meta_size)
-    print(f'SIZE: {size} ({hex(size)})')
     size = size.to_bytes(4, "little")
 
     with open(args.filename, 'rb+') as f:
 
         # Write binary size to the binary minus size of meta block
-        f.seek(SIZE_POSITION)
+        f.seek(SIZE_POSITION + int(args.meta_offset))
         f.write(size)
 
 def crc_test():
@@ -53,7 +52,7 @@ def process_crc(args):
         crc_val = crc_val.to_bytes(4, "little")
 
         # Write CRC to the binary
-        f.seek(CRC_POSITION)
+        f.seek(CRC_POSITION + int(args.meta_offset))
         f.write(crc_val)
 
 def main(args):
@@ -68,6 +67,7 @@ if __name__ == '__main__':
     )
 
     parser.add_argument('filename')
+    parser.add_argument('meta_offset')
     parser.add_argument('meta_size')
 
     args = parser.parse_args()

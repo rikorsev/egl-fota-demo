@@ -81,6 +81,9 @@ int main(void)
                                                           info->version.minor,
                                                           info->version.revision,
                                                           info->version.sufix);
+    EGL_TRACE_INFO("Date: %s", info->buildtime);
+    EGL_TRACE_INFO("Size: %u", info->size);
+    EGL_TRACE_INFO("Checksum: %08x", info->checksum);
 #endif
 
     while(1)

@@ -41,7 +41,7 @@ _Min_Stack_Size = @CONFIG_PLAT_STACK_SIZE@; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-  IVT  (rx):  ORIGIN = @CONFIG_PLAT_SLOT_ORIGIN@, LENGTH = 256
+  IVT  (rx):  ORIGIN = @CONFIG_PLAT_SLOT_ORIGIN@, LENGTH = @CONFIG_PLAT_SLOT_INFO_OFFSET@
   META (r):   ORIGIN = ORIGIN(IVT) + LENGTH(IVT), LENGTH = @CONFIG_PLAT_SLOT_INFO_SECTION_SIZE@
   FLASH (rx): ORIGIN = ORIGIN(META) + LENGTH(META), LENGTH = @CONFIG_PLAT_SLOT_LENGTH@
   RAM (xrw):  ORIGIN = 0x20000000, LENGTH = 20K
@@ -55,7 +55,7 @@ SECTIONS
   {
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
-    . = ALIGN(4);
+    . = ALIGN(@CONFIG_PLAT_SLOT_INFO_OFFSET@);
   } >IVT
 
   /* Application metadata */
@@ -63,7 +63,7 @@ SECTIONS
   {
     . = ALIGN(4);
     *(.info*)
-    . = ALIGN(4);
+    . = ALIGN(@CONFIG_PLAT_SLOT_INFO_SECTION_SIZE@);
   } >META
 
   /* The program code and other data goes into FLASH */
