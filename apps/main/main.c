@@ -53,9 +53,9 @@ static egl_result_t init(void)
 static void blink(void)
 {
     egl_pio_set(SYSLED, true);
-    egl_plat_sleep(PLATFORM, 50);
+    egl_pm_sleep(SYSPM, 50);
     egl_pio_set(SYSLED, false);
-    egl_plat_sleep(PLATFORM, 950);
+    egl_pm_sleep(SYSPM, 950);
 
     EGL_TRACE_INFO("Tick...");
 }

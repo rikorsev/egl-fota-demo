@@ -68,29 +68,6 @@ static void *slot_info(unsigned int slot_idx)
     return (void *)slot_addr;
 }
 
-static egl_result_t sleep(uint32_t delay)
-{
-    uint32_t target = egl_timer_get(SYSTIMER) + delay;
-
-    while(egl_timer_get(SYSTIMER) < target)
-    {
-        /* Wait */
-    }
-
-    return EGL_SUCCESS;
-}
-
-static egl_result_t reboot(void)
-{
-    __NVIC_SystemReset();
-    return EGL_SUCCESS;
-}
-
-static egl_result_t shutdown(void)
-{
-    return EGL_SUCCESS;
-}
-
 static void *info(void)
 {
     slot_info_t *info = (slot_info_t *)slot_info_get();
@@ -107,9 +84,6 @@ static egl_platform_t platform_inst =
 {
     .init      = init,
     .boot      = boot,
-    .reboot    = reboot,
-    .sleep     = sleep,
-    .shutdown  = shutdown,
     .info      = info,
     .slot_info = slot_info
 };

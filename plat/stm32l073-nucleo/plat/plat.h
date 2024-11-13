@@ -11,6 +11,7 @@
 #include "sysled.h"
 #include "syslog.h"
 #include "systimer.h"
+#include "syspm.h"
 #include "slot.h"
 
 #define PLATFORM platform_get()
