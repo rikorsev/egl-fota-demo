@@ -154,7 +154,7 @@ egl_result_t fota_mgr_init(void)
 static void blink(egl_pio_t *pio)
 {
     egl_pio_set(pio, true);
-    egl_plat_sleep(PLATFORM, 10);
+    egl_pm_sleep(SYSPM, 10);
     egl_pio_set(pio, false);
 }
 

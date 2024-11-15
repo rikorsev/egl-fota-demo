@@ -16,11 +16,11 @@ static egl_result_t init_trace(void)
     static egl_trace_t trace = {0};
 
     /* Init trace iface */
-    result = egl_itf_init(TRACE_IFACE);
+    result = egl_itf_init(SYSLOG);
     EGL_RESULT_CHECK(result);
 
     /* Init tracer */
-    result = egl_trace_init(&trace, TRACE_IFACE, SYSTIMER);
+    result = egl_trace_init(&trace, SYSLOG, SYSTIMER);
     EGL_RESULT_CHECK(result);
 
     /* Set default tracer */
@@ -90,7 +90,7 @@ int main(void)
     boot_mgr_process();
 
     EGL_TRACE_INFO("No bootable image detected. Reboot...");
-    result = egl_plat_reboot(PLATFORM);
+    result = egl_pm_reset(SYSPM);
     if(result != EGL_SUCCESS)
     {
         EGL_TRACE_FAIL("Fail to reboot platform. Result: %s", EGL_RESULT(result));
