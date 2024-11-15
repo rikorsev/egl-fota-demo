@@ -42,14 +42,14 @@ static egl_result_t get(void)
     return GPIOB->ODR & GPIO_ODR_OD13_Msk ? EGL_SET : EGL_RESET;
 }
 
-static egl_pio_t pio_led_green_inst =
+static egl_pio_t plat_sysled_inst =
 {
     .init = init,
     .set  = set,
     .get  = get
 };
 
-egl_pio_t *pio_led_green_get(void)
+egl_pio_t *plat_sysled_get(void)
 {
-    return &pio_led_green_inst;
+    return &plat_sysled_inst;
 }

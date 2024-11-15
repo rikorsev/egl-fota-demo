@@ -7,9 +7,11 @@
 #include "plat_crc.h" 
 #include "plat_flash.h"
 #include "plat_radio.h"
-#include "pio_led_green.h"
-#include "iface_trace.h"
-#include "timer_sys.h"
+#include "plat_sysled.h"
+#include "plat_syslog.h"
+#include "plat_systimer.h"
+#include "plat_syspm.h"
+#include "plat_sysclock.h"
 
 #define PLATFORM platform_get()
 #define PLAT_NUM_SLOTS (3U)

@@ -1,8 +1,8 @@
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/sysclock.c
+        ${CMAKE_CURRENT_LIST_DIR}/plat_sysclock.c
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/sysclock.h
+        ${CMAKE_CURRENT_LIST_DIR}/plat_sysclock.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})

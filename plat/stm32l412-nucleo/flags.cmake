@@ -43,8 +43,7 @@ set(CMAKE_EXE_LINKER_FLAGS "\
     -Xlinker muldefs \
     -Xlinker -Map=output.map \
     -Wl,--print-memory-usage \
-    -T${CMAKE_CURRENT_LIST_DIR}/linker/stm32l412rbtx_${TARGET_SLOT}.ld \
-    -T${CMAKE_CURRENT_LIST_DIR}/linker/stm32l412rbtx_base.ld \
+    -T${CMAKE_BINARY_DIR}/stm32l412rbtx.ld \
 ")
 
 add_definitions(-DSTM32L412xx)

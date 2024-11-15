@@ -7,11 +7,11 @@
 // #include "plat_flash.h"
 // #include "plat_radio.h"
 
-#include "sysclock.h"
-#include "sysled.h"
-#include "syslog.h"
-#include "systimer.h"
-#include "syspm.h"
+#include "plat_sysclock.h"
+#include "plat_sysled.h"
+#include "plat_syslog.h"
+#include "plat_systimer.h"
+#include "plat_syspm.h"
 #include "slot.h"
 
 #define PLATFORM platform_get()

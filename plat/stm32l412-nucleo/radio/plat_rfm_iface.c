@@ -117,8 +117,6 @@ static egl_result_t init(void)
 
 static size_t write(void *data, size_t len)
 {
-    uint8_t dummy;
-
     for(uint32_t i = 0; i < len; i++)
     {
         while(!(SPI2->SR & SPI_SR_TXE))
@@ -131,7 +129,8 @@ static size_t write(void *data, size_t len)
         {
             /* Wait for data reception */
         }
-        dummy = *(volatile uint8_t*)&SPI2->DR;
+        /* Dummy read */
+        SPI2->DR;
     }
 
     return len;

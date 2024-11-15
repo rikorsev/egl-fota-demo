@@ -1,5 +1,5 @@
-#ifndef SYSPM_H
-#define SYSPM_H
+#ifndef PLAT_SYSPM_H
+#define PLAT_SYSPM_H
 
 #define SYSPM plat_syspm_get()
 

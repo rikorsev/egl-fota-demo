@@ -1,5 +1,5 @@
-#ifndef SYSCLOCK_H
-#define SYSCLOCK_H
+#ifndef PLAT_SYSCLOCK_H
+#define PLAT_SYSCLOCK_H
 
 #define SYSCLOCK plat_sysclock_get()
 

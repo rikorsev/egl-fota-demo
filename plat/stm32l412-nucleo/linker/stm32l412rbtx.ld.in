@@ -40,29 +40,39 @@ ENTRY(Reset_Handler)
 /* Highest address of the user mode stack */
 _estack = ORIGIN(RAM) + LENGTH(RAM); /* end of "RAM" Ram type memory */
 
-_Min_Heap_Size = 0x200; /* required amount of heap */
-_Min_Stack_Size = 0x2000; /* required amount of stack */
+_Min_Heap_Size =  @CONFIG_PLAT_HEAP_SIZE@; /* required amount of heap */
+_Min_Stack_Size = 0x@CONFIG_PLAT_STACK_SIZE@; /* required amount of stack */
 
-/* Memories definition */
 MEMORY
 {
-  RAM      (xrw)    : ORIGIN = 0x20000000,   LENGTH = 40K
-  SRAM1    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 32K
-  SRAM2    (xrw)    : ORIGIN = 0x20008000,   LENGTH = 8K
+  IVT      (rx) : ORIGIN = @CONFIG_PLAT_SLOT_ORIGIN@, LENGTH = @CONFIG_PLAT_SLOT_INFO_OFFSET@
+  META     (r)  : ORIGIN = ORIGIN(IVT) + LENGTH(IVT), LENGTH = @CONFIG_PLAT_SLOT_INFO_SECTION_SIZE@
+  FLASH    (rx) : ORIGIN = ORIGIN(META) + LENGTH(META), LENGTH = @CONFIG_PLAT_SLOT_LENGTH@
+  RAM      (xrw): ORIGIN = 0x20000000,   LENGTH = 40K
+  SRAM1    (xrw): ORIGIN = 0x20000000,   LENGTH = 32K
+  SRAM2    (xrw): ORIGIN = 0x20008000,   LENGTH = 8K
 }
 
 /* Sections */
 SECTIONS
 {
-  /* The startup code into "ROM" Rom type memory */
+  /* The startup code into "FLASH" Rom type memory */
   .isr_vector :
   {
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
-  } >ROM
+  } >IVT
 
-  /* The program code and other data into "ROM" Rom type memory */
+  /* Application metadata */
+  .info :
+  {
+    . = ALIGN(4);
+    *(.info*)
+    . = ALIGN(4);
+  } >META
+
+  /* The program code and other data into "FLASH" Rom type memory */
   .text :
   {
     . = ALIGN(4);
@@ -77,22 +87,22 @@ SECTIONS
 
     . = ALIGN(4);
     _etext = .;        /* define a global symbols at end of code */
-  } >ROM
+  } >FLASH
 
-  /* Constant data into "ROM" Rom type memory */
+  /* Constant data into "FLASH" Rom type memory */
   .rodata :
   {
     . = ALIGN(4);
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
     . = ALIGN(4);
-  } >ROM
+  } >FLASH
 
   .ARM.extab   : {
     . = ALIGN(4);
     *(.ARM.extab* .gnu.linkonce.armextab.*)
     . = ALIGN(4);
-  } >ROM
+  } >FLASH
 
   .ARM : {
     . = ALIGN(4);
@@ -100,7 +110,7 @@ SECTIONS
     *(.ARM.exidx*)
     __exidx_end = .;
     . = ALIGN(4);
-  } >ROM
+  } >FLASH
 
   .preinit_array     :
   {
@@ -109,7 +119,7 @@ SECTIONS
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
     . = ALIGN(4);
-  } >ROM
+  } >FLASH
 
   .init_array :
   {
@@ -119,7 +129,7 @@ SECTIONS
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
     . = ALIGN(4);
-  } >ROM
+  } >FLASH
 
   .fini_array :
   {
@@ -129,7 +139,7 @@ SECTIONS
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
     . = ALIGN(4);
-  } >ROM
+  } >FLASH
 
   /* Used by the startup to initialize data */
   _sidata = LOADADDR(.data);
@@ -147,7 +157,7 @@ SECTIONS
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
 
-  } >RAM AT> ROM
+  } >RAM AT> FLASH
 
   _sisram2 = LOADADDR(.sram2);
 
@@ -166,7 +176,7 @@ SECTIONS
 
     . = ALIGN(4);
     _esram2 = .;       /* create a global symbol at sram2 end */
-  } >SRAM2 AT> ROM
+  } >SRAM2 AT> FLASH
 
   /* Uninitialized data section into "RAM" Ram type memory */
   . = ALIGN(4);

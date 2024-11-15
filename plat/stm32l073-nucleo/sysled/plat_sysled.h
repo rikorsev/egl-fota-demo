@@ -1,5 +1,5 @@
-#ifndef SYSLED_H
-#define SYSLED_H
+#ifndef PLAT_SYSLED_H
+#define PLAT_SYSLED_H
 
 #define SYSLED plat_sysled_get()
 

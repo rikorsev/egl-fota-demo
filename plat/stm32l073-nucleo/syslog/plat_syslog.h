@@ -1,5 +1,5 @@
-#ifndef SYSLOG_H
-#define SYSLOG_H
+#ifndef PLAT_SYSLOG_H
+#define PLAT_SYSLOG_H
 
 #define SYSLOG plat_syslog_get()
 

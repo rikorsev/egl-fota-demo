@@ -64,14 +64,14 @@ static size_t write(void *data, size_t len)
     return len;
 }
 
-static egl_interface_t iface_trace_inst =
+static egl_interface_t plat_syslog_inst =
 {
     .init = init,
     .write = write
 };
 
-egl_interface_t *iface_trace_inst_get(void)
+egl_interface_t *plat_syslog_get(void)
 {
-    return &iface_trace_inst;
+    return &plat_syslog_inst;
 }
 
