@@ -97,42 +97,42 @@ egl_result_t fota_mgr_init(void)
     result = egl_pio_init(PLAT_RFM_TX_LED);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to init rfm tx led pin. Result %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to init rfm tx led pin. Result %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
     result = egl_pio_init(PLAT_RFM_RX_LED);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to init rfm rx led pin. Result %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to init rfm rx led pin. Result %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
     result = egl_pio_init(PLAT_RFM_SW1);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to init sw1 pin. Result %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to init sw1 pin. Result %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
     result = egl_pio_callback_set(PLAT_RFM_SW1, fota_sw1_callback);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to set callback for sw1 pin. Result %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to set callback for sw1 pin. Result %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
     result = egl_pio_init(PLAT_RFM_SW2);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to init sw2 pin. Result %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to init sw2 pin. Result %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
     result = egl_pio_callback_set(PLAT_RFM_SW2, fota_sw2_callback);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to set callback for sw2 pin. Result %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to set callback for sw2 pin. Result %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
@@ -176,7 +176,7 @@ static fota_state_t fota_ping_process(fota_state_t state)
     {
         if(((uint32_t *)packet)[0] == FOTA_MARKER_PING)
         {
-            EGL_TRACE_INFO("Ping message received");
+            EGL_LOG_INFO("Ping message received");
             state = FOTA_STATE_WAIT_FOR_ACTIONS;
         }
     }
@@ -259,9 +259,9 @@ static fota_state_t fota_state_wait_for_actions_step(fota_state_t state)
 {
     uint32_t timeout = egl_timer_get(SYSTIMER) + FOTA_ACTION_TIMEOUT_MS;
 
-    EGL_TRACE_INFO("Ready for FOTA");
-    EGL_TRACE_INFO("Press SW1 to update slot A");
-    EGL_TRACE_INFO("Press SW2 to update slot B");
+    EGL_LOG_INFO("Ready for FOTA");
+    EGL_LOG_INFO("Press SW1 to update slot A");
+    EGL_LOG_INFO("Press SW2 to update slot B");
 
     radio->StartRx();
 
@@ -306,7 +306,7 @@ void print_block(uint32_t addr, uint8_t *buffer, size_t size)
 {
     for(int i = 0; i < (size / sizeof(uint32_t)); i+=8)
     {
-        EGL_TRACE_INFO("%08x: %08x %08x %08x %08x %08x %08x %08x %08x", addr + i * sizeof(uint32_t),
+        EGL_LOG_INFO("%08x: %08x %08x %08x %08x %08x %08x %08x %08x", addr + i * sizeof(uint32_t),
                                                                         ((uint32_t *)buffer)[i],
                                                                         ((uint32_t *)buffer)[i + 1],
                                                                         ((uint32_t *)buffer)[i + 2],
@@ -327,7 +327,7 @@ static void fota_req_packet_send(uint32_t page, uint32_t offset)
         .offset = offset
     };
 
-    EGL_TRACE_INFO("Requ: page %u, offset %u", page, offset);
+    EGL_LOG_INFO("Requ: page %u, offset %u", page, offset);
 
     radio->SetTxPacket(&packet, sizeof(packet));
 }
@@ -342,35 +342,35 @@ static fota_packet_status_t fota_data_packet_get(fota_data_packet_t *data)
 
     if(((uint32_t *)packet)[0] == FOTA_MARKER_END)
     {
-        EGL_TRACE_INFO("End marker received");
+        EGL_LOG_INFO("End marker received");
         return FOTA_PACKET_END_MARKER;
     }
 
     if(packet_size != sizeof(fota_data_packet_t))
     {
-        EGL_TRACE_ERROR("Wrong packet size. Expected %u, actual %u",
+        EGL_LOG_ERROR("Wrong packet size. Expected %u, actual %u",
                                                            sizeof(fota_data_packet_t), packet_size);
         return FOTA_PACKET_WRONG_SIZE;
     }
 
     if(packet_ptr->marker != FOTA_MARKER_DATA)
     {
-        EGL_TRACE_ERROR("Wrong packet marker");
+        EGL_LOG_ERROR("Wrong packet marker");
         return FOTA_PACKET_WRONG_MARKER;
     }
 
     egl_result_t result = egl_crc_reset(PLAT_CRC);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_FAIL("Fail to reset CRC. Result: %s", EGL_RESULT(result));
+        EGL_LOG_FAIL("Fail to reset CRC. Result: %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
     uint32_t calc_crc = egl_crc32_calc(PLAT_CRC, packet_ptr->payload, sizeof(packet_ptr->payload));
     if(calc_crc != packet_ptr->crc)
     {
-        EGL_TRACE_ERROR("Packet CRC missmatch");
-        EGL_TRACE_ERROR("Expected: 0x%08x, Calculated: 0x%08x", packet_ptr->crc, calc_crc);
+        EGL_LOG_ERROR("Packet CRC missmatch");
+        EGL_LOG_ERROR("Expected: 0x%08x, Calculated: 0x%08x", packet_ptr->crc, calc_crc);
 
         return FOTA_PACKET_CRC_ERROR;
     }
@@ -409,7 +409,7 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
     uint32_t slot_start_addr = slot_info_addr_get(slot);
     if(slot_start_addr == 0)
     {
-        EGL_TRACE_ERROR("Fail to get slot address");
+        EGL_LOG_ERROR("Fail to get slot address");
         return FOTA_STATE_END;
     }
 
@@ -428,15 +428,15 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
                 break;
 
             case RF_TX_TIMEOUT:
-                EGL_TRACE_WARN("TX timeout");
+                EGL_LOG_WARN("TX timeout");
                 fota_req_packet_send(curr_page, curr_offset);
                 break;
 
             case RF_RX_TIMEOUT:
-                EGL_TRACE_WARN("RX timeout");
+                EGL_LOG_WARN("RX timeout");
                 if(++timeout_cnt > FOTA_RX_TIMEOUT_COUNT_LIMIT)
                 {
-                    EGL_TRACE_ERROR("RX timeout limit reached");
+                    EGL_LOG_ERROR("RX timeout limit reached");
                     return FOTA_STATE_END;
                 }
 
@@ -460,15 +460,15 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
 
                 if(data.page != curr_page || data.offset != curr_offset)
                 {
-                    EGL_TRACE_WARN("Requested/received data missmatch");
-                    EGL_TRACE_WARN("Page: req %u, recv: %u", curr_page, data.page);
-                    EGL_TRACE_WARN("OFFSET: req %u, recv: %u", curr_offset, data.offset);
+                    EGL_LOG_WARN("Requested/received data missmatch");
+                    EGL_LOG_WARN("Page: req %u, recv: %u", curr_page, data.page);
+                    EGL_LOG_WARN("OFFSET: req %u, recv: %u", curr_offset, data.offset);
 
                     fota_req_packet_send(curr_page, curr_offset);
                     break;
                 }
 
-                EGL_TRACE_INFO("Recv: page %u, offset %u", curr_page, curr_offset);
+                EGL_LOG_INFO("Recv: page %u, offset %u", curr_page, curr_offset);
 
                 memcpy(page_buff + curr_offset, data.payload, sizeof(data.payload));
 
@@ -492,7 +492,7 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
                     egl_result_t result = egl_block_write(PLAT_FLASH, addr, page_buff);
                     if(result != EGL_SUCCESS)
                     {
-                        EGL_TRACE_ERROR("Fail to read flash page. Result: %s", EGL_RESULT(result));
+                        EGL_LOG_ERROR("Fail to read flash page. Result: %s", EGL_RESULT(result));
                         return FOTA_STATE_END;
                     }
 
@@ -503,7 +503,7 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
                         slot_info = egl_plat_slot_info(PLATFORM, slot);
                         if(slot_info == NULL)
                         {
-                            EGL_TRACE_ERROR("Firmware validation fail");
+                            EGL_LOG_ERROR("Firmware validation fail");
                             return FOTA_STATE_END;
                         }
                     }
@@ -511,12 +511,12 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
                     curr_page++;
                     if(curr_page >= slot_info->size / PLAT_FLASH_PAGE_SIZE + 1)
                     {
-                        EGL_TRACE_INFO("Firmware update complete");
+                        EGL_LOG_INFO("Firmware update complete");
 
                         result = boot_mgr_init();
                         if(result != EGL_SUCCESS)
                         {
-                            EGL_TRACE_WARN("Fail to reinit boot manager. Result: %s",
+                            EGL_LOG_WARN("Fail to reinit boot manager. Result: %s",
                                                                                 EGL_RESULT(result));
                         }
 
@@ -525,7 +525,7 @@ static fota_state_t fota_state_get_firmware_step(fota_state_t state)
                 }
                 else if(curr_offset > PLAT_FLASH_PAGE_SIZE)
                 {
-                    EGL_TRACE_ERROR("Buffer overflow");
+                    EGL_LOG_ERROR("Buffer overflow");
                     return FOTA_STATE_END;
                 }
 
@@ -549,19 +549,19 @@ static fota_packet_status_t fota_request_packet_get(fota_req_packet_t *req)
 
     if(((uint32_t *)packet)[0] == FOTA_MARKER_END)
     {
-        EGL_TRACE_INFO("Got end marker");
+        EGL_LOG_INFO("Got end marker");
         return FOTA_PACKET_END_MARKER;
     }
 
     if(packet_size != sizeof(fota_req_packet_t))
     {
-        EGL_TRACE_ERROR("Wrong packet size");
+        EGL_LOG_ERROR("Wrong packet size");
         return FOTA_PACKET_WRONG_SIZE;
     }
 
     if(((fota_req_packet_t *)packet)->marker != FOTA_MARKER_REQ)
     {
-        EGL_TRACE_ERROR("Wrong marker");
+        EGL_LOG_ERROR("Wrong marker");
         return FOTA_PACKET_WRONG_MARKER;
     }
 
@@ -586,7 +586,7 @@ static void fota_data_packet_send(uint8_t *buff, uint32_t page, uint32_t offset)
     egl_result_t result = egl_crc_reset(PLAT_CRC);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_FAIL("Fail to reset CRC. Result: %s", EGL_RESULT(result));
+        EGL_LOG_FAIL("Fail to reset CRC. Result: %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
     }
 
@@ -614,21 +614,21 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
     }
     else
     {
-        EGL_TRACE_ERROR("Incorrect slot");
+        EGL_LOG_ERROR("Incorrect slot");
         return FOTA_STATE_END;
     }
 
     slot_info_t *slot_info = egl_plat_slot_info(PLATFORM, slot);
     if(slot_info == NULL)
     {
-        EGL_TRACE_ERROR("No slot info detected");
+        EGL_LOG_ERROR("No slot info detected");
         return FOTA_STATE_END;
     }
 
     result = boot_mgr_slot_validate(slot_info);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Binary validation fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Binary validation fail. Result: %s", EGL_RESULT(result));
         return FOTA_STATE_END;
     }
 
@@ -641,7 +641,7 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
         {
             case RF_TX_DONE:
                 blink(PLAT_RFM_TX_LED);
-                EGL_TRACE_INFO("Sent: page %u, offset %u", req.page, req.offset);
+                EGL_LOG_INFO("Sent: page %u, offset %u", req.page, req.offset);
                 /* No break here */
 
             case RF_TX_TIMEOUT:
@@ -654,18 +654,18 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
                 fota_packet_status_t packet_status = fota_request_packet_get(&req);
                 if(packet_status == FOTA_PACKET_STATUS_OK)
                 {
-                    EGL_TRACE_INFO("Req: page %u, offset %u", req.page, req.offset);
+                    EGL_LOG_INFO("Req: page %u, offset %u", req.page, req.offset);
 
                     if(req.offset + FOTA_DATA_PACKET_PAYLOAD > PLAT_FLASH_PAGE_SIZE)
                     {
-                        EGL_TRACE_WARN("Invalid offset");
+                        EGL_LOG_WARN("Invalid offset");
                         radio->StartRx();
                         break;
                     }
 
                     if(req.page > slot_info->size / PLAT_FLASH_PAGE_SIZE +1)
                     {
-                        EGL_TRACE_WARN("Invalid offset");
+                        EGL_LOG_WARN("Invalid offset");
                         radio->StartRx();
                         break;
                     }
@@ -677,7 +677,7 @@ static fota_state_t fota_state_send_firmware_step(fota_state_t state)
                         result = egl_block_read(PLAT_FLASH, addr, page_buff);
                         if(result != EGL_SUCCESS)
                         {
-                            EGL_TRACE_ERROR("Fail to read flash page. Result: %s",
+                            EGL_LOG_ERROR("Fail to read flash page. Result: %s",
                                                                                 EGL_RESULT(result));
                             return FOTA_STATE_END;
                         }
@@ -782,11 +782,11 @@ void fota_mgr_process(void)
                 return;
 
             default:
-                EGL_TRACE_WARN("Wrong state %d", curr_state);
+                EGL_LOG_WARN("Wrong state %d", curr_state);
                 curr_state = FOTA_STATE_END;
         }
 
-        EGL_TRACE_INFO("%s -> %s", state_srt[prev_state], state_srt[curr_state]);
+        EGL_LOG_INFO("%s -> %s", state_srt[prev_state], state_srt[curr_state]);
 
     }while(true);
 }

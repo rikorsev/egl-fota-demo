@@ -3,22 +3,22 @@
 
 #define EGL_MODULE_NAME "main"
 
-#if CONFIG_EGL_TRACE_ENABLED
-static egl_result_t init_trace(void)
+#if CONFIG_EGL_LOG_ENABLED
+static egl_result_t init_log(void)
 {
     egl_result_t result;
-    static egl_trace_t trace = {0};
+    static egl_log_t log = {0};
 
-    /* Init trace iface */
+    /* Init log iface */
     result = egl_itf_init(SYSLOG);
     EGL_RESULT_CHECK(result);
 
-    /* Init tracer */
-    result = egl_trace_init(&trace, SYSLOG, SYSTIMER);
+    /* Init log */
+    result = egl_log_init(&log, SYSLOG, SYSTIMER);
     EGL_RESULT_CHECK(result);
 
-    /* Set default tracer */
-    result = egl_trace_default_set(&trace);
+    /* Set default log */
+    result = egl_log_default_set(&log);
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -35,15 +35,15 @@ static egl_result_t init(void)
     result = egl_timer_init(SYSTIMER);
     EGL_RESULT_CHECK(result);
 
-#if CONFIG_EGL_TRACE_ENABLED
-    result = init_trace();
+#if CONFIG_EGL_LOG_ENABLED
+    result = init_log();
     EGL_RESULT_CHECK(result);
 #endif
 
     result = egl_pio_init(SYSLED);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to init led. Result %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to init led. Result %s", EGL_RESULT(result));
         return result;
     }
 
@@ -57,7 +57,7 @@ static void blink(void)
     egl_pio_set(SYSLED, false);
     egl_pm_sleep(SYSPM, 950);
 
-    EGL_TRACE_INFO("Tick...");
+    EGL_LOG_INFO("Tick...");
 }
 
 static void loop(void)
@@ -70,20 +70,20 @@ int main(void)
     egl_result_t result = init();
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_FAIL("Fatal error");
+        EGL_LOG_FAIL("Fatal error");
         EGL_RESULT_FATAL();
     }
 
-#if CONFIG_EGL_TRACE_ENABLED
+#if CONFIG_EGL_LOG_ENABLED
     slot_info_t *info = egl_plat_info(PLATFORM);
-    EGL_TRACE_INFO("Application %s (%u.%u.%u%s) started", info->name,
+    EGL_LOG_INFO("Application %s (%u.%u.%u%s) started", info->name,
                                                           info->version.major,
                                                           info->version.minor,
                                                           info->version.revision,
                                                           info->version.sufix);
-    EGL_TRACE_INFO("Date: %s", info->buildtime);
-    EGL_TRACE_INFO("Size: %u", info->size);
-    EGL_TRACE_INFO("Checksum: %08x", info->checksum);
+    EGL_LOG_INFO("Date: %s", info->buildtime);
+    EGL_LOG_INFO("Size: %u", info->size);
+    EGL_LOG_INFO("Checksum: %08x", info->checksum);
 #endif
 
     while(1)

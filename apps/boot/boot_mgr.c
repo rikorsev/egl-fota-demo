@@ -16,18 +16,18 @@ egl_result_t boot_mgr_slot_validate(slot_info_t *info)
 
     if(info == NULL)
     {
-        EGL_TRACE_ERROR("Slot information not detected");
+        EGL_LOG_ERROR("Slot information not detected");
         return EGL_FAIL;
     }
 
     result = egl_crc_reset(PLAT_CRC);
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to reset CRC. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to reset CRC. Result: %s", EGL_RESULT(result));
         return result;
     }
 
-    EGL_TRACE_INFO("Binary len: %u", info->size);
+    EGL_LOG_INFO("Binary len: %u", info->size);
 
     pages_to_read = (info->size + CONFIG_PLAT_SLOT_INFO_SECTION_SIZE)/PLAT_FLASH_PAGE_SIZE + 1;
     for(int i = 0, offset = 0; i < pages_to_read; i++, offset += PLAT_FLASH_PAGE_SIZE)
@@ -35,7 +35,7 @@ egl_result_t boot_mgr_slot_validate(slot_info_t *info)
         uint8_t *data = buffer;
         size_t len = PLAT_FLASH_PAGE_SIZE;
 
-        EGL_TRACE_INFO("Read flash page %u, Offset: %u (0x%08x)", i, offset, offset);
+        EGL_LOG_INFO("Read flash page %u, Offset: %u (0x%08x)", i, offset, offset);
 
         /* Read flash page */
         result = egl_block_read(PLAT_FLASH, app_addr + offset, buffer);
@@ -64,8 +64,8 @@ egl_result_t boot_mgr_slot_validate(slot_info_t *info)
         total_len += len;
     }
 
-    EGL_TRACE_INFO("Total len calculated: %u", total_len);
-    EGL_TRACE_INFO("Calculated CRC: 0x%08x, Expected: 0x%08x", crc_val, info->checksum);
+    EGL_LOG_INFO("Total len calculated: %u", total_len);
+    EGL_LOG_INFO("Calculated CRC: 0x%08x, Expected: 0x%08x", crc_val, info->checksum);
 
     return crc_val == info->checksum ? EGL_SUCCESS : EGL_FAIL;
 }
@@ -74,22 +74,22 @@ static void boot_mgr_slot_info_print(slot_info_t *info)
 {
     if(info == NULL)
     {
-        EGL_TRACE_WARN(" - No platform info found");
+        EGL_LOG_WARN(" - No platform info found");
 
         return;
     }
 
-    EGL_TRACE_INFO(" - Application: %s (v%d.%d.%d%s)", info->name,
+    EGL_LOG_INFO(" - Application: %s (v%d.%d.%d%s)", info->name,
                                                     info->version.major,
                                                     info->version.minor,
                                                     info->version.revision,
                                                     info->version.sufix);
-    EGL_TRACE_INFO(" - Buildtime:   %s", info->buildtime);
-    EGL_TRACE_INFO(" - Branch:      %s", info->git.branch);
-    EGL_TRACE_INFO(" - Commit:      %s", info->git.commit);
-    EGL_TRACE_INFO(" - Size:        %u", info->size);
-    EGL_TRACE_INFO(" - Checksum:    %u (0x%08x)", info->checksum, info->checksum);
-    EGL_TRACE_INFO(" - Boot number: %u", info->boot_number);
+    EGL_LOG_INFO(" - Buildtime:   %s", info->buildtime);
+    EGL_LOG_INFO(" - Branch:      %s", info->git.branch);
+    EGL_LOG_INFO(" - Commit:      %s", info->git.commit);
+    EGL_LOG_INFO(" - Size:        %u", info->size);
+    EGL_LOG_INFO(" - Checksum:    %u (0x%08x)", info->checksum, info->checksum);
+    EGL_LOG_INFO(" - Boot number: %u", info->boot_number);
 }
 
 uint32_t boot_mgr_highest_boot_number_get(void)
@@ -134,7 +134,7 @@ egl_result_t boot_mgr_init(void)
     /* Printout slot info */
     for(uint32_t i = 0; i < sizeof(slot_table)/sizeof(slot_table[0]); i++)
     {
-        EGL_TRACE_INFO("Slot %u:", i);
+        EGL_LOG_INFO("Slot %u:", i);
         boot_mgr_slot_info_print(slot_table[i]);
     }
 
@@ -166,18 +166,18 @@ void boot_mgr_process(void)
         result = boot_mgr_slot_validate(slot_table[slot_idx]);
         if(result == EGL_SUCCESS)
         {
-            EGL_TRACE_INFO("Slot %u successfully validated", slot_idx);
+            EGL_LOG_INFO("Slot %u successfully validated", slot_idx);
             break;
         }
         else
         {
-            EGL_TRACE_WARN("Fail to validate slot %u. Result: %s", slot_idx, EGL_RESULT(result));
+            EGL_LOG_WARN("Fail to validate slot %u. Result: %s", slot_idx, EGL_RESULT(result));
         }
     }
 
     result = egl_plat_boot(PLATFORM, boot_mgr_slot_index_get(slot_table[slot_idx]));
     if(result != EGL_SUCCESS)
     {
-        EGL_TRACE_ERROR("Fail to boot %u slot. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to boot %u slot. Result: %s", EGL_RESULT(result));
     }
 }
