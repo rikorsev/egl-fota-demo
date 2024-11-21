@@ -1,5 +1,6 @@
 #include "egl_lib.h"
 #include "plat.h"
+#include "rfm_test.h"
 
 #define EGL_MODULE_NAME "main"
 
@@ -47,6 +48,13 @@ static egl_result_t init(void)
         return result;
     }
 
+    result = rfm_test_init();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to init RFM. Result %s", EGL_RESULT(result));
+        return result;
+    }
+
     return result;
 }
 
@@ -63,6 +71,7 @@ static void blink(void)
 static void loop(void)
 {
     blink();
+    rfm_test_run();
 }
 
 int main(void)
