@@ -136,6 +136,12 @@ static size_t write_addr(uint32_t addr, void *data, size_t len)
         /* Wait for data transmission */
     }
     *(volatile uint8_t *)&SPI1->DR = ((uint8_t)addr & 0x7F) | 0x80;
+    while(!(SPI1->SR & SPI_SR_RXNE))
+    {
+        /* Wait for data reception */
+    }
+    *(volatile uint8_t *)&SPI1->DR; /* Dummy read */
+
 
     /* Write data */
     for(uint32_t i = 0; i < len; i++)
@@ -151,7 +157,7 @@ static size_t write_addr(uint32_t addr, void *data, size_t len)
             /* Wait for data reception */
         }
         /* Dummy read */
-        SPI2->DR;
+        *(volatile uint8_t *)&SPI1->DR;
     }
 
     /* Reset NSS */
@@ -173,6 +179,11 @@ static size_t read_addr(uint32_t addr, void *data, size_t len)
         /* Wait for data transmission */
     }
     *(volatile uint8_t *)&SPI1->DR = ((uint8_t)addr & 0x7F);
+    while(!(SPI1->SR & SPI_SR_RXNE))
+    {
+        /* Wait for data reception */
+    }
+    *(volatile uint8_t *)&SPI1->DR; /* Dummy read */
 
     /* Read data */
     for(uint32_t i = 0; i < len; i++)
