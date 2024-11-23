@@ -125,11 +125,19 @@ static egl_result_t init(void)
     return EGL_SUCCESS;
 }
 
-static size_t write(void *data, size_t len)
+static size_t write_addr(uint32_t addr, void *data, size_t len)
 {
     /* Set NSS */
     GPIOB->BSRR |= GPIO_BSRR_BR_6;
 
+    /* Set address */
+    while(!(SPI1->SR & SPI_SR_TXE))
+    {
+        /* Wait for data transmission */
+    }
+    *(volatile uint8_t *)&SPI1->DR = ((uint8_t)addr & 0x7F) | 0x80;
+
+    /* Write data */
     for(uint32_t i = 0; i < len; i++)
     {
         while(!(SPI1->SR & SPI_SR_TXE))
@@ -152,20 +160,28 @@ static size_t write(void *data, size_t len)
     return len;
 }
 
-static size_t read(void *data, size_t len)
+static size_t read_addr(uint32_t addr, void *data, size_t len)
 {
     uint8_t *data_ptr = data;
 
     /* Set NSS */
     GPIOB->BSRR |= GPIO_BSRR_BR_6;
 
+    /* Set address */
+    while(!(SPI1->SR & SPI_SR_TXE))
+    {
+        /* Wait for data transmission */
+    }
+    *(volatile uint8_t *)&SPI1->DR = ((uint8_t)addr & 0x7F);
+
+    /* Read data */
     for(uint32_t i = 0; i < len; i++)
     {
         while(!(SPI1->SR & SPI_SR_TXE))
         {
             /* Wait for data transmission */
         }
-        *(volatile uint8_t*)&SPI2->DR = 0; /* Send dummy data */
+        *(volatile uint8_t*)&SPI1->DR = 0; /* Send dummy data */
 
         while(!(SPI1->SR & SPI_SR_RXNE))
         {
@@ -184,6 +200,6 @@ static size_t read(void *data, size_t len)
 const egl_interface_t plat_rfm_iface_inst =
 {
     .init = init,
-    .write = write,
-    .read = read,
+    .write_addr = write_addr,
+    .read_addr = read_addr,
 };

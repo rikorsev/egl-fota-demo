@@ -27,12 +27,17 @@ static egl_result_t init(void)
     return EGL_SUCCESS;
 }
 
+static egl_result_t poweron(void)
+{
+    return EGL_SUCCESS;
+}
+
 static egl_result_t reset(void)
 {
     egl_result_t result;
     /* up 1 ms */
     GPIOA->BSRR |= GPIO_BSRR_BS_9;
-    result = egl_pm_sleep(SYSPM, 1);
+    result = egl_pm_sleep(SYSPM, 2);
     EGL_RESULT_CHECK(result);
 
     /* down 5 ms */
@@ -46,5 +51,6 @@ static egl_result_t reset(void)
 const egl_pm_t plat_rfm_pm_inst =
 {
     .init  = init,
+    .poweron = poweron,
     .reset = reset
 };
