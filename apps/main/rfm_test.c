@@ -26,40 +26,30 @@ egl_result_t rfm_test_run(void)
     result = egl_rfm69_read_byte(PLAT_RFM69, EGL_RFM69_REG_VERSION, &version);
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_ERROR("Fail to read rfm69 version. Result: %d", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to read rfm69 version. Result: %s", EGL_RESULT(result));
         return result;
     }
 
     EGL_LOG_INFO("RFM version: 0x%02x", version);
 
+    /* Get bitrate */
+    uint32_t bitrate;
+    result = egl_rfm69_bitrate_get(PLAT_RFM69, &bitrate);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get rfm69 bitrate. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("RFM bitrate: %u", bitrate);
+
     /* Set bitrate */
-    uint8_t bitrate_lsb;
-    result = egl_rfm69_read_byte(PLAT_RFM69, EGL_RFM69_REG_BITRATE_LSB, &bitrate_lsb);
+    result = egl_rfm69_bitrate_set(PLAT_RFM69, 115200);
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_ERROR("Fail to read rfm69 bitrate lsb. Result: %d", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to set rfm69 bitrate. Result: %s", EGL_RESULT(result));
         return result;
     }
-
-    EGL_LOG_INFO("Bitrate LSB A: 0x%02x", bitrate_lsb);
-
-    result = egl_rfm69_write_byte(PLAT_RFM69, EGL_RFM69_REG_BITRATE_LSB, 0xA5);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to write rfm69 bitrate lsb. Result: %d", EGL_RESULT(result));
-        return result;
-    }
-
-    egl_pm_sleep(SYSPM, 2);
-
-    result = egl_rfm69_read_byte(PLAT_RFM69, EGL_RFM69_REG_BITRATE_LSB, &bitrate_lsb);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to read rfm69 bitrate lsb. Result: %d", EGL_RESULT(result));
-        return result;
-    }
-
-    EGL_LOG_INFO("Bitrate LSB B: 0x%02x", bitrate_lsb);
 
     return result;
 }
