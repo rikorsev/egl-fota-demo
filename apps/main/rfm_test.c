@@ -173,6 +173,52 @@ static egl_result_t rfm_frequency_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_rc_calib_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm69_rc_calib_state_t state;
+
+    result = egl_rfm69_mode_set(PLAT_RFM69, EGL_RFM69_STANDBY_MODE);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set rfm69 mode. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm_rc_calib_state_get(PLAT_RFM69, &state);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get RC calib state. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("RC calib state: %u", state);
+
+    result = egl_rfm_rc_calib_start(PLAT_RFM69);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to start RC calibration. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("RC calibration start");
+
+    do
+    {
+        result = egl_rfm_rc_calib_state_get(PLAT_RFM69, &state);
+        if(result != EGL_SUCCESS)
+        {
+            EGL_LOG_ERROR("Fail to get RC calib state. Result: %s", EGL_RESULT(result));
+            return result;
+        }
+        EGL_LOG_INFO("RC calibration in progress...");
+    }while(state != EGL_RFM69_RC_CALIB_STATE_DONE);
+
+    EGL_LOG_INFO("RC calibration done");
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -204,13 +250,19 @@ void rfm_test_run(void)
     result = rfm_deviation_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_ERROR("Data deviation test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Deviation test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_frequency_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_ERROR("Data frequency test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Frequency test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_rc_calib_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("RC calibration test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
