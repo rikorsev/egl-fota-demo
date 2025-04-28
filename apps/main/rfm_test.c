@@ -118,7 +118,55 @@ static egl_result_t rfm_data_modul_test_run(void)
     result = egl_rfm69_data_mode_set(PLAT_RFM69, EGL_RFM69_DATA_MODE_CONTINIOUS_W_SYNC);
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_ERROR("Fail to set data mode. Result: %d", EGL_RESULT(result));
+        EGL_LOG_ERROR("Fail to set data mode. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
+static egl_result_t rfm_deviation_test_run(void)
+{
+    egl_result_t result;
+    uint32_t deviation;
+
+    result = egl_rfm69_deviation_get(PLAT_RFM69, &deviation);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get deviation. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("Deviation: %u", deviation);
+
+    result = egl_rfm69_deviation_set(PLAT_RFM69, 30000);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set deviation. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
+static egl_result_t rfm_frequency_test_run(void)
+{
+    egl_result_t result;
+    uint32_t frequency;
+
+    result = egl_rfm69_frequency_get(PLAT_RFM69, &frequency);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get frequency. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("Frequency: %u", frequency);
+
+    result = egl_rfm69_frequency_set(PLAT_RFM69, 868000000);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set frequency. Result: %s", EGL_RESULT(result));
         return result;
     }
 
@@ -151,6 +199,18 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Data modul test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_deviation_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Data deviation test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_frequency_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Data frequency test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
