@@ -243,6 +243,78 @@ static egl_result_t rfm_afc_ctrl_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_listen_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm69_listen_end_t end_action;
+    egl_rfm69_listen_criteria_t criteria;
+    egl_rfm69_listen_resolution_t rx_resolution;
+    egl_rfm69_listen_resolution_t idle_resolution;
+
+    result = egl_rfm69_listen_end_get(PLAT_RFM69, &end_action);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get listen end. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_criteria_get(PLAT_RFM69, &criteria);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get listen criteria. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_rx_resolution_get(PLAT_RFM69, &rx_resolution);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get listen RX resolution. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_idle_resolution_get(PLAT_RFM69, &idle_resolution);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get listen IDLE resolution. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("Listen end action: %u", end_action);
+    EGL_LOG_INFO("Listen criteria: %u", criteria);
+    EGL_LOG_INFO("Listen RX resolution: %u", rx_resolution);
+    EGL_LOG_INFO("Listen IDLE resolution: %u", idle_resolution);
+
+    result = egl_rfm69_listen_end_set(PLAT_RFM69, EGL_RFM69_LISTEN_STAY_RX);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set listen end action. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_criteria_set(PLAT_RFM69, EGL_RFM69_LISTEN_CRITERIA_ABOVE_RSSI_AND_SYNC_ADDR);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set listen criteria. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_rx_resolution_set(PLAT_RFM69, EGL_RFM69_LISTEN_RESOL_4_1MS);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set listen RX resolution. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_idle_resolution_set(PLAT_RFM69, EGL_RFM69_LISTEN_RESOL_262MS);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set listen IDLE resolution. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -293,6 +365,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("AFC control test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_listen_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Listen test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
