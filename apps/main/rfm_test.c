@@ -219,6 +219,30 @@ static egl_result_t rfm_rc_calib_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_afc_ctrl_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm69_afc_routine_t routine;
+
+    result = egl_rfm69_afc_routine_get(PLAT_RFM69, &routine);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get AFC routine type. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("AFC routine: %u", routine);
+
+    result = egl_rfm69_afc_routine_set(PLAT_RFM69, EGL_RFM69_AFC_ROUTINE_IMPROVED);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set AFC routine type. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -263,6 +287,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("RC calibration test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_afc_ctrl_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("AFC control test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
