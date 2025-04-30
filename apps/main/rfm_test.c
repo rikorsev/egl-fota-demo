@@ -354,6 +354,7 @@ static egl_result_t rfm_power_test_run(void)
     bool pa1_state;
     bool pa2_state;
     egl_result_t result;
+    egl_rfm69_power_ramp_t ramp;
 
     result = egl_rfm69_power_get(PLAT_RFM69, &power);
     if(result != EGL_SUCCESS)
@@ -383,10 +384,18 @@ static egl_result_t rfm_power_test_run(void)
         return result;
     }
 
+    result = egl_rfm69_power_ramp_get(PLAT_RFM69, &ramp);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get ramp time. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
     EGL_LOG_INFO("Power: %d dB", power);
     EGL_LOG_INFO("PA0: %u", pa0_state);
     EGL_LOG_INFO("PA1: %u", pa1_state);
     EGL_LOG_INFO("PA2: %u", pa2_state);
+    EGL_LOG_INFO("Ramp: %u", ramp);
 
     result = egl_rfm69_power_set(PLAT_RFM69, EGL_RFM69_MIN_POWER_DB);
     if(result != EGL_SUCCESS)
@@ -413,6 +422,13 @@ static egl_result_t rfm_power_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Fail to set PA2. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_power_ramp_set(PLAT_RFM69, EGL_RFM69_POWER_RAMP_2_MS);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set ramp time. Result: %s", EGL_RESULT(result));
         return result;
     }
 
