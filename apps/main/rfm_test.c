@@ -347,6 +347,78 @@ static egl_result_t rfm_listen_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_power_test_run(void)
+{
+    int8_t power;
+    bool pa0_state;
+    bool pa1_state;
+    bool pa2_state;
+    egl_result_t result;
+
+    result = egl_rfm69_power_get(PLAT_RFM69, &power);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get power. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_pa0_get(PLAT_RFM69, &pa0_state);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get PA0 state. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_pa1_get(PLAT_RFM69, &pa1_state);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get PA1 state. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_pa2_get(PLAT_RFM69, &pa2_state);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get PA2 state. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("Power: %d dB", power);
+    EGL_LOG_INFO("PA0: %u", pa0_state);
+    EGL_LOG_INFO("PA1: %u", pa1_state);
+    EGL_LOG_INFO("PA2: %u", pa2_state);
+
+    result = egl_rfm69_power_set(PLAT_RFM69, EGL_RFM69_MIN_POWER_DB);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set power. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_pa0_set(PLAT_RFM69, false);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set PA0. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_pa1_set(PLAT_RFM69, true);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set PA1. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_pa2_set(PLAT_RFM69, true);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set PA2. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -403,6 +475,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Listen test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_power_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Power test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
