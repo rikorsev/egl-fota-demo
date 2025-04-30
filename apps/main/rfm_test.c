@@ -250,6 +250,8 @@ static egl_result_t rfm_listen_test_run(void)
     egl_rfm69_listen_criteria_t criteria;
     egl_rfm69_listen_resolution_t rx_resolution;
     egl_rfm69_listen_resolution_t idle_resolution;
+    uint8_t idle_coef;
+    uint8_t rx_coef;
 
     result = egl_rfm69_listen_end_get(PLAT_RFM69, &end_action);
     if(result != EGL_SUCCESS)
@@ -279,10 +281,26 @@ static egl_result_t rfm_listen_test_run(void)
         return result;
     }
 
+    result = egl_rfm69_listen_rx_coef_get(PLAT_RFM69, &rx_coef);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get RX coefficient. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_idle_coef_get(PLAT_RFM69, &idle_coef);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get IDLE coefficient. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
     EGL_LOG_INFO("Listen end action: %u", end_action);
     EGL_LOG_INFO("Listen criteria: %u", criteria);
     EGL_LOG_INFO("Listen RX resolution: %u", rx_resolution);
     EGL_LOG_INFO("Listen IDLE resolution: %u", idle_resolution);
+    EGL_LOG_INFO("Listen RX coefficient: %u", rx_coef);
+    EGL_LOG_INFO("Listen IDLE coefficient: %u", idle_coef);
 
     result = egl_rfm69_listen_end_set(PLAT_RFM69, EGL_RFM69_LISTEN_STAY_RX);
     if(result != EGL_SUCCESS)
@@ -309,6 +327,20 @@ static egl_result_t rfm_listen_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Fail to set listen IDLE resolution. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_rx_coef_set(PLAT_RFM69, 11);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set RX coefficient. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_listen_idle_coef_set(PLAT_RFM69, 12);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set IDLE coefficient. Result: %s", EGL_RESULT(result));
         return result;
     }
 
