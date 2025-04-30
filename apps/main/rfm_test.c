@@ -435,6 +435,46 @@ static egl_result_t rfm_power_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_ocp_test_run(void)
+{
+    bool ocp_state;
+    uint8_t ocp_trim;
+    egl_result_t result;
+
+    result = egl_rfm69_ocp_trim_get(PLAT_RFM69, &ocp_trim);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get OCP trim. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_ocp_state_get(PLAT_RFM69, &ocp_state);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get OCP state. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("OCP state: %u", ocp_state);
+    EGL_LOG_INFO("OCP trim: %u mA", ocp_trim);
+
+    result = egl_rfm69_ocp_trim_set(PLAT_RFM69, 120);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set OCP trim. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_ocp_state_set(PLAT_RFM69, false);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set OCP state. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -497,6 +537,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Power test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_ocp_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("OCP test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
