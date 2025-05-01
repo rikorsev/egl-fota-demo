@@ -475,6 +475,55 @@ static egl_result_t rfm_ocp_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_lna_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm69_lna_gain_t select_gain;
+    egl_rfm69_lna_gain_t current_gain;
+    egl_rfm69_lna_zin_t zin;
+
+    result = egl_rfm69_lna_select_gain_get(PLAT_RFM69, &select_gain);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get LNA select gain. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_lna_current_gain_get(PLAT_RFM69, &current_gain);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get LNA current gain. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_lna_zin_get(PLAT_RFM69, &zin);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get LNA zin. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("LNA gain select: %u", select_gain);
+    EGL_LOG_INFO("LNA gain current: %u", current_gain);
+    EGL_LOG_INFO("LNA Zin: %u", zin);
+
+    result = egl_rfm69_lna_select_gain_set(PLAT_RFM69, EGL_RFM69_LNA_GAIN_HIGHEST_MINUS_48_DB);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set LNA select gain. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_lna_zin_set(PLAT_RFM69, EGL_RFM69_LNA_ZIN_200_OHMS);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get LNA zin. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -543,6 +592,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("OCP test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_lna_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("LNA test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
