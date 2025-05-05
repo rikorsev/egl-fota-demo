@@ -524,6 +524,111 @@ static egl_result_t rfm_lna_test_run(void)
     return result;
 }
 
+
+static egl_result_t rfm_bw_test_run(void)
+{
+    egl_result_t result;
+    uint8_t rx_bw_exp;
+    egl_rfm69_bw_mant_t rx_bw_mant;
+    uint8_t rx_dcc_freq;
+    uint8_t afc_bw_exp;
+    egl_rfm69_bw_mant_t afc_bw_mant;
+    uint8_t afc_dcc_freq;
+
+    result = egl_rfm69_rx_bw_exp_get(PLAT_RFM69, &rx_bw_exp);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get RX BW exp. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_rx_bw_mant_get(PLAT_RFM69, &rx_bw_mant);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get RX BW mant. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_rx_dcc_freq_get(PLAT_RFM69, &rx_dcc_freq);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get RX DCC freq. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_afc_bw_exp_get(PLAT_RFM69, &afc_bw_exp);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get RX BW exp. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_afc_bw_mant_get(PLAT_RFM69, &afc_bw_mant);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get RX BW mant. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_afc_dcc_freq_get(PLAT_RFM69, &afc_dcc_freq);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get RX DCC freq. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("RX BW exp: %u", rx_bw_exp);
+    EGL_LOG_INFO("RX BW mant: %u", rx_bw_mant);
+    EGL_LOG_INFO("RX DCC freq: %u", rx_dcc_freq);
+    EGL_LOG_INFO("AFC BW exp: %u", afc_bw_exp);
+    EGL_LOG_INFO("AFC BW mant: %u", afc_bw_mant);
+    EGL_LOG_INFO("AFC DCC freq: %u", afc_dcc_freq);
+
+    result = egl_rfm69_rx_bw_exp_set(PLAT_RFM69, 1);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set RX BW exp. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_rx_bw_mant_set(PLAT_RFM69, EGL_RFM69_BW_MANT_20);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set RX BW mant. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_rx_dcc_freq_set(PLAT_RFM69, 3);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set RX DCC freq. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_afc_bw_exp_set(PLAT_RFM69, 4);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set RX BW exp. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_afc_bw_mant_set(PLAT_RFM69, EGL_RFM69_BW_MANT_24);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set RX BW mant. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_afc_dcc_freq_set(PLAT_RFM69, 6);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set RX DCC freq. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -598,6 +703,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("LNA test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_bw_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("BW test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
