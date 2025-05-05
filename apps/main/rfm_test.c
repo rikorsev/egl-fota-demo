@@ -629,6 +629,62 @@ static egl_result_t rfm_bw_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_ook_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm_ook_thresh_dec_t dec;
+    egl_rfm69_ook_thresh_step_t step;
+    egl_rfm69_ook_thresh_type_t type;
+
+    result = egl_rfm69_ook_peak_thresh_dec_get(PLAT_RFM69, &dec);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get OOK thresh dec. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_ook_peak_thresh_step_get(PLAT_RFM69, &step);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get OOK thresh step. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_ook_thresh_type_get(PLAT_RFM69, &type);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to get OOK thresh type. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    EGL_LOG_INFO("OOK Thresh dec: %u", dec);
+    EGL_LOG_INFO("OOK Thresh step: %u", step);
+    EGL_LOG_INFO("OOK Thresh type: %u", type);
+
+    result = egl_rfm69_ook_peak_thresh_dec_set(PLAT_RFM69, EGL_RFM69_OOK_THRESH_DEC_ONCE_PER_2_CHIPS);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set OOK thresh dec. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_ook_peak_thresh_step_set(PLAT_RFM69, EGL_RFM69_OOK_THRESH_STEP_2_0_DB);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set OOK thresh set. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    result = egl_rfm69_ook_thresh_type_set(PLAT_RFM69, EGL_RFM69_OOK_THRESH_TYPE_PEAK);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to set OOK thresh type. Result: %s", EGL_RESULT(result));
+        return result;
+    }
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -709,6 +765,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("BW test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_ook_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("OOK test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
