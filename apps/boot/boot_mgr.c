@@ -1,8 +1,6 @@
 #include "egl_lib.h"
 #include "plat.h"
 
-#define EGL_MODULE_NAME "boot_mgr"
-
 static slot_info_t *slot_table[PLAT_NUM_SLOTS];
 
 egl_result_t boot_mgr_slot_validate(slot_info_t *info)

@@ -1,8 +1,6 @@
 #include "egl_lib.h"
 #include "plat.h"
 
-#define EGL_MODULE_NAME "rfm_test"
-
 static egl_result_t rfm_version_test_run(void)
 {
     egl_result_t result;
@@ -10,11 +8,7 @@ static egl_result_t rfm_version_test_run(void)
 
     /* Check version */
     result = egl_rfm69_read_byte(PLAT_RFM69, EGL_RFM69_REG_VERSION, &version);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to read rfm69 version. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RFM version: 0x%02x", version);
 
@@ -27,20 +21,12 @@ static egl_result_t rfm_bitrate_test_run(void)
     uint32_t bitrate;
 
     result = egl_rfm69_bitrate_get(PLAT_RFM69, &bitrate);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get rfm69 bitrate. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RFM bitrate: %u", bitrate);
 
     result = egl_rfm69_bitrate_set(PLAT_RFM69, 115200);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set rfm69 bitrate. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -51,20 +37,12 @@ static egl_result_t rfm_mode_test_run(void)
     egl_rfm69_mode_t mode;
 
     result = egl_rfm69_mode_get(PLAT_RFM69, &mode);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get rfm69 mode. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RFM mode: %u", mode);
 
     result = egl_rfm69_mode_set(PLAT_RFM69, EGL_RFM69_RX_MODE);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set rfm69 mode. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -77,50 +55,26 @@ static egl_result_t rfm_data_modul_test_run(void)
     egl_rfm69_data_mode_t          datamode;
 
     result = egl_rfm69_modulation_shaping_get(PLAT_RFM69, &modshap);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get modulation shaping. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_modulation_type_get(PLAT_RFM69, &modtype);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get modulation type. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_data_mode_get(PLAT_RFM69, &datamode);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get data mode. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("Modulation shaping: %u", modshap);
     EGL_LOG_INFO("Modulation type: %u", modtype);
     EGL_LOG_INFO("Data mode: %u", datamode);
 
     result = egl_rfm69_modulation_shaping_set(PLAT_RFM69, EGL_RFM69_MODULATION_SHAPING_1);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set modulation shaping. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_modulation_type_set(PLAT_RFM69, EGL_RFM69_MODULATION_TYPE_OOK);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set modulation type. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_data_mode_set(PLAT_RFM69, EGL_RFM69_DATA_MODE_CONTINIOUS_W_SYNC);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set data mode. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -131,20 +85,12 @@ static egl_result_t rfm_deviation_test_run(void)
     uint32_t deviation;
 
     result = egl_rfm69_deviation_get(PLAT_RFM69, &deviation);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get deviation. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("Deviation: %u", deviation);
 
     result = egl_rfm69_deviation_set(PLAT_RFM69, 30000);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set deviation. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -155,20 +101,12 @@ static egl_result_t rfm_frequency_test_run(void)
     uint32_t frequency;
 
     result = egl_rfm69_frequency_get(PLAT_RFM69, &frequency);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get frequency. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("Frequency: %u", frequency);
 
     result = egl_rfm69_frequency_set(PLAT_RFM69, 868000000);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set frequency. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -179,38 +117,22 @@ static egl_result_t rfm_rc_calib_test_run(void)
     egl_rfm69_rc_calib_state_t state;
 
     result = egl_rfm69_mode_set(PLAT_RFM69, EGL_RFM69_STANDBY_MODE);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set rfm69 mode. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm_rc_calib_state_get(PLAT_RFM69, &state);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get RC calib state. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RC calib state: %u", state);
 
     result = egl_rfm_rc_calib_start(PLAT_RFM69);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to start RC calibration. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RC calibration start");
 
     do
     {
         result = egl_rfm_rc_calib_state_get(PLAT_RFM69, &state);
-        if(result != EGL_SUCCESS)
-        {
-            EGL_LOG_ERROR("Fail to get RC calib state. Result: %s", EGL_RESULT(result));
-            return result;
-        }
+        EGL_RESULT_CHECK(result);
         EGL_LOG_INFO("RC calibration in progress...");
     }while(state != EGL_RFM69_RC_CALIB_STATE_DONE);
 
@@ -225,20 +147,12 @@ static egl_result_t rfm_afc_ctrl_test_run(void)
     egl_rfm69_afc_routine_t routine;
 
     result = egl_rfm69_afc_routine_get(PLAT_RFM69, &routine);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get AFC routine type. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("AFC routine: %u", routine);
 
     result = egl_rfm69_afc_routine_set(PLAT_RFM69, EGL_RFM69_AFC_ROUTINE_IMPROVED);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set AFC routine type. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -254,46 +168,22 @@ static egl_result_t rfm_listen_test_run(void)
     uint8_t rx_coef;
 
     result = egl_rfm69_listen_end_get(PLAT_RFM69, &end_action);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get listen end. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_criteria_get(PLAT_RFM69, &criteria);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get listen criteria. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_rx_resolution_get(PLAT_RFM69, &rx_resolution);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get listen RX resolution. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_idle_resolution_get(PLAT_RFM69, &idle_resolution);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get listen IDLE resolution. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_rx_coef_get(PLAT_RFM69, &rx_coef);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get RX coefficient. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_idle_coef_get(PLAT_RFM69, &idle_coef);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get IDLE coefficient. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("Listen end action: %u", end_action);
     EGL_LOG_INFO("Listen criteria: %u", criteria);
@@ -303,46 +193,22 @@ static egl_result_t rfm_listen_test_run(void)
     EGL_LOG_INFO("Listen IDLE coefficient: %u", idle_coef);
 
     result = egl_rfm69_listen_end_set(PLAT_RFM69, EGL_RFM69_LISTEN_STAY_RX);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set listen end action. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_criteria_set(PLAT_RFM69, EGL_RFM69_LISTEN_CRITERIA_ABOVE_RSSI_AND_SYNC_ADDR);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set listen criteria. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_rx_resolution_set(PLAT_RFM69, EGL_RFM69_LISTEN_RESOL_4_1MS);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set listen RX resolution. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_idle_resolution_set(PLAT_RFM69, EGL_RFM69_LISTEN_RESOL_262MS);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set listen IDLE resolution. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_rx_coef_set(PLAT_RFM69, 11);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set RX coefficient. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_listen_idle_coef_set(PLAT_RFM69, 12);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set IDLE coefficient. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -357,39 +223,19 @@ static egl_result_t rfm_power_test_run(void)
     egl_rfm69_power_ramp_t ramp;
 
     result = egl_rfm69_power_get(PLAT_RFM69, &power);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get power. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_pa0_get(PLAT_RFM69, &pa0_state);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get PA0 state. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_pa1_get(PLAT_RFM69, &pa1_state);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get PA1 state. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_pa2_get(PLAT_RFM69, &pa2_state);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get PA2 state. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_power_ramp_get(PLAT_RFM69, &ramp);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get ramp time. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("Power: %d dB", power);
     EGL_LOG_INFO("PA0: %u", pa0_state);
@@ -398,39 +244,19 @@ static egl_result_t rfm_power_test_run(void)
     EGL_LOG_INFO("Ramp: %u", ramp);
 
     result = egl_rfm69_power_set(PLAT_RFM69, EGL_RFM69_MIN_POWER_DB);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set power. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_pa0_set(PLAT_RFM69, false);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set PA0. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_pa1_set(PLAT_RFM69, true);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set PA1. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_pa2_set(PLAT_RFM69, true);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set PA2. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_power_ramp_set(PLAT_RFM69, EGL_RFM69_POWER_RAMP_2_MS);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set ramp time. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -442,35 +268,19 @@ static egl_result_t rfm_ocp_test_run(void)
     egl_result_t result;
 
     result = egl_rfm69_ocp_trim_get(PLAT_RFM69, &ocp_trim);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get OCP trim. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_ocp_state_get(PLAT_RFM69, &ocp_state);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get OCP state. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("OCP state: %u", ocp_state);
     EGL_LOG_INFO("OCP trim: %u mA", ocp_trim);
 
     result = egl_rfm69_ocp_trim_set(PLAT_RFM69, 120);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set OCP trim. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_ocp_state_set(PLAT_RFM69, false);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set OCP state. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -483,43 +293,23 @@ static egl_result_t rfm_lna_test_run(void)
     egl_rfm69_lna_zin_t zin;
 
     result = egl_rfm69_lna_select_gain_get(PLAT_RFM69, &select_gain);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get LNA select gain. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_lna_current_gain_get(PLAT_RFM69, &current_gain);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get LNA current gain. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_lna_zin_get(PLAT_RFM69, &zin);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get LNA zin. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("LNA gain select: %u", select_gain);
     EGL_LOG_INFO("LNA gain current: %u", current_gain);
     EGL_LOG_INFO("LNA Zin: %u", zin);
 
     result = egl_rfm69_lna_select_gain_set(PLAT_RFM69, EGL_RFM69_LNA_GAIN_HIGHEST_MINUS_48_DB);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set LNA select gain. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_lna_zin_set(PLAT_RFM69, EGL_RFM69_LNA_ZIN_200_OHMS);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get LNA zin. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -536,46 +326,22 @@ static egl_result_t rfm_bw_test_run(void)
     uint8_t afc_dcc_freq;
 
     result = egl_rfm69_rx_bw_exp_get(PLAT_RFM69, &rx_bw_exp);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get RX BW exp. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rx_bw_mant_get(PLAT_RFM69, &rx_bw_mant);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get RX BW mant. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rx_dcc_freq_get(PLAT_RFM69, &rx_dcc_freq);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get RX DCC freq. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_afc_bw_exp_get(PLAT_RFM69, &afc_bw_exp);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get RX BW exp. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_afc_bw_mant_get(PLAT_RFM69, &afc_bw_mant);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get RX BW mant. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_afc_dcc_freq_get(PLAT_RFM69, &afc_dcc_freq);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get RX DCC freq. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RX BW exp: %u", rx_bw_exp);
     EGL_LOG_INFO("RX BW mant: %u", rx_bw_mant);
@@ -585,46 +351,23 @@ static egl_result_t rfm_bw_test_run(void)
     EGL_LOG_INFO("AFC DCC freq: %u", afc_dcc_freq);
 
     result = egl_rfm69_rx_bw_exp_set(PLAT_RFM69, 1);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set RX BW exp. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rx_bw_mant_set(PLAT_RFM69, EGL_RFM69_BW_MANT_20);
     if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set RX BW mant. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rx_dcc_freq_set(PLAT_RFM69, 3);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set RX DCC freq. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_afc_bw_exp_set(PLAT_RFM69, 4);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set RX BW exp. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_afc_bw_mant_set(PLAT_RFM69, EGL_RFM69_BW_MANT_24);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set RX BW mant. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_afc_dcc_freq_set(PLAT_RFM69, 6);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set RX DCC freq. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -637,50 +380,33 @@ static egl_result_t rfm_ook_test_run(void)
     egl_rfm69_ook_thresh_type_t type;
 
     result = egl_rfm69_ook_peak_thresh_dec_get(PLAT_RFM69, &dec);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get OOK thresh dec. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_ook_peak_thresh_step_get(PLAT_RFM69, &step);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get OOK thresh step. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_ook_thresh_type_get(PLAT_RFM69, &type);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to get OOK thresh type. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("OOK Thresh dec: %u", dec);
     EGL_LOG_INFO("OOK Thresh step: %u", step);
     EGL_LOG_INFO("OOK Thresh type: %u", type);
 
     result = egl_rfm69_ook_peak_thresh_dec_set(PLAT_RFM69, EGL_RFM69_OOK_THRESH_DEC_ONCE_PER_2_CHIPS);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set OOK thresh dec. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_ook_peak_thresh_step_set(PLAT_RFM69, EGL_RFM69_OOK_THRESH_STEP_2_0_DB);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set OOK thresh set. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_ook_thresh_type_set(PLAT_RFM69, EGL_RFM69_OOK_THRESH_TYPE_PEAK);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to set OOK thresh type. Result: %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned int line, void *ctx)
+{
+    egl_log(egl_log_default_get(), EGL_LOG_LEVEL_ERROR, file, "line: %u: Result: %s", line, EGL_RESULT(result));
 
     return result;
 }
@@ -688,6 +414,14 @@ static egl_result_t rfm_ook_test_run(void)
 void rfm_test_run(void)
 {
     egl_result_t result;
+
+    egl_result_error_hook_t error_hook =
+    {
+        .func = error_hook_func,
+        .ctx = NULL
+    };
+
+    egl_result_error_hook_set(&error_hook);
 
     result = rfm_version_test_run();
     if(result != EGL_SUCCESS)

@@ -2,8 +2,6 @@
 #include "plat.h"
 #include "rfm_test.h"
 
-#define EGL_MODULE_NAME "main"
-
 #if CONFIG_EGL_LOG_ENABLED
 static egl_result_t init_log(void)
 {

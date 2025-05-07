@@ -5,7 +5,6 @@
 #include "fota_mgr.h"
 #include "boot_mgr.h"
 
-#define EGL_MODULE_NAME "boot_main"
 #define BOOT_CRC_POLY ((uint32_t)0x4C11DB7)
 #define BOOT_CRC_INIT ((uint32_t)0xFFFFFFFF)
 

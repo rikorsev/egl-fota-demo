@@ -6,8 +6,6 @@
 #include "egl_lib.h"
 #include "plat.h"
 
-#define EGL_MODULE_NAME "radio-hal"
-
 void SX1232InitIo( void )
 {
     egl_result_t result;

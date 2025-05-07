@@ -8,8 +8,6 @@
 #include "sx1232-Misc.h"
 #include "boot_mgr.h"
 
-#define EGL_MODULE_NAME "fota"
-
 #define FOTA_DATA_PACKET_PAYLOAD      (128U)
 #define FOTA_MARKER_PING              (0x50494E47)
 #define FOTA_MARKER_SLOT              (0x534C4F54)
