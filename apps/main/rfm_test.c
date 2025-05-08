@@ -378,6 +378,8 @@ static egl_result_t rfm_ook_test_run(void)
     egl_rfm_ook_thresh_dec_t dec;
     egl_rfm69_ook_thresh_step_t step;
     egl_rfm69_ook_thresh_type_t type;
+    egl_rfm69_ook_thresh_avg_filt_t filt;
+    uint8_t fixed_thrash;
 
     result = egl_rfm69_ook_peak_thresh_dec_get(PLAT_RFM69, &dec);
     EGL_RESULT_CHECK(result);
@@ -388,9 +390,17 @@ static egl_result_t rfm_ook_test_run(void)
     result = egl_rfm69_ook_thresh_type_get(PLAT_RFM69, &type);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm69_ook_thresh_avg_filt_get(PLAT_RFM69, &filt);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_ook_thresh_fixed_get(PLAT_RFM69, &fixed_thrash);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("OOK Thresh dec: %u", dec);
     EGL_LOG_INFO("OOK Thresh step: %u", step);
     EGL_LOG_INFO("OOK Thresh type: %u", type);
+    EGL_LOG_INFO("OOK Thresh avg filt: %u", filt);
+    EGL_LOG_INFO("OOK Thresh fixed: %u", fixed_thrash);
 
     result = egl_rfm69_ook_peak_thresh_dec_set(PLAT_RFM69, EGL_RFM69_OOK_THRESH_DEC_ONCE_PER_2_CHIPS);
     EGL_RESULT_CHECK(result);
@@ -399,6 +409,12 @@ static egl_result_t rfm_ook_test_run(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_ook_thresh_type_set(PLAT_RFM69, EGL_RFM69_OOK_THRESH_TYPE_PEAK);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_ook_thresh_avg_filt_set(PLAT_RFM69, EGL_RFM69_OOK_CHIP_RATE_DIV_2P);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_ook_thresh_fixed_set(PLAT_RFM69, 3);
     EGL_RESULT_CHECK(result);
 
     return result;
