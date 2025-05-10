@@ -119,19 +119,19 @@ static egl_result_t rfm_rc_calib_test_run(void)
     result = egl_rfm69_mode_set(PLAT_RFM69, EGL_RFM69_STANDBY_MODE);
     EGL_RESULT_CHECK(result);
 
-    result = egl_rfm_rc_calib_state_get(PLAT_RFM69, &state);
+    result = egl_rfm69_rc_calib_state_get(PLAT_RFM69, &state);
     EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RC calib state: %u", state);
 
-    result = egl_rfm_rc_calib_start(PLAT_RFM69);
+    result = egl_rfm69_rc_calib_start(PLAT_RFM69);
     EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RC calibration start");
 
     do
     {
-        result = egl_rfm_rc_calib_state_get(PLAT_RFM69, &state);
+        result = egl_rfm69_rc_calib_state_get(PLAT_RFM69, &state);
         EGL_RESULT_CHECK(result);
         EGL_LOG_INFO("RC calibration in progress...");
     }while(state != EGL_RFM69_RC_CALIB_STATE_DONE);
@@ -420,6 +420,105 @@ static egl_result_t rfm_ook_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_afc_test_run(void)
+{
+    egl_result_t result;
+    bool afc_state;
+    bool afc_auto_start_state;
+    bool afc_auto_clear_state;
+
+    result = egl_rfm69_afc_state_get(PLAT_RFM69, &afc_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_auto_start_get(PLAT_RFM69, &afc_auto_start_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_auto_clear_get(PLAT_RFM69, &afc_auto_clear_state);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("AFC state: %u", afc_state);
+    EGL_LOG_INFO("1: AFC auto start state: %u", afc_auto_start_state);
+    EGL_LOG_INFO("1: AFC auto clear state: %u", afc_auto_clear_state);
+
+    result = egl_rfm69_afc_auto_start_set(PLAT_RFM69, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_auto_clear_set(PLAT_RFM69, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_auto_start_get(PLAT_RFM69, &afc_auto_start_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_auto_clear_get(PLAT_RFM69, &afc_auto_clear_state);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("2: AFC auto start state: %u", afc_auto_start_state);
+    EGL_LOG_INFO("2: AFC auto clear state: %u", afc_auto_clear_state);
+
+    result = egl_rfm69_afc_auto_start_set(PLAT_RFM69, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_auto_clear_set(PLAT_RFM69, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_auto_start_get(PLAT_RFM69, &afc_auto_start_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_auto_clear_get(PLAT_RFM69, &afc_auto_clear_state);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("3: AFC auto start state: %u", afc_auto_start_state);
+    EGL_LOG_INFO("3: AFC auto clear state: %u", afc_auto_clear_state);
+
+    result = egl_rfm69_afc_start(PLAT_RFM69);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("AFC started");
+
+    do
+    {
+        EGL_LOG_INFO("AFC in progress...");
+        result = egl_rfm69_afc_state_get(PLAT_RFM69, &afc_state);
+        EGL_RESULT_CHECK(result);
+    }while(afc_state != true);
+
+    EGL_LOG_INFO("AFC complete");
+
+    result = egl_rfm69_afc_clear(PLAT_RFM69);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+#if 0
+static egl_result_t rfm_fei_test_run(void)
+{
+    egl_result_t result;
+    bool fei_state;
+
+    result = egl_rfm69_fei_state_get(PLAT_RFM69, &fei_state);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("FEI state: %u", fei_state);
+
+    result = egl_rfm69_fei_start(PLAT_RFM69);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("FEI start");
+
+    do
+    {
+        EGL_LOG_INFO("FEI in progress...");
+        result = egl_rfm69_fei_state_get(PLAT_RFM69, &fei_state);
+        EGL_RESULT_CHECK(result);
+    }while(fei_state != true);
+
+    EGL_LOG_INFO("FEI complete");
+
+    return result;
+}
+#endif
+
 static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned int line, void *ctx)
 {
     egl_log(egl_log_default_get(), EGL_LOG_LEVEL_ERROR, file, "line: %u: Result: %s", line, EGL_RESULT(result));
@@ -430,12 +529,7 @@ static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned in
 void rfm_test_run(void)
 {
     egl_result_t result;
-
-    egl_result_error_hook_t error_hook =
-    {
-        .func = error_hook_func,
-        .ctx = NULL
-    };
+    egl_result_error_hook_t error_hook = { error_hook_func };
 
     egl_result_error_hook_set(&error_hook);
 
@@ -522,6 +616,20 @@ void rfm_test_run(void)
     {
         EGL_LOG_ERROR("OOK test fail. Result: %s", EGL_RESULT(result));
     }
+
+    result = rfm_afc_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("AFC test fail. Result: %s", EGL_RESULT(result));
+    }
+
+#if 0
+    result = rfm_fei_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("FEI test fail. Result: %s", EGL_RESULT(result));
+    }
+#endif
 }
 
 egl_result_t rfm_test_init(void)
