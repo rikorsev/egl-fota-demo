@@ -426,6 +426,7 @@ static egl_result_t rfm_afc_test_run(void)
     bool afc_state;
     bool afc_auto_start_state;
     bool afc_auto_clear_state;
+    int16_t afc_value;
 
     result = egl_rfm69_afc_state_get(PLAT_RFM69, &afc_state);
     EGL_RESULT_CHECK(result);
@@ -436,7 +437,11 @@ static egl_result_t rfm_afc_test_run(void)
     result = egl_rfm69_afc_auto_clear_get(PLAT_RFM69, &afc_auto_clear_state);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm69_afc_get(PLAT_RFM69, &afc_value);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("AFC state: %u", afc_state);
+    EGL_LOG_INFO("AFC value: %d Hz", afc_value);
     EGL_LOG_INFO("1: AFC auto start state: %u", afc_auto_start_state);
     EGL_LOG_INFO("1: AFC auto clear state: %u", afc_auto_clear_state);
 
@@ -490,17 +495,22 @@ static egl_result_t rfm_afc_test_run(void)
     return result;
 }
 
-#if 0
 static egl_result_t rfm_fei_test_run(void)
 {
     egl_result_t result;
     bool fei_state;
+    int16_t fei_value;
 
     result = egl_rfm69_fei_state_get(PLAT_RFM69, &fei_state);
     EGL_RESULT_CHECK(result);
 
-    EGL_LOG_INFO("FEI state: %u", fei_state);
+    result = egl_rfm69_fei_get(PLAT_RFM69, &fei_value);
+    EGL_RESULT_CHECK(result);
 
+    EGL_LOG_INFO("FEI state: %u", fei_state);
+    EGL_LOG_INFO("FEI value: %d Hz", fei_value);
+
+#if 0
     result = egl_rfm69_fei_start(PLAT_RFM69);
     EGL_RESULT_CHECK(result);
 
@@ -514,10 +524,10 @@ static egl_result_t rfm_fei_test_run(void)
     }while(fei_state != true);
 
     EGL_LOG_INFO("FEI complete");
+#endif
 
     return result;
 }
-#endif
 
 static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned int line, void *ctx)
 {
@@ -623,13 +633,11 @@ void rfm_test_run(void)
         EGL_LOG_ERROR("AFC test fail. Result: %s", EGL_RESULT(result));
     }
 
-#if 0
     result = rfm_fei_test_run();
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("FEI test fail. Result: %s", EGL_RESULT(result));
     }
-#endif
 }
 
 egl_result_t rfm_test_init(void)
