@@ -569,6 +569,70 @@ static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned in
     return result;
 }
 
+static egl_result_t rfm_dio_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm69_dio_mode_t dio0;
+    egl_rfm69_dio_mode_t dio1;
+    egl_rfm69_dio_mode_t dio2;
+    egl_rfm69_dio_mode_t dio3;
+    egl_rfm69_dio_mode_t dio4;
+    egl_rfm69_dio_mode_t dio5;
+    egl_rfm69_clk_out_t clk_out;
+
+    result = egl_rfm69_dio0_mode_get(PLAT_RFM69, &dio0);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio1_mode_get(PLAT_RFM69, &dio1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio2_mode_get(PLAT_RFM69, &dio2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio3_mode_get(PLAT_RFM69, &dio3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio4_mode_get(PLAT_RFM69, &dio4);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio5_mode_get(PLAT_RFM69, &dio5);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_clk_out_get(PLAT_RFM69, &clk_out);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("DIO0 mode: %u", dio0);
+    EGL_LOG_INFO("DIO1 mode: %u", dio1);
+    EGL_LOG_INFO("DIO2 mode: %u", dio2);
+    EGL_LOG_INFO("DIO3 mode: %u", dio3);
+    EGL_LOG_INFO("DIO4 mode: %u", dio4);
+    EGL_LOG_INFO("DIO5 mode: %u", dio5);
+    EGL_LOG_INFO("CLK OUT mode: %u", clk_out);
+
+    result = egl_rfm69_dio0_mode_set(PLAT_RFM69, EGL_RFM69_DIO_MODE_1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio1_mode_set(PLAT_RFM69, EGL_RFM69_DIO_MODE_2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio2_mode_set(PLAT_RFM69, EGL_RFM69_DIO_MODE_3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio3_mode_set(PLAT_RFM69, EGL_RFM69_DIO_MODE_1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio4_mode_set(PLAT_RFM69, EGL_RFM69_DIO_MODE_2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dio5_mode_set(PLAT_RFM69, EGL_RFM69_DIO_MODE_3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_clk_out_set(PLAT_RFM69, EGL_RFM69_CLK_OUT_FXOSC_DIV_16);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -676,6 +740,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("RSSI test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_dio_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("DIO test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
