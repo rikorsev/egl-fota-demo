@@ -529,6 +529,39 @@ static egl_result_t rfm_fei_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_rssi_test_run(void)
+{
+    bool state;
+    egl_result_t result;
+    int8_t value;
+
+    result = egl_rfm69_rssi_state_get(PLAT_RFM69, &state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_rssi_get(PLAT_RFM69, &value);
+
+    EGL_LOG_INFO("RSSI state: %u", state);
+    EGL_LOG_INFO("RSSI value: %d dB", value);
+
+#if 0
+    result = egl_rfm69_rssi_start(PLAT_RFM69);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("RSSI measure start");
+
+    do
+    {
+        EGL_LOG_INFO("RSSI measure in progress...");
+        result = egl_rfm69_rssi_state_get(PLAT_RFM69, &state);
+        EGL_RESULT_CHECK(result);
+    }while(state != true);
+
+    EGL_LOG_INFO("RSSI measure complete");
+#endif
+
+    return result;
+}
+
 static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned int line, void *ctx)
 {
     egl_log(egl_log_default_get(), EGL_LOG_LEVEL_ERROR, file, "line: %u: Result: %s", line, EGL_RESULT(result));
@@ -637,6 +670,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("FEI test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_rssi_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("RSSI test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
