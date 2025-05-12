@@ -672,6 +672,30 @@ static egl_result_t rfm_flags_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_timeout_test_run(void)
+{
+    egl_result_t result;
+    uint8_t rx_start_tout;
+    uint8_t rssi_thresh_tout;
+
+    result = egl_rfm69_timeout_rx_start_get(PLAT_RFM69, &rx_start_tout);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_timeout_rssi_thresh_get(PLAT_RFM69, &rssi_thresh_tout);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("TIMEOUT RX start: %u", rx_start_tout);
+    EGL_LOG_INFO("TIMEOUT RSSI thresh: %u", rssi_thresh_tout);
+
+    result = egl_rfm69_timeout_rx_start_set(PLAT_RFM69, 123);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_timeout_rssi_thresh_set(PLAT_RFM69, 231);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -791,6 +815,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Flags test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_timeout_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Timeout test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
