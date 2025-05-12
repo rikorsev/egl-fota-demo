@@ -712,6 +712,46 @@ static egl_result_t rfm_preamble_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_sync_test_run(void)
+{
+    uint8_t sync_tol;
+    uint8_t sync_size;
+    bool sync_state;
+    egl_result_t result;
+    egl_rfm69_fifo_fill_cont_t fill_cond;
+
+    result = egl_rfm69_sync_tol_get(PLAT_RFM69, &sync_tol);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_sync_size_get(PLAT_RFM69, &sync_size);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_fifo_fill_cond_get(PLAT_RFM69, &fill_cond);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_sync_state_get(PLAT_RFM69, &sync_state);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Sync state: %u", sync_state);
+    EGL_LOG_INFO("Sync tol: %u", sync_tol);
+    EGL_LOG_INFO("Sync size: %u", sync_size);
+    EGL_LOG_INFO("Fifo fill condition: %u", fill_cond);
+
+    result = egl_rfm69_sync_tol_set(PLAT_RFM69, 7);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_sync_size_set(PLAT_RFM69, 8);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_fifo_fill_cond_set(PLAT_RFM69, EGL_RFM69_FIFO_FILL_COND_AS_LONG_AS_SET);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_sync_state_set(PLAT_RFM69, false);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -843,6 +883,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Preamble test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_sync_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Sync test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
