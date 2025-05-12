@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "egl_lib.h"
 #include "plat.h"
 
@@ -719,11 +721,10 @@ static egl_result_t rfm_sync_test_run(void)
     bool sync_state;
     egl_result_t result;
     egl_rfm69_fifo_fill_cont_t fill_cond;
+    uint8_t sync_buff[EGL_RFM69_SYNC_MAX_SIZE + 1] = { 0 }; /* +1 for 0 termination */
+    char *sync_str = "rikorsev";
 
     result = egl_rfm69_sync_tol_get(PLAT_RFM69, &sync_tol);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_rfm69_sync_size_get(PLAT_RFM69, &sync_size);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_fifo_fill_cond_get(PLAT_RFM69, &fill_cond);
@@ -732,21 +733,33 @@ static egl_result_t rfm_sync_test_run(void)
     result = egl_rfm69_sync_state_get(PLAT_RFM69, &sync_state);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm69_sync_get(PLAT_RFM69, sync_buff, &sync_size);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("Sync state: %u", sync_state);
     EGL_LOG_INFO("Sync tol: %u", sync_tol);
     EGL_LOG_INFO("Sync size: %u", sync_size);
     EGL_LOG_INFO("Fifo fill condition: %u", fill_cond);
+    EGL_LOG_INFO("Sync bytes: %02x %02x %02x %02x %02x %02x %02x %02x", sync_buff[0],
+                                                                        sync_buff[1],
+                                                                        sync_buff[2],
+                                                                        sync_buff[3],
+                                                                        sync_buff[4],
+                                                                        sync_buff[5],
+                                                                        sync_buff[6],
+                                                                        sync_buff[7]);
+    EGL_LOG_INFO("Sync string: %s", sync_buff);
 
     result = egl_rfm69_sync_tol_set(PLAT_RFM69, 7);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_rfm69_sync_size_set(PLAT_RFM69, 8);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_fifo_fill_cond_set(PLAT_RFM69, EGL_RFM69_FIFO_FILL_COND_AS_LONG_AS_SET);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_sync_state_set(PLAT_RFM69, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_sync_set(PLAT_RFM69, (uint8_t *)sync_str, strlen(sync_str));
     EGL_RESULT_CHECK(result);
 
     return result;
