@@ -534,14 +534,24 @@ static egl_result_t rfm_rssi_test_run(void)
     bool state;
     egl_result_t result;
     int8_t value;
+    int8_t thresh;
 
     result = egl_rfm69_rssi_state_get(PLAT_RFM69, &state);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rssi_get(PLAT_RFM69, &value);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_rssi_thresh_get(PLAT_RFM69, &thresh);
+    EGL_RESULT_CHECK(result);
+
 
     EGL_LOG_INFO("RSSI state: %u", state);
     EGL_LOG_INFO("RSSI value: %d dB", value);
+    EGL_LOG_INFO("RSSI thresh: %d dB", thresh);
+
+    result = egl_rfm69_rssi_thresh_set(PLAT_RFM69, -100);
+    EGL_RESULT_CHECK(result);
 
 #if 0
     result = egl_rfm69_rssi_start(PLAT_RFM69);
