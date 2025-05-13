@@ -853,6 +853,38 @@ static egl_result_t rfm_address_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_auto_modes_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm69_intermediate_mode_t mode;
+    egl_rfm69_exit_condition_t exit_cond;
+    egl_rfm69_enter_condition_t enter_cond;
+
+    result = egl_rfm69_intermediate_mode_get(PLAT_RFM69, &mode);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_exit_condition_get(PLAT_RFM69, &exit_cond);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_enter_condition_get(PLAT_RFM69, &enter_cond);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Intermediate mode: %u", mode);
+    EGL_LOG_INFO("Exit condition: %u", exit_cond);
+    EGL_LOG_INFO("Enter condition: %u", enter_cond);
+
+    result = egl_rfm69_intermediate_mode_set(PLAT_RFM69, EGL_RFM69_INTERMEDIATE_MODE_TX);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_exit_condition_set(PLAT_RFM69, EGL_RFM69_EXIT_CONDITION_FALL_EDGE_FIFO_NOT_EMPTY);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_enter_condition_set(PLAT_RFM69, EGL_RFM69_ENTER_CONDITION_RISE_CRC_OK);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1008,6 +1040,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Address test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_auto_modes_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Auto modes test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
