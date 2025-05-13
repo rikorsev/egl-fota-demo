@@ -813,6 +813,46 @@ static egl_result_t rfm_packet_config_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_payload_length_test_run(void)
+{
+    egl_result_t result;
+    uint8_t payload_len;
+
+    result = egl_rfm69_payload_length_get(PLAT_RFM69, &payload_len);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Payload length: %u", payload_len);
+
+    result = egl_rfm69_payload_length_set(PLAT_RFM69, 255);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+static egl_result_t rfm_address_test_run(void)
+{
+    egl_result_t result;
+    uint8_t address_node;
+    uint8_t address_broadcast;
+
+    result = egl_rfm69_node_address_get(PLAT_RFM69, &address_node);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_broadcast_address_get(PLAT_RFM69, &address_broadcast);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Address node: %u", address_node);
+    EGL_LOG_INFO("Address broadcast: %u", address_broadcast);
+
+    result = egl_rfm69_node_address_set(PLAT_RFM69, 11);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_broadcast_address_set(PLAT_RFM69, 22);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -956,6 +996,18 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Packet config test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_payload_length_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Payload length test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_address_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Address test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
