@@ -936,6 +936,12 @@ static egl_result_t rfm_fifo_thresh_thresh_run(void)
     return result;
 }
 
+static egl_result_t rfm_aes_test_run(void)
+{
+    uint8_t aes_key[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+    return  egl_rfm69_aes_key_set(PLAT_RFM69, aes_key, sizeof(aes_key));
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1103,6 +1109,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Fifo thresh test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_aes_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("AES test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
