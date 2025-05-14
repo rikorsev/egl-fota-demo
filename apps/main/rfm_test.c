@@ -942,6 +942,34 @@ static egl_result_t rfm_aes_test_run(void)
     return  egl_rfm69_aes_key_set(PLAT_RFM69, aes_key, sizeof(aes_key));
 }
 
+static egl_result_t rfm_temp_test_result(void)
+{
+    egl_result_t result;
+    bool state;
+    int8_t temp;
+
+    result = egl_rfm69_temp_meas_start(PLAT_RFM69);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Temp measurement start");
+
+    do
+    {
+        EGL_LOG_INFO("Temp measurement in progress...");
+        result = egl_rfm69_temp_meas_state_get(PLAT_RFM69, &state);
+        EGL_RESULT_CHECK(result);
+    }while(state == true);
+
+    EGL_LOG_INFO("Temp measurement complete");
+
+    result = egl_rfm69_temp_get(PLAT_RFM69, &temp);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Temp: %d", temp);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1115,6 +1143,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("AES test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_temp_test_result();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Temp test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
