@@ -885,6 +885,30 @@ static egl_result_t rfm_auto_modes_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_fifo_thresh_thresh_run(void)
+{
+    egl_result_t result;
+    uint8_t fifo_thresh;
+    egl_rfm69_tx_start_cond_t tx_start_cond;
+
+    result = egl_rfm69_fifo_thresh_get(PLAT_RFM69, &fifo_thresh);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_tx_start_cond_get(PLAT_RFM69, &tx_start_cond);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("FIFO thresh: %u", fifo_thresh);
+    EGL_LOG_INFO("TX start cond: %u", tx_start_cond);
+
+    result = egl_rfm69_fifo_thresh_set(PLAT_RFM69, 127);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_tx_start_cond_set(PLAT_RFM69, EGL_RFM69_TX_START_CONDITION_FIFO_NOT_EMPTY);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1046,6 +1070,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Auto modes test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_fifo_thresh_thresh_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fifo thresh test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
