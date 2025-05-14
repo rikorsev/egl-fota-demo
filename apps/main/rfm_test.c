@@ -773,6 +773,9 @@ static egl_result_t rfm_packet_config_test_run(void)
     egl_rfm69_dc_free_t dc_free_type;
     bool crc_auto_clear;
     bool crc_check;
+    bool aes_state;
+    bool rx_auto_restart;
+    uint8_t interpacket_delay;
 
     result = egl_rfm69_address_filtering_get(PLAT_RFM69, &filtering);
     EGL_RESULT_CHECK(result);
@@ -789,11 +792,23 @@ static egl_result_t rfm_packet_config_test_run(void)
     result = egl_rfm69_packet_format_get(PLAT_RFM69, &packet_format);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm69_aes_state_get(PLAT_RFM69, &aes_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_auto_rx_restart_state_get(PLAT_RFM69, &rx_auto_restart);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_interpacket_delay_get(PLAT_RFM69, &interpacket_delay);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("Packet filtering: %u", filtering);
     EGL_LOG_INFO("Packet format: %u", packet_format);
     EGL_LOG_INFO("Packet DC free type: %u", dc_free_type);
     EGL_LOG_INFO("Packet CRC autoclear: %u", crc_auto_clear);
     EGL_LOG_INFO("Packet CRC state: %u", crc_check);
+    EGL_LOG_INFO("Packet AES state: %u", aes_state);
+    EGL_LOG_INFO("Packet RX autorestart: %u", rx_auto_restart);
+    EGL_LOG_INFO("Packet RX delay: %u", interpacket_delay);
 
     result = egl_rfm69_address_filtering_set(PLAT_RFM69, EGL_RFM69_ADDRESS_GILTERING_NODE_AND_BROADCAST);
     EGL_RESULT_CHECK(result);
@@ -808,6 +823,18 @@ static egl_result_t rfm_packet_config_test_run(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_packet_format_set(PLAT_RFM69, EGL_RFM69_PACKET_FORMAT_VARIABLE_LENGTH);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_aes_state_set(PLAT_RFM69, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_auto_rx_restart_state_set(PLAT_RFM69, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_interpacket_delay_set(PLAT_RFM69, 15);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_rx_restart(PLAT_RFM69);
     EGL_RESULT_CHECK(result);
 
     return result;
