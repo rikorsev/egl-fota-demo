@@ -970,6 +970,54 @@ static egl_result_t rfm_temp_test_result(void)
     return result;
 }
 
+static egl_result_t rfm_test_reg_test_run(void)
+{
+    uint32_t afc_offset;
+    egl_result_t result;
+    egl_rfm69_sensitivity_mode_t sens_mode;
+    egl_rfm69_pa1_mode_t pa1_mode;
+    egl_rfm69_pa2_mode_t pa2_mode;
+    egl_rfm69_dagc_mode_t dagc_mode;
+
+    result = egl_rfm69_sensitivity_mode_get(PLAT_RFM69, &sens_mode);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_pa1_mode_get(PLAT_RFM69, &pa1_mode);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_pa2_mode_get(PLAT_RFM69, &pa2_mode);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dagc_mode_get(PLAT_RFM69, &dagc_mode);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_offset_get(PLAT_RFM69, &afc_offset);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Test sensetivity mode: %u (0x%02x)", sens_mode, sens_mode);
+    EGL_LOG_INFO("Test PA1 mode: %u (0x%02x)", pa1_mode, pa1_mode);
+    EGL_LOG_INFO("Test PA2 mode: %u (0x%02x)", pa2_mode, pa2_mode);
+    EGL_LOG_INFO("Test DAGC mode: %u (0x%02x)", dagc_mode, dagc_mode);
+    EGL_LOG_INFO("Test AFC offset: %u Hz", afc_offset);
+
+    result = egl_rfm69_sensitivity_mode_set(PLAT_RFM69, EGL_RFM69_SENSITIVITY_MODE_HIGH);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_pa1_mode_set(PLAT_RFM69, EGL_RFM69_PA1_MODE_PLUS_13_DBM);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_pa2_mode_set(PLAT_RFM69, EGL_RFM69_PA2_MODE_PLUS_13_DBM);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_dagc_mode_set(PLAT_RFM69, EGL_RFM69_DAGC_MODE_IMPROVED_MARGIN2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_offset_set(PLAT_RFM69, 124440);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1149,6 +1197,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Temp test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_test_reg_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Test reg test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
