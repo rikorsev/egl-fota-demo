@@ -36,12 +36,41 @@ static egl_result_t rfm_bitrate_test_run(void)
 static egl_result_t rfm_mode_test_run(void)
 {
     egl_result_t result;
-    egl_rfm69_mode_t mode;
+    egl_rfm69_mode_t op_mode;
+    bool listen_mode;
+    bool sequencer_mode;
 
-    result = egl_rfm69_mode_get(PLAT_RFM69, &mode);
+    result = egl_rfm69_mode_get(PLAT_RFM69, &op_mode);
     EGL_RESULT_CHECK(result);
 
-    EGL_LOG_INFO("RFM mode: %u", mode);
+    result = egl_rfm69_listen_state_get(PLAT_RFM69, &listen_mode);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_sequencer_state_get(PLAT_RFM69, &sequencer_mode);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("OP Mode: %u", op_mode);
+    EGL_LOG_INFO("Sequencer mode: %u", sequencer_mode);
+    EGL_LOG_INFO("1: Listen mode: %u", listen_mode);
+
+    result = egl_rfm69_sequencer_state_set(PLAT_RFM69, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_listen_state_set(PLAT_RFM69, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_listen_state_get(PLAT_RFM69, &listen_mode);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("2: Listen mode: %u", listen_mode);
+
+    result = egl_rfm69_listen_abort(PLAT_RFM69);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_listen_state_get(PLAT_RFM69, &listen_mode);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("3: Listen mode: %u", listen_mode);
 
     result = egl_rfm69_mode_set(PLAT_RFM69, EGL_RFM69_RX_MODE);
     EGL_RESULT_CHECK(result);
