@@ -56,6 +56,22 @@ static egl_result_t rfm_mode_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_bitrate_test_run(void)
+{
+    egl_result_t result;
+    uint32_t bitrate;
+
+    result = egl_rfm66_bitrate_get(PLAT_RFM66, &bitrate);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("RFM bitrate: %u", bitrate);
+
+    result = egl_rfm66_bitrate_set(PLAT_RFM66, 115200);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -73,6 +89,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_INFO("Mode test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_bitrate_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_INFO("Bitrate test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
