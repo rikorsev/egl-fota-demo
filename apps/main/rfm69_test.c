@@ -9,7 +9,7 @@ static egl_result_t rfm_version_test_run(void)
     uint8_t version;
 
     /* Check version */
-    result = egl_rfm69_read_byte(PLAT_RFM69, EGL_RFM69_REG_VERSION, &version);
+    result = egl_rfm69_version_get(PLAT_RFM69, &version);
     EGL_RESULT_CHECK(result);
 
     EGL_LOG_INFO("RFM version: 0x%02x", version);
@@ -1240,11 +1240,7 @@ egl_result_t rfm_test_init(void)
     egl_result_t result;
 
     result = egl_rfm69_init(PLAT_RFM69);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to init rfm69 module. Result: %d", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }

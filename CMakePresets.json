@@ -81,7 +81,7 @@
             }
         },
         {
-            "name": "main-stm32l073-nucleo-slot-boot-debug",
+            "name": "main-stm32l073-nucleo-rfm69-slot-boot-debug",
             "binaryDir": "build/main/boot",
             "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
@@ -90,11 +90,12 @@
                 "CMAKE_BUILD_TYPE": "debug",
                 "TARGET_APP": "main",
                 "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot"
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm69"
             }
         },
         {
-            "name": "main-stm32l073-nucleo-slot-boot-release",
+            "name": "main-stm32l073-nucleo-rfm69-slot-boot-release",
             "binaryDir": "build/main/boot",
             "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
@@ -103,7 +104,36 @@
                 "CMAKE_BUILD_TYPE": "release",
                 "TARGET_APP": "main",
                 "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot"
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm69"
+            }
+        },
+        {
+            "name": "main-stm32l073-nucleo-rfm66-slot-boot-debug",
+            "binaryDir": "build/main/boot",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "debug",
+                "TARGET_APP": "main",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm66"
+            }
+        },
+        {
+            "name": "main-stm32l073-nucleo-rfm66-slot-boot-release",
+            "binaryDir": "build/main/boot",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "release",
+                "TARGET_APP": "main",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm66"
             }
         }
     ],
@@ -140,13 +170,23 @@
             "jobs": 4
         },
         {
-            "name": "main-stm32l073-nucleo-slot-boot-debug",
-            "configurePreset": "main-stm32l073-nucleo-slot-boot-debug",
+            "name": "main-stm32l073-nucleo-rfm66-slot-boot-debug",
+            "configurePreset": "main-stm32l073-nucleo-rfm66-slot-boot-debug",
             "jobs": 4
         },
         {
-            "name": "main-stm32l073-nucleo-slot-boot-release",
-            "configurePreset": "main-stm32l073-nucleo-slot-boot-release",
+            "name": "main-stm32l073-nucleo-rfm66-slot-boot-release",
+            "configurePreset": "main-stm32l073-nucleo-rfm66-slot-boot-release",
+            "jobs": 4
+        },
+        {
+            "name": "main-stm32l073-nucleo-rfm69-slot-boot-debug",
+            "configurePreset": "main-stm32l073-nucleo-rfm69-slot-boot-debug",
+            "jobs": 4
+        },
+        {
+            "name": "main-stm32l073-nucleo-rfm69-slot-boot-release",
+            "configurePreset": "main-stm32l073-nucleo-rfm69-slot-boot-release",
             "jobs": 4
         }
     ]

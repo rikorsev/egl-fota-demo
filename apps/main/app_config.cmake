@@ -6,3 +6,11 @@ set(CONFIG_APP_VERSION_SUFIX "-RC1-${TARGET_SLOT}")
 if(CMAKE_BUILD_TYPE STREQUAL "release")
     set(CONFIG_APP_MINIMAL 1) 
 endif()
+
+message("Target RFM: ${TARGET_RFM}")
+
+if(${TARGET_RFM} STREQUAL "rfm69")
+    add_definitions(-DCONFIG_APP_TARGET_RFM_69=1)
+elseif(${TARGET_RFM} STREQUAL "rfm66")
+    add_definitions(-DCONFIG_APP_TARGET_RFM_66=1)
+endif()
