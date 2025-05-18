@@ -107,8 +107,10 @@ static egl_result_t rfm_frequency_test_run(void)
 static egl_result_t rfm_power_test_run(void)
 {
     uint8_t power;
+    bool low_pn_tx_state;
     egl_result_t result;
     egl_rfm66_pa_select_t select;
+    egl_rfm66_power_ramp_t ramp;
 
     result = egl_rfm66_pa_power_get(PLAT_RFM66, &power);
     EGL_RESULT_CHECK(result);
@@ -116,13 +118,27 @@ static egl_result_t rfm_power_test_run(void)
     result = egl_rfm66_pa_select_get(PLAT_RFM66, &select);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm66_pa_ramp_get(PLAT_RFM66, &ramp);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_low_pn_tx_state_get(PLAT_RFM66, &low_pn_tx_state);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("Power raw value: %u", power);
     EGL_LOG_INFO("Power select: %u", select);
+    EGL_LOG_INFO("Power ramp: %u", ramp);
+    EGL_LOG_INFO("Low PN TX state: %u", low_pn_tx_state);
 
     result = egl_rfm66_pa_power_set(PLAT_RFM66, 14);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm66_pa_select_set(PLAT_RFM66, EGL_RFM66_PA_SELECT_PA_BOOST);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_pa_ramp_set(PLAT_RFM66, EGL_RFM66_POWER_RAMP_31_US);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_low_pn_tx_state_set(PLAT_RFM66, true);
     EGL_RESULT_CHECK(result);
 
     return result;
