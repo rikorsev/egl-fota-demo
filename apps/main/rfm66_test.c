@@ -144,6 +144,46 @@ static egl_result_t rfm_power_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_ocp_test_run(void)
+{
+    bool ocp_state;
+    uint8_t ocp_trim;
+    egl_result_t result;
+
+    result = egl_rfm66_ocp_state_get(PLAT_RFM66, &ocp_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ocp_trim_get(PLAT_RFM66, &ocp_trim);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("OCP state: %u", ocp_state);
+    EGL_LOG_INFO("1: OCP trim: %u mA", ocp_trim);
+
+    result = egl_rfm66_ocp_state_set(PLAT_RFM66, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ocp_trim_set(PLAT_RFM66, 120);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ocp_trim_get(PLAT_RFM66, &ocp_trim);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("2: OCP trim: %u mA", ocp_trim);
+
+    result = egl_rfm66_ocp_trim_set(PLAT_RFM66, 230);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ocp_trim_get(PLAT_RFM66, &ocp_trim);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("3: OCP trim: %u mA", ocp_trim);
+
+    result = egl_rfm66_ocp_trim_set(PLAT_RFM66, 250);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -185,6 +225,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_INFO("Power test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_ocp_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_INFO("OCP test cail. Result: %s", EGL_RESULT(result));
     }
 }
 
