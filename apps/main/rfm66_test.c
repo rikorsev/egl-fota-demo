@@ -88,6 +88,22 @@ static egl_result_t rfm_deviation_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_frequency_test_run(void)
+{
+    egl_result_t result;
+    uint32_t frequency;
+
+    result = egl_rfm66_frequency_get(PLAT_RFM66, &frequency);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Frequency: %u Hz", frequency);
+
+    result = egl_rfm66_frequency_set(PLAT_RFM66, 868000000);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -117,6 +133,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_INFO("Deviation test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_frequency_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_INFO("Frequency test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
