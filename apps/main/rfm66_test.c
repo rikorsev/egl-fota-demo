@@ -104,6 +104,30 @@ static egl_result_t rfm_frequency_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_power_test_run(void)
+{
+    uint8_t power;
+    egl_result_t result;
+    egl_rfm66_pa_select_t select;
+
+    result = egl_rfm66_pa_power_get(PLAT_RFM66, &power);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_pa_select_get(PLAT_RFM66, &select);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Power raw value: %u", power);
+    EGL_LOG_INFO("Power select: %u", select);
+
+    result = egl_rfm66_pa_power_set(PLAT_RFM66, 14);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_pa_select_set(PLAT_RFM66, EGL_RFM66_PA_SELECT_PA_BOOST);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -139,6 +163,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_INFO("Frequency test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_power_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_INFO("Power test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
