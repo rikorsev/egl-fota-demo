@@ -264,6 +264,38 @@ static egl_result_t rfm_rx_config_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_rssi_config_test_run(void)
+{
+    int8_t offset;
+    egl_result_t result;
+    egl_rfm66_rssi_smoothing_t smoothing;
+
+    result = egl_rfm66_rssi_offset_get(PLAT_RFM66, &offset);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rssi_smoothing_get(PLAT_RFM66, &smoothing);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("RSSI smoothing: %u", smoothing);
+    EGL_LOG_INFO("1: RSSI offset: %d", offset);
+
+    result = egl_rfm66_rssi_smoothing_set(PLAT_RFM66, EGL_RFM66_RSSI_SMOOTHING_256_SAMPLES);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rssi_offset_set(PLAT_RFM66, -16);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rssi_offset_get(PLAT_RFM66, &offset);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("2: RSSI offset: %d", offset);
+
+    result = egl_rfm66_rssi_offset_set(PLAT_RFM66, 15);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -323,6 +355,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_INFO("RX config test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_rssi_config_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_INFO("RSSI config test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
