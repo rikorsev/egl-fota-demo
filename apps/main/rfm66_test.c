@@ -184,6 +184,30 @@ static egl_result_t rfm_ocp_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_lna_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm66_lna_boost_t boost_state;
+    egl_rfm66_lna_gain_t gain;
+
+    result = egl_rfm66_lna_boost_state_get(PLAT_RFM66, &boost_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_lna_gain_get(PLAT_RFM66, &gain);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("LNA boost state: %u", boost_state);
+    EGL_LOG_INFO("LNA gain: %u", gain);
+
+    result = egl_rfm66_lna_boost_state_set(PLAT_RFM66, EGL_RFM66_LNA_BOOST_ON);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_lna_gain_set(PLAT_RFM66, EGL_RFM66_LNA_GAIN_HIGHEST_MINUS_48_DB);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -230,7 +254,13 @@ void rfm_test_run(void)
     result = rfm_ocp_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("OCP test cail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_INFO("OCP test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_lna_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_INFO("LNA test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
