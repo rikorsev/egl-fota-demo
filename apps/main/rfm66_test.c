@@ -208,6 +208,62 @@ static egl_result_t rfm_lna_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_rx_config_test_run(void)
+{
+    bool auto_agc_state;
+    bool auto_afc_state;
+    bool reset_rx_with_pll_lock;
+    bool reset_rx_wo_pll_lock;
+    bool reset_rx_on_collision;
+    egl_result_t result;
+    egl_rfm66_rx_trigger_t trigger;
+
+    result = egl_rfm66_rx_trigger_get(PLAT_RFM66, &trigger);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_auto_agc_state_get(PLAT_RFM66, &auto_agc_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_auto_afc_state_get(PLAT_RFM66, &auto_afc_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_restart_rx_with_pll_lock_state_get(PLAT_RFM66, &reset_rx_with_pll_lock);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_restart_rx_wo_pll_lock_state_get(PLAT_RFM66, &reset_rx_wo_pll_lock);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_restart_rx_on_collision_state_get(PLAT_RFM66, &reset_rx_on_collision);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("RX trigger: %u", trigger);
+    EGL_LOG_INFO("Auto AGC: %u", auto_agc_state);
+    EGL_LOG_INFO("Auto AFC: %u", auto_afc_state);
+    EGL_LOG_INFO("RX restart with PLL lock: %u", reset_rx_with_pll_lock);
+    EGL_LOG_INFO("RX restart without PLL lock: %u", reset_rx_wo_pll_lock);
+    EGL_LOG_INFO("RX restart on collision: %u", reset_rx_on_collision);
+
+    result = egl_rfm66_rx_trigger_set(PLAT_RFM66, EGL_RFM66_RX_TRIGGER_3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_auto_agc_state_set(PLAT_RFM66, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_auto_afc_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_restart_rx_with_pll_lock_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_restart_rx_wo_pll_lock_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_restart_rx_on_collision_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -261,6 +317,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_INFO("LNA test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_rx_config_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_INFO("RX config test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
