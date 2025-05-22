@@ -266,7 +266,10 @@ static egl_result_t rfm_rx_config_test_run(void)
 
 static egl_result_t rfm_rssi_config_test_run(void)
 {
+    int8_t rssi;
     int8_t offset;
+    int8_t threshold;
+    uint8_t collision;
     egl_result_t result;
     egl_rfm66_rssi_smoothing_t smoothing;
 
@@ -276,7 +279,19 @@ static egl_result_t rfm_rssi_config_test_run(void)
     result = egl_rfm66_rssi_smoothing_get(PLAT_RFM66, &smoothing);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm66_rssi_collision_get(PLAT_RFM66, &collision);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rssi_threshold_get(PLAT_RFM66, &threshold);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rssi_get(PLAT_RFM66, &rssi);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("RSSI smoothing: %u", smoothing);
+    EGL_LOG_INFO("RSSI collision: %u dB", collision);
+    EGL_LOG_INFO("RSSI threshold: %d", threshold);
+    EGL_LOG_INFO("RSSI: %d", rssi);
     EGL_LOG_INFO("1: RSSI offset: %d", offset);
 
     result = egl_rfm66_rssi_smoothing_set(PLAT_RFM66, EGL_RFM66_RSSI_SMOOTHING_256_SAMPLES);
@@ -291,6 +306,12 @@ static egl_result_t rfm_rssi_config_test_run(void)
     EGL_LOG_INFO("2: RSSI offset: %d", offset);
 
     result = egl_rfm66_rssi_offset_set(PLAT_RFM66, 15);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rssi_collision_set(PLAT_RFM66, 20);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rssi_threshold_set(PLAT_RFM66, -100);
     EGL_RESULT_CHECK(result);
 
     return result;
