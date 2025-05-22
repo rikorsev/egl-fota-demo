@@ -360,9 +360,13 @@ static egl_result_t rfm_bw_test_run(void)
 static egl_result_t rfm_ook_test_run(void)
 {
     bool bit_sync;
+    uint8_t fix_thresh;
     egl_result_t result;
+    egl_rfm66_ook_thresh_dec_t dec;
     egl_rfm66_ook_thresh_step_t step;
     egl_rfm66_ook_thresh_type_t type;
+    egl_rfm66_ook_thresh_avg_filt_t filt;
+    egl_rfm66_ook_avg_offset_t offset;
 
     result = egl_rfm66_ook_peak_thresh_step_get(PLAT_RFM66, &step);
     EGL_RESULT_CHECK(result);
@@ -373,9 +377,25 @@ static egl_result_t rfm_ook_test_run(void)
     result = egl_rfm66_bit_sync_state_get(PLAT_RFM66, &bit_sync);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm66_ook_thresh_fixed_get(PLAT_RFM66, &fix_thresh);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_thresh_avg_filt_get(PLAT_RFM66, &filt);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_peak_thresh_dec_get(PLAT_RFM66, &dec);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_avg_offset_get(PLAT_RFM66, &offset);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("Bit sync state: %u", bit_sync);
     EGL_LOG_INFO("OOK Thresh step: %u", step);
     EGL_LOG_INFO("OOK Thresh type: %u", type);
+    EGL_LOG_INFO("OOK Thresh fixed: %u", fix_thresh);
+    EGL_LOG_INFO("OOK Thresh dec: %u", dec);
+    EGL_LOG_INFO("OOK Thresh avg filt: %u", filt);
+    EGL_LOG_INFO("OOK average offset: %u", offset);
 
     result = egl_rfm66_ook_peak_thresh_step_set(PLAT_RFM66, EGL_RFM66_OOK_THRESH_STEP_2_0_DB);
     EGL_RESULT_CHECK(result);
@@ -384,6 +404,18 @@ static egl_result_t rfm_ook_test_run(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm66_bit_sync_state_set(PLAT_RFM66, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_thresh_fixed_set(PLAT_RFM66, 3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_thresh_avg_filt_set(PLAT_RFM66, EGL_RFM66_OOK_CHIP_RATE_DIV_2P);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_peak_thresh_dec_set(PLAT_RFM66, EGL_RFM66_OOK_THRESH_DEC_ONCE_PER_2_CHIPS);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_avg_offset_set(PLAT_RFM66, EGL_RFM66_OOK_AVERAGE_OFFSET_6_DB);
     EGL_RESULT_CHECK(result);
 
     return result;
