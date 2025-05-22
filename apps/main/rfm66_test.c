@@ -421,6 +421,38 @@ static egl_result_t rfm_ook_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_afc_fei_test_run(void)
+{
+    bool afc_auto_clear_state;
+    int16_t afc_value;
+    int16_t fei_value;
+    egl_result_t result;
+
+    result = egl_rfm66_afc_auto_clear_get(PLAT_RFM66, &afc_auto_clear_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_afc_get(PLAT_RFM66, &afc_value);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_fei_get(PLAT_RFM66, &fei_value);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("AFC auto clear state: %u", afc_auto_clear_state);
+    EGL_LOG_INFO("AFC value: %d", afc_value);
+    EGL_LOG_INFO("FEI value: %d", fei_value);
+
+    result = egl_rfm66_afc_clear(PLAT_RFM66);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_afc_auto_clear_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_start(PLAT_RFM66);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -500,6 +532,11 @@ void rfm_test_run(void)
         EGL_LOG_ERROR("OOK test fail. Result: %s", EGL_RESULT(result));
     }
 
+    result = rfm_afc_fei_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("AFC test fail. Result: %s", EGL_RESULT(result));
+    }
 }
 
 egl_result_t rfm_test_init(void)
