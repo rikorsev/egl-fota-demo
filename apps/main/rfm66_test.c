@@ -317,6 +317,46 @@ static egl_result_t rfm_rssi_config_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_bw_test_run(void)
+{
+    egl_result_t result;
+    uint8_t rx_bw_exp;
+    egl_rfm66_bw_mant_t rx_bw_mant;
+    uint8_t afc_bw_exp;
+    egl_rfm66_bw_mant_t afc_bw_mant;
+
+    result = egl_rfm66_rx_bw_exp_get(PLAT_RFM66, &rx_bw_exp);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rx_bw_mant_get(PLAT_RFM66, &rx_bw_mant);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_afc_bw_exp_get(PLAT_RFM66, &afc_bw_exp);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_afc_bw_mant_get(PLAT_RFM66, &afc_bw_mant);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("RX BW exp: %u", rx_bw_exp);
+    EGL_LOG_INFO("RX BW mant: %u", rx_bw_mant);
+    EGL_LOG_INFO("AFC BW exp: %u", afc_bw_exp);
+    EGL_LOG_INFO("AFC BW mant: %u", afc_bw_mant);
+
+    result = egl_rfm66_rx_bw_exp_set(PLAT_RFM66, 1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rx_bw_mant_set(PLAT_RFM66, EGL_RFM66_BW_MANT_20);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_afc_bw_exp_set(PLAT_RFM66, 4);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_afc_bw_mant_set(PLAT_RFM66, EGL_RFM66_BW_MANT_24);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -327,61 +367,67 @@ void rfm_test_run(void)
     result = rfm_version_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("Version test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Version test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_mode_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("Mode test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Mode test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_bitrate_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("Bitrate test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Bitrate test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_deviation_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("Deviation test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Deviation test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_frequency_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("Frequency test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Frequency test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_power_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("Power test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Power test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_ocp_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("OCP test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("OCP test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_lna_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("LNA test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("LNA test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_rx_config_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("RX config test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("RX config test fail. Result: %s", EGL_RESULT(result));
     }
 
     result = rfm_rssi_config_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_INFO("RSSI config test fail. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("RSSI config test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_bw_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("BW test fail. Result: %s", EGL_RESULT(result));
     }
 }
 

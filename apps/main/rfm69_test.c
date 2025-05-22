@@ -385,7 +385,6 @@ static egl_result_t rfm_bw_test_run(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rx_bw_mant_set(PLAT_RFM69, EGL_RFM69_BW_MANT_20);
-    if(result != EGL_SUCCESS)
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rx_dcc_freq_set(PLAT_RFM69, 3);
