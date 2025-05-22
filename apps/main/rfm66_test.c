@@ -357,6 +357,38 @@ static egl_result_t rfm_bw_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_ook_test_run(void)
+{
+    bool bit_sync;
+    egl_result_t result;
+    egl_rfm66_ook_thresh_step_t step;
+    egl_rfm66_ook_thresh_type_t type;
+
+    result = egl_rfm66_ook_peak_thresh_step_get(PLAT_RFM66, &step);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_thresh_type_get(PLAT_RFM66, &type);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_bit_sync_state_get(PLAT_RFM66, &bit_sync);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Bit sync state: %u", bit_sync);
+    EGL_LOG_INFO("OOK Thresh step: %u", step);
+    EGL_LOG_INFO("OOK Thresh type: %u", type);
+
+    result = egl_rfm66_ook_peak_thresh_step_set(PLAT_RFM66, EGL_RFM66_OOK_THRESH_STEP_2_0_DB);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_ook_thresh_type_set(PLAT_RFM66, EGL_RFM69_OOK_THRESH_TYPE_PEAK);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_bit_sync_state_set(PLAT_RFM66, false);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -429,6 +461,13 @@ void rfm_test_run(void)
     {
         EGL_LOG_ERROR("BW test fail. Result: %s", EGL_RESULT(result));
     }
+
+    result = rfm_ook_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("OOK test fail. Result: %s", EGL_RESULT(result));
+    }
+
 }
 
 egl_result_t rfm_test_init(void)
