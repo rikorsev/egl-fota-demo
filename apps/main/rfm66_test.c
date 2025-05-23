@@ -485,6 +485,46 @@ static egl_result_t rfm_preamble_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_rx_timeout_test_run(void)
+{
+    egl_result_t result;
+    uint8_t rssi_timeout;
+    uint8_t preamble_timeout;
+    uint8_t signal_sync_timeout;
+    uint8_t delay;
+
+    result = egl_rfm66_timeout_rx_rssi_get(PLAT_RFM66, &rssi_timeout);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timeout_rx_preamble_get(PLAT_RFM66, &preamble_timeout);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timeout_rx_signal_sync_get(PLAT_RFM66, &signal_sync_timeout);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timeout_rx_delay_get(PLAT_RFM66, &delay);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("RX timeout RSSI: %u", rssi_timeout);
+    EGL_LOG_INFO("RX timeout preamble: %u", preamble_timeout);
+    EGL_LOG_INFO("RX timeout signal sync: %u", signal_sync_timeout);
+    EGL_LOG_INFO("RX delay: %u", delay);
+
+    result = egl_rfm66_timeout_rx_rssi_set(PLAT_RFM66, 10);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timeout_rx_preamble_set(PLAT_RFM66, 20);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timeout_rx_signal_sync_set(PLAT_RFM66, 30);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timeout_rx_delay_set(PLAT_RFM66, 40);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -573,7 +613,13 @@ void rfm_test_run(void)
     result = rfm_preamble_test_run();
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_ERROR("Fail to test preamble. Result: %s", EGL_RESULT(result));
+        EGL_LOG_ERROR("Preamble test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_rx_timeout_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("RX timeout test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
