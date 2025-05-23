@@ -453,6 +453,38 @@ static egl_result_t rfm_afc_fei_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_preamble_test_run(void)
+{
+    bool state;
+    uint8_t tolerance;
+    egl_result_t result;
+    egl_rfm66_preamble_detect_size_t size;
+
+    result = egl_rfm66_preamble_detect_tol_get(PLAT_RFM66, &tolerance);
+    EGL_RESULT_CHECK(result);
+    
+    result = egl_rfm66_preamble_detect_size_get(PLAT_RFM66, &size);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_preamble_detect_state_get(PLAT_RFM66, &state);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Preamble detect state: %u", state);
+    EGL_LOG_INFO("Preamble detect size: %u", size);
+    EGL_LOG_INFO("Preamble detect tolerance: %u", tolerance);
+
+    result = egl_rfm66_preamble_detect_tol_set(PLAT_RFM66, 31);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_preamble_detect_size_set(PLAT_RFM66, EGL_RFM66_PREAMBLE_DETECT_SIZE_2_BYTE);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_preamble_detect_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -536,6 +568,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("AFC test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_preamble_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Fail to test preamble. Result: %s", EGL_RESULT(result));
     }
 }
 
