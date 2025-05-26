@@ -457,6 +457,7 @@ static egl_result_t rfm_preamble_test_run(void)
 {
     bool state;
     uint8_t tolerance;
+    uint16_t preamble;
     egl_result_t result;
     egl_rfm66_preamble_detect_size_t size;
 
@@ -469,9 +470,16 @@ static egl_result_t rfm_preamble_test_run(void)
     result = egl_rfm66_preamble_detect_state_get(PLAT_RFM66, &state);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm66_preamble_get(PLAT_RFM66, &preamble);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Preamble size: %u", preamble);
     EGL_LOG_INFO("Preamble detect state: %u", state);
     EGL_LOG_INFO("Preamble detect size: %u", size);
     EGL_LOG_INFO("Preamble detect tolerance: %u", tolerance);
+
+    result = egl_rfm66_preamble_set(PLAT_RFM66, 513);
+    EGL_RESULT_CHECK(result);
 
     result = egl_rfm66_preamble_detect_tol_set(PLAT_RFM66, 31);
     EGL_RESULT_CHECK(result);
