@@ -552,7 +552,7 @@ static egl_result_t rfm_osc_test_run(void)
     return result;
 }
 
-static egl_result_t rfm_sync_config_test_run(void)
+static egl_result_t rfm_sync_test_run(void)
 {
     bool state;
     uint8_t size;
@@ -560,6 +560,8 @@ static egl_result_t rfm_sync_config_test_run(void)
     egl_rfm66_preamble_pol_t polarity;
     egl_rfm66_fifo_fill_cond_t cond;
     egl_rfm66_auto_restart_rx_mode_t mode;
+    uint8_t sync_buff[EGL_RFM66_SYNC_MAX_SIZE + 1] = { 0 }; /* +1 for 0 termination */
+    static const char sync_word[] = "rikorsev";
 
     result = egl_rfm66_sync_size_get(PLAT_RFM66, &size);
     EGL_RESULT_CHECK(result);
@@ -576,13 +578,25 @@ static egl_result_t rfm_sync_config_test_run(void)
     result = egl_rfm66_auto_restart_rx_mode_get(PLAT_RFM66, &mode);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm66_sync_get(PLAT_RFM66, sync_buff, &size);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("Sync state: %u", state);
     EGL_LOG_INFO("Sync size: %u", size);
     EGL_LOG_INFO("Preamble polarity: %u", polarity);
     EGL_LOG_INFO("Fifo fill condition: %u", cond);
     EGL_LOG_INFO("Auto restart RX mode: %u", mode);
+    EGL_LOG_INFO("Sync bytes: %02x %02x %02x %02x %02x %02x %02x %02x", sync_buff[0],
+                                                                        sync_buff[1],
+                                                                        sync_buff[2],
+                                                                        sync_buff[3],
+                                                                        sync_buff[4],
+                                                                        sync_buff[5],
+                                                                        sync_buff[6],
+                                                                        sync_buff[7]);
+    EGL_LOG_INFO("Sync string: %s", sync_buff);
 
-    result = egl_rfm66_sync_size_set(PLAT_RFM66, 7);
+    result = egl_rfm66_sync_size_set(PLAT_RFM66, 8);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm66_fifo_fill_cond_set(PLAT_RFM66, EGL_RFM66_FIFO_FILL_COND_FIFO_COND_SET);
@@ -595,6 +609,9 @@ static egl_result_t rfm_sync_config_test_run(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm66_auto_restart_rx_mode_set(PLAT_RFM66, EGL_RFM66_AUTO_RESTART_RX_MODE_ON_WO_PLL);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_sync_set(PLAT_RFM66, (uint8_t *)sync_word, strlen(sync_word));
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -703,7 +720,7 @@ void rfm_test_run(void)
         EGL_LOG_ERROR("OSC test fail. Result: %s", EGL_RESULT(result));
     }
 
-    result = rfm_sync_config_test_run();
+    result = rfm_sync_test_run();
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Sync config test fail. Result: %s", EGL_RESULT(result));
