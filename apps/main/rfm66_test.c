@@ -525,6 +525,25 @@ static egl_result_t rfm_rx_timeout_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_osc_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm66_clk_out_t out;
+
+    result = egl_rfm66_clk_out_get(PLAT_RFM66, &out);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("CLK out: %u", out);
+
+    result = egl_rfm66_clk_out_set(PLAT_RFM66, EGL_RFM66_CLK_OUT_OFF);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rc_calibration_start(PLAT_RFM66);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -620,6 +639,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("RX timeout test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_osc_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("OSC test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
