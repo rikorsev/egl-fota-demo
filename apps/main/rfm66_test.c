@@ -552,6 +552,54 @@ static egl_result_t rfm_osc_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_sync_config_test_run(void)
+{
+    bool state;
+    uint8_t size;
+    egl_result_t result;
+    egl_rfm66_preamble_pol_t polarity;
+    egl_rfm66_fifo_fill_cond_t cond;
+    egl_rfm66_auto_restart_rx_mode_t mode;
+
+    result = egl_rfm66_sync_size_get(PLAT_RFM66, &size);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_fifo_fill_cond_get(PLAT_RFM66, &cond);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_sync_state_get(PLAT_RFM66, &state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_preamble_polarity_get(PLAT_RFM66, &polarity);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_auto_restart_rx_mode_get(PLAT_RFM66, &mode);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Sync state: %u", state);
+    EGL_LOG_INFO("Sync size: %u", size);
+    EGL_LOG_INFO("Preamble polarity: %u", polarity);
+    EGL_LOG_INFO("Fifo fill condition: %u", cond);
+    EGL_LOG_INFO("Auto restart RX mode: %u", mode);
+
+    result = egl_rfm66_sync_size_set(PLAT_RFM66, 7);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_fifo_fill_cond_set(PLAT_RFM66, EGL_RFM66_FIFO_FILL_COND_FIFO_COND_SET);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_sync_state_set(PLAT_RFM66, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_preamble_polarity_set(PLAT_RFM66, EGL_RFM66_PREAMBLE_POL_55);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_auto_restart_rx_mode_set(PLAT_RFM66, EGL_RFM66_AUTO_RESTART_RX_MODE_ON_WO_PLL);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -653,6 +701,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("OSC test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_sync_config_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Sync config test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
