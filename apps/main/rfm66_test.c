@@ -617,6 +617,102 @@ static egl_result_t rfm_sync_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_packet_config_test_run(void)
+{
+    bool crc_autoclear_state;
+    bool crc_state;
+    bool beacon_state;
+    bool io_home_state;
+    bool io_home_power_frame_state;
+    uint16_t length;
+    egl_result_t result;
+    egl_rfm66_dc_free_t type;
+    egl_rfm66_data_mode_t mode;
+    egl_rfm66_crc_whitening_t whitening;
+    egl_rfm66_packet_format_t format;
+    egl_rfm66_address_filtering_t filtering;
+
+    result = egl_rfm66_crc_whitening_type_get(PLAT_RFM66, &whitening);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_address_filtering_get(PLAT_RFM66, &filtering);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_crc_autoclear_state_get(PLAT_RFM66, &crc_autoclear_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_crc_state_get(PLAT_RFM66, &crc_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dc_free_get(PLAT_RFM66, &type);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_packet_format_get(PLAT_RFM66, &format);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_packet_length_get(PLAT_RFM66, &length);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_beacon_mode_get(PLAT_RFM66, &beacon_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_io_home_power_frame_state_get(PLAT_RFM66, &io_home_power_frame_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_io_home_state_get(PLAT_RFM66, &io_home_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_data_mode_get(PLAT_RFM66, &mode);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("CRC whitening type: %u", whitening);
+    EGL_LOG_INFO("Address filtering: %u", filtering);
+    EGL_LOG_INFO("CRC autoclear state: %u", crc_autoclear_state);
+    EGL_LOG_INFO("CRC state: %u", crc_state);
+    EGL_LOG_INFO("DC free: %u", type);
+    EGL_LOG_INFO("Packet format: %u", format);
+    EGL_LOG_INFO("Packet length: %u", length);
+    EGL_LOG_INFO("Beacon state: %u", beacon_state);
+    EGL_LOG_INFO("IO home power frame: %u", io_home_power_frame_state);
+    EGL_LOG_INFO("IO home state: %u", io_home_state);
+    EGL_LOG_INFO("Data mode: %u", mode);
+
+    result = egl_rfm66_crc_whitening_type_set(PLAT_RFM66, EGL_RFM66_CRC_WHITENING_TYPE_IBM);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_address_filtering_set(PLAT_RFM66, EGK_RFM66_ADDRESS_FILTERING_MATCH_NODE_AND_BROADCAST_ADDRESS);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_crc_autoclear_state_set(PLAT_RFM66, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_crc_state_set(PLAT_RFM66, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dc_free_set(PLAT_RFM66, EGL_RFM66_DC_FREE_ENCODING_WHITENING);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_packet_format_set(PLAT_RFM66, EGL_RFM66_PACKET_FORMAT_FIXED);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_packet_length_set(PLAT_RFM66, 513);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_beacon_mode_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_io_home_power_frame_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_io_home_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_data_mode_set(PLAT_RFM66, EGL_RFM66_DATA_MODE_CONTINIOUS);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -724,6 +820,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Sync config test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_packet_config_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Packet config test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
