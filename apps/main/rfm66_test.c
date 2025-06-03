@@ -713,6 +713,54 @@ static egl_result_t rfm_packet_config_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_address_test_run(void)
+{
+    uint8_t node_address;
+    uint8_t broadcast_address;
+    egl_result_t result;
+
+    result = egl_rfm66_node_address_get(PLAT_RFM66, &node_address);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_broadcast_address_get(PLAT_RFM66, &broadcast_address);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Node address: %u", node_address);
+    EGL_LOG_INFO("Broadcast address: %u", broadcast_address);
+
+    result = egl_rfm66_node_address_set(PLAT_RFM66, 111);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_broadcast_address_set(PLAT_RFM66, 222);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+static egl_result_t rfm_fifo_thresh_test_run(void)
+{
+    uint8_t thresh;
+    egl_result_t result;
+    egl_rfm66_tx_start_condition_t cond;
+
+    result = egl_rfm66_fifo_thresh_get(PLAT_RFM66, &thresh);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_tx_start_condition_get(PLAT_RFM66, &cond);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Fifo threshold: %u", thresh);
+    EGL_LOG_INFO("TX start condition: %u", cond);
+
+    result = egl_rfm66_fifo_thresh_set(PLAT_RFM66, 31);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_tx_start_condition_set(PLAT_RFM66, EGL_RFM66_TX_START_CONDITION_FIFO_EMPTY);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -826,6 +874,18 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Packet config test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_address_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Address test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_fifo_thresh_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("FIFO thresh test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
