@@ -761,6 +761,84 @@ static egl_result_t rfm_fifo_thresh_test_run(void)
     return result;
 }
 
+static egl_result_t egl_sequencer_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm66_from_transmit_t from_transmit;
+    egl_rfm66_from_idle_t from_idle;
+    egl_rfm66_low_power_selection_t low_power_selection;
+    egl_rfm66_from_start_t from_start;
+    egl_rfm66_idle_mode_t idle_mode;
+    egl_rfm66_from_packet_received_t from_packet_received;
+    egl_rfm66_from_rx_timeout_t from_rx_timeout;
+    egl_rfm66_from_receive_t from_receive;
+
+    result = egl_rfm66_from_transmit_get(PLAT_RFM66, &from_transmit);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_idle_get(PLAT_RFM66, &from_idle);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_low_power_selection_get(PLAT_RFM66, &low_power_selection);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_start_get(PLAT_RFM66, &from_start);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_idle_mode_get(PLAT_RFM66, &idle_mode);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_packet_received_get(PLAT_RFM66, &from_packet_received);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_rx_timeout_get(PLAT_RFM66, &from_rx_timeout);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_receive_get(PLAT_RFM66, &from_receive);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("From transmit: %u", from_transmit);
+    EGL_LOG_INFO("From idle: %u", from_idle);
+    EGL_LOG_INFO("Low power selection: %u", low_power_selection);
+    EGL_LOG_INFO("From start: %u", from_start);
+    EGL_LOG_INFO("Idle mode: %u", idle_mode);
+    EGL_LOG_INFO("From packet received: %u", from_packet_received);
+    EGL_LOG_INFO("From RX timeout: %u", from_rx_timeout);
+    EGL_LOG_INFO("From receive: %u", from_receive);
+
+    result = egl_rfm66_from_transmit_set(PLAT_RFM66, EGL_RFM66_FROM_TRANSMIT_TO_RECEIVE);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_idle_set(PLAT_RFM66, EGL_RFM66_FROM_IDLE_TO_RECEIVE);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_low_power_selection_set(PLAT_RFM66, EGL_RFM66_LOW_POWER_SELECTION_IDLE_STATE);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_start_set(PLAT_RFM66, EGL_RFM66_FROM_START_TO_TRANSMIT_ON_FIFO_LEVEL);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_idle_mode_set(PLAT_RFM66, EGL_RFM66_IDLE_MODE_SLEEP);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_packet_received_set(PLAT_RFM66, EGL_RFM66_FROM_PACKET_RECEIVED_TO_RECEIVE);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_rx_timeout_set(PLAT_RFM66, EGL_RFM66_FROM_RX_TIMEOUT_TO_SEQUENCER_OFF);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_from_receive_set(PLAT_RFM66, EGL_RFM66_FROM_RECEIVE_TO_SEQUENCER_OFF_ON_PREAMBLE_DETECT);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_sequencer_start(PLAT_RFM66);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_sequencer_stop(PLAT_RFM66);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -886,6 +964,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("FIFO thresh test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = egl_sequencer_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Sequencer test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
