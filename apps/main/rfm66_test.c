@@ -761,7 +761,7 @@ static egl_result_t rfm_fifo_thresh_test_run(void)
     return result;
 }
 
-static egl_result_t egl_sequencer_test_run(void)
+static egl_result_t rfm_sequencer_test_run(void)
 {
     egl_result_t result;
     egl_rfm66_from_transmit_t from_transmit;
@@ -834,6 +834,46 @@ static egl_result_t egl_sequencer_test_run(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm66_sequencer_stop(PLAT_RFM66);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+static egl_result_t rfm_timer_tset_run(void)
+{
+    uint8_t timer1_coef;
+    uint8_t timer2_coef;
+    egl_result_t result;
+    egl_rfm66_timer_resolution_t timer1_resolution;
+    egl_rfm66_timer_resolution_t timer2_resolution;
+
+    result = egl_rfm66_timer1_resolution_get(PLAT_RFM66, &timer1_resolution);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timer2_resolution_get(PLAT_RFM66, &timer2_resolution);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timer1_coef_get(PLAT_RFM66, &timer1_coef);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timer2_coef_get(PLAT_RFM66, &timer2_coef);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Timer 1 resolution: %u", timer1_resolution);
+    EGL_LOG_INFO("Timer 2 resolution: %u", timer2_resolution);
+    EGL_LOG_INFO("Timer 1 coef: %u", timer1_coef);
+    EGL_LOG_INFO("Timer 2 coef: %u", timer2_coef);
+
+    result = egl_rfm66_timer1_resolution_set(PLAT_RFM66, EGL_RFM66_TIMER_RESOLUTION_4_1_MS);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timer2_resolution_set(PLAT_RFM66, EGL_RFM66_TIMER_RESOLUTION_262_MS);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timer1_coef_set(PLAT_RFM66, 100);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_timer2_coef_set(PLAT_RFM66, 200);
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -966,10 +1006,16 @@ void rfm_test_run(void)
         EGL_LOG_ERROR("FIFO thresh test fail. Result: %s", EGL_RESULT(result));
     }
 
-    result = egl_sequencer_test_run();
+    result = rfm_sequencer_test_run();
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Sequencer test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_timer_tset_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Timer test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
