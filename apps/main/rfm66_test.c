@@ -839,7 +839,7 @@ static egl_result_t rfm_sequencer_test_run(void)
     return result;
 }
 
-static egl_result_t rfm_timer_tset_run(void)
+static egl_result_t rfm_timer_test_run(void)
 {
     uint8_t timer1_coef;
     uint8_t timer2_coef;
@@ -875,6 +875,65 @@ static egl_result_t rfm_timer_tset_run(void)
 
     result = egl_rfm66_timer2_coef_set(PLAT_RFM66, 200);
     EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+static egl_result_t egl_image_cal_test_run(void)
+{
+    bool image_cal_state;
+    bool temp_monitor_state;
+    bool auto_image_cal_state;
+    egl_rfm66_temp_change_t temp_change;
+    egl_rfm66_temp_threshold_t temp_threshold;
+    egl_result_t result;
+
+    result = egl_rfm66_temp_monitor_state_get(PLAT_RFM66, &temp_monitor_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_temp_threshold_get(PLAT_RFM66, &temp_threshold);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_temp_change_get(PLAT_RFM66, &temp_change);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_image_cal_state_get(PLAT_RFM66, &image_cal_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_auto_image_cal_state_get(PLAT_RFM66, &auto_image_cal_state);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Temperature monitor state: %u", temp_monitor_state);
+    EGL_LOG_INFO("Temperature threshold: %u", temp_threshold);
+    EGL_LOG_INFO("Temperature change: %u", temp_change);
+    EGL_LOG_INFO("Auto image calibration state: %u", auto_image_cal_state);
+    EGL_LOG_INFO("Image calibration state: %u", image_cal_state);
+
+    result = egl_rfm66_temp_monitor_state_set(PLAT_RFM66, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_temp_threshold_set(PLAT_RFM66, EGL_RFM66_TEMP_THRESHOLD_20_C);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_temp_change_set(PLAT_RFM66, EGL_RFM66_TEMP_CHANGE_HIGHER_THAN_THRESHOLD);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_auto_image_cal_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_image_cal_start(PLAT_RFM66);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Image caibration started");
+
+    do
+    {
+        EGL_LOG_INFO("Image calibration in progress...");
+        result = egl_rfm66_image_cal_state_get(PLAT_RFM66, &image_cal_state);
+        EGL_RESULT_CHECK(result);
+    }while(image_cal_state);
+
+    EGL_LOG_INFO("Image caibration completed");
 
     return result;
 }
@@ -1012,10 +1071,16 @@ void rfm_test_run(void)
         EGL_LOG_ERROR("Sequencer test fail. Result: %s", EGL_RESULT(result));
     }
 
-    result = rfm_timer_tset_run();
+    result = rfm_timer_test_run();
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Timer test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = egl_image_cal_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Image calibration test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
