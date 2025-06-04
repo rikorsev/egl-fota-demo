@@ -938,6 +938,22 @@ static egl_result_t egl_image_cal_test_run(void)
     return result;
 }
 
+static egl_result_t egl_temp_test_run(void)
+{
+    egl_result_t result;
+    int8_t temp;
+
+    result = egl_rfm66_temp_monitor_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_temp_get(PLAT_RFM66, &temp);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Temperature: %d C", temp);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1081,6 +1097,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Image calibration test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = egl_temp_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Temperature test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
