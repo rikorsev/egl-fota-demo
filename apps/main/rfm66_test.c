@@ -1007,6 +1007,70 @@ static egl_result_t rfm_flags_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_dio_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm66_dio_mode_t dio0;
+    egl_rfm66_dio_mode_t dio1;
+    egl_rfm66_dio_mode_t dio2;
+    egl_rfm66_dio_mode_t dio3;
+    egl_rfm66_dio_mode_t dio4;
+    egl_rfm66_dio_mode_t dio5;
+    egl_rfm66_map_preamble_detect_t map;
+
+    result = egl_rfm66_dio0_mode_get(PLAT_RFM66, &dio0);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio1_mode_get(PLAT_RFM66, &dio1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio2_mode_get(PLAT_RFM66, &dio2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio3_mode_get(PLAT_RFM66, &dio3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio4_mode_get(PLAT_RFM66, &dio4);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio5_mode_get(PLAT_RFM66, &dio5);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_map_preamble_detect_get(PLAT_RFM66, &map);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("DIO0 mode: %u", dio0);
+    EGL_LOG_INFO("DIO1 mode: %u", dio1);
+    EGL_LOG_INFO("DIO2 mode: %u", dio2);
+    EGL_LOG_INFO("DIO3 mode: %u", dio3);
+    EGL_LOG_INFO("DIO4 mode: %u", dio4);
+    EGL_LOG_INFO("DIO5 mode: %u", dio5);
+    EGL_LOG_INFO("Map preamble detect: %u", map);
+
+    result = egl_rfm66_dio0_mode_set(PLAT_RFM66, EGL_RFM66_DIO_MODE_1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio1_mode_set(PLAT_RFM66, EGL_RFM66_DIO_MODE_2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio2_mode_set(PLAT_RFM66, EGL_RFM66_DIO_MODE_3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio3_mode_set(PLAT_RFM66, EGL_RFM66_DIO_MODE_1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio4_mode_set(PLAT_RFM66, EGL_RFM66_DIO_MODE_2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_dio5_mode_set(PLAT_RFM66, EGL_RFM66_DIO_MODE_3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_map_preamble_detect_set(PLAT_RFM66, EGL_RFM66_MAP_PREAMBLE_DETECT_PREAMBLE);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1168,6 +1232,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)   
     {
         EGL_LOG_ERROR("Flags test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_dio_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("DIO test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
