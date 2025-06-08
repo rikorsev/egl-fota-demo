@@ -1071,6 +1071,63 @@ static egl_result_t rfm_dio_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_agc_test_run(void)
+{
+    egl_result_t result;
+    uint8_t level;
+    uint8_t step1;
+    uint8_t step2;
+    uint8_t step3;
+    uint8_t step4;
+    uint8_t step5;
+
+    result = egl_rfm66_agc_reference_level_get(PLAT_RFM66, &level);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step1_get(PLAT_RFM66, &step1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step2_get(PLAT_RFM66, &step2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step3_get(PLAT_RFM66, &step3);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step4_get(PLAT_RFM66, &step4);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step5_get(PLAT_RFM66, &step5);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("AGC reference level: %u", level);
+    EGL_LOG_INFO("AGC step 1: %u", step1);
+    EGL_LOG_INFO("AGC step 2: %u", step2);
+    EGL_LOG_INFO("AGC step 3: %u", step3);
+    EGL_LOG_INFO("AGC step 4: %u", step4);
+    EGL_LOG_INFO("AGC step 5: %u", step5);
+
+    result = egl_rfm66_agc_reference_level_set(PLAT_RFM66, 63);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step1_set(PLAT_RFM66, 1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step2_set(PLAT_RFM66, 2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step3_set(PLAT_RFM66, 4);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step4_set(PLAT_RFM66, 8);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_agc_step5_set(PLAT_RFM66, 15);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1238,6 +1295,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("DIO test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_agc_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("AGC test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
