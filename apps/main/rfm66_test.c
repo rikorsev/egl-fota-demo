@@ -978,6 +978,35 @@ static egl_result_t egl_low_bat_test_run(void)
     return result;
 }
 
+static egl_result_t rfm_flags_test_run(void)
+{
+    egl_result_t result;
+    egl_rfm66_irq_flags_t flags;
+
+    result = egl_rfm66_flags_get(PLAT_RFM66, &flags);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("FLAGS raw: %04x", flags.raw);
+    EGL_LOG_INFO("FLAGS sync_addr_match: %u", flags.bitfield.sync_addr_match);
+    EGL_LOG_INFO("FLAGS preamble_detect: %u", flags.bitfield.preamble_detect);
+    EGL_LOG_INFO("FLAGS timeout: %u", flags.bitfield.timeout);
+    EGL_LOG_INFO("FLAGS rssi: %u", flags.bitfield.rssi);
+    EGL_LOG_INFO("FLAGS pll_lock: %u", flags.bitfield.pll_lock);
+    EGL_LOG_INFO("FLAGS tx_ready: %u", flags.bitfield.tx_ready);
+    EGL_LOG_INFO("FLAGS rx_ready: %u", flags.bitfield.rx_ready);
+    EGL_LOG_INFO("FLAGS mode_ready: %u", flags.bitfield.mode_ready);
+    EGL_LOG_INFO("FLAGS low_bat: %u", flags.bitfield.low_bat);
+    EGL_LOG_INFO("FLAGS crc_ok: %u", flags.bitfield.crc_ok);
+    EGL_LOG_INFO("FLAGS payload_ready: %u", flags.bitfield.payload_ready);
+    EGL_LOG_INFO("FLAGS packet_sent: %u", flags.bitfield.packet_sent);
+    EGL_LOG_INFO("FLAGS fifo_overrun: %u", flags.bitfield.fifo_overrun);
+    EGL_LOG_INFO("FLAGS fifo_level: %u", flags.bitfield.fifo_level);
+    EGL_LOG_INFO("FLAGS fifo_empty: %u", flags.bitfield.fifo_empty);
+    EGL_LOG_INFO("FLAGS fifo_full: %u", flags.bitfield.fifo_full);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1133,6 +1162,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Low battery test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_flags_test_run();
+    if(result != EGL_SUCCESS)   
+    {
+        EGL_LOG_ERROR("Flags test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
