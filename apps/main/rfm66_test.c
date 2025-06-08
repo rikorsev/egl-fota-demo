@@ -954,6 +954,30 @@ static egl_result_t egl_temp_test_run(void)
     return result;
 }
 
+static egl_result_t egl_low_bat_test_run(void)
+{
+    bool state;
+    egl_result_t result;
+    egl_rfm66_low_bat_trim_t trim;
+
+    result = egl_rfm66_low_bat_trim_get(PLAT_RFM66, &trim);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_low_bat_state_get(PLAT_RFM66, &state);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Low battery trim: %u", trim);
+    EGL_LOG_INFO("Low battery state: %u", state);
+
+    result = egl_rfm66_low_bat_trim_set(PLAT_RFM66, EGL_RFM66_LOW_BAT_TRIM_2185_MV);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_low_bat_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1103,6 +1127,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("Temperature test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = egl_low_bat_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("Low battery test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
