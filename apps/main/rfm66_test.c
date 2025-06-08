@@ -942,6 +942,7 @@ static egl_result_t egl_temp_test_run(void)
 {
     egl_result_t result;
     int8_t temp;
+    int8_t former_temp;
 
     result = egl_rfm66_temp_monitor_state_set(PLAT_RFM66, true);
     EGL_RESULT_CHECK(result);
@@ -949,7 +950,11 @@ static egl_result_t egl_temp_test_run(void)
     result = egl_rfm66_temp_get(PLAT_RFM66, &temp);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm66_former_temp_get(PLAT_RFM66, &former_temp);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("Temperature: %d C", temp);
+    EGL_LOG_INFO("Former temperature: %d C", former_temp);
 
     return result;
 }
