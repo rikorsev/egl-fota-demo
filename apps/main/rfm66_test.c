@@ -1128,6 +1128,46 @@ static egl_result_t rfm_agc_test_run(void)
 
 }
 
+static egl_result_t rfm_pll_test_run(void)
+{
+    bool fast_hop_state;
+    bool tcxo_input_state;
+    egl_rfm66_pa_dac_t pa_dac_type;
+    egl_rfm66_pll_bandwidth_t pll_bandwidth;
+    egl_result_t result;
+
+    result = egl_rfm66_fast_hop_state_get(PLAT_RFM66, &fast_hop_state);
+    EGL_RESULT_CHECK(result);
+    
+    result = egl_rfm66_tcxo_input_state_get(PLAT_RFM66, &tcxo_input_state);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_pa_dac_get(PLAT_RFM66, &pa_dac_type);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_pll_bandwidth_get(PLAT_RFM66, &pll_bandwidth);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_INFO("Fast hop state: %u", fast_hop_state);
+    EGL_LOG_INFO("TCXO input state: %u", tcxo_input_state);
+    EGL_LOG_INFO("PA DAC type: %u", pa_dac_type);
+    EGL_LOG_INFO("PLL bandwidth: %u", pll_bandwidth);
+
+    result = egl_rfm66_fast_hop_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_tcxo_input_state_set(PLAT_RFM66, true);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_pa_dac_set(PLAT_RFM66, EGL_RFM66_PA_DAC_PLUS_20_DBM);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_pll_bandwidth_set(PLAT_RFM66, EGL_RFM66_PLL_BANDWIDTH_150_KHZ);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 void rfm_test_run(void)
 {
     egl_result_t result;
@@ -1301,6 +1341,12 @@ void rfm_test_run(void)
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_ERROR("AGC test fail. Result: %s", EGL_RESULT(result));
+    }
+
+    result = rfm_pll_test_run();
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_ERROR("PLL test fail. Result: %s", EGL_RESULT(result));
     }
 }
 
