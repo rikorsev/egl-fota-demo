@@ -2,7 +2,7 @@
 
 #define PLAT_RFM69_XTAL_CLOCK_FREQ_HZ (32000000U)
 
-static egl_result_t init(uint32_t profile)
+static egl_result_t init(void)
 {
     return EGL_SUCCESS;
 }

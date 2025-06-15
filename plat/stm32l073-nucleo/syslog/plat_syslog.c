@@ -3,6 +3,9 @@
 
 #define BAUDRATE_115200 (0x12U)
 
+extern egl_timer_t plat_systimer_inst;
+
+
 static void init_tx_pin(void)
 {
     /* Enable GPIOA clock */
@@ -64,13 +67,19 @@ static size_t write(void *data, size_t len)
     return len;
 }
 
-static egl_interface_t plat_syslog_inst =
+static egl_interface_t plat_syslog_iface =
 {
     .init = init,
     .write = write
 };
 
-egl_interface_t *plat_syslog_get(void)
+egl_log_t plat_syslog_inst =
+{
+    .iface = &plat_syslog_iface,
+    .timer = &plat_systimer_inst
+};
+
+egl_log_t *plat_syslog_get(void)
 {
     return &plat_syslog_inst;
 }

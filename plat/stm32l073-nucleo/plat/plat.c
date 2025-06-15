@@ -80,7 +80,7 @@ static void *info(void)
     return info;
 }
 
-static egl_platform_t platform_inst =
+egl_platform_t platform_inst =
 {
     .init      = init,
     .boot      = boot,

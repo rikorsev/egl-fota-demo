@@ -2,56 +2,30 @@
 #include "plat.h"
 #include "rfm_test.h"
 
-#if CONFIG_EGL_LOG_ENABLED
-static egl_result_t init_log(void)
+static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned int line, void *ctx)
 {
-    egl_result_t result;
-    static egl_log_t log = {0};
-
-    /* Init log iface */
-    result = egl_itf_init(SYSLOG);
-    EGL_RESULT_CHECK(result);
-
-    /* Init log */
-    result = egl_log_init(&log, SYSLOG, SYSTIMER);
-    EGL_RESULT_CHECK(result);
-
-    /* Set default log */
-    result = egl_log_default_set(&log);
-    EGL_RESULT_CHECK(result);
+#if CONFIG_EGL_LOG_ENABLED
+    egl_log(SYSLOG, EGL_LOG_LEVEL_ERROR, file, "line: %u: Result: %s", line, EGL_RESULT(result));
+#endif
 
     return result;
 }
-#endif
 
 static egl_result_t init(void)
 {
     egl_result_t result;
+    egl_result_error_hook_t error_hook = { error_hook_func };
 
-    result = egl_plat_init(PLATFORM);
+    result = egl_system_init(SYSTEM);
     EGL_RESULT_CHECK(result);
 
-    result = egl_timer_init(SYSTIMER);
-    EGL_RESULT_CHECK(result);
-
-#if CONFIG_EGL_LOG_ENABLED
-    result = init_log();
-    EGL_RESULT_CHECK(result);
-#endif
+    egl_result_error_hook_set(&error_hook);
 
     result = egl_pio_init(SYSLED);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to init led. Result %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     result = rfm_test_init();
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_ERROR("Fail to init RFM. Result %s", EGL_RESULT(result));
-        return result;
-    }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -59,9 +33,9 @@ static egl_result_t init(void)
 static void blink(void)
 {
     egl_pio_set(SYSLED, true);
-    egl_pm_sleep(SYSPM, 50);
+    egl_sys_delay(50);
     egl_pio_set(SYSLED, false);
-    egl_pm_sleep(SYSPM, 950);
+    egl_sys_delay(950);
 
     EGL_LOG_INFO("Tick...");
 }

@@ -35,14 +35,15 @@ static egl_result_t poweron(void)
 static egl_result_t reset(void)
 {
     egl_result_t result;
+
     /* up 1 ms */
     GPIOA->BSRR |= GPIO_BSRR_BS_9;
-    result = egl_pm_sleep(SYSPM, 2);
+    result = egl_sys_delay(2);
     EGL_RESULT_CHECK(result);
 
     /* down 5 ms */
     GPIOA->BSRR |= GPIO_BSRR_BR_9;
-    egl_pm_sleep(SYSPM, 5);
+    result = egl_sys_delay(5);
     EGL_RESULT_CHECK(result);
 
     return result;

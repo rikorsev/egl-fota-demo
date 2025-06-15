@@ -10,7 +10,7 @@ static uint32_t get(void)
     return 32768U * (1U << (msirange + 1U));
 }
 
-static egl_clock_t plat_sysclock_inst =
+egl_clock_t plat_sysclock_inst =
 {
     .get  = get
 };
