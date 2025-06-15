@@ -8,14 +8,16 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/rfm_test.h
 )
 
-if(${TARGET_RFM} STREQUAL "rfm69")
-    target_sources(${PROJECT_NAME}
-        PRIVATE
-            ${CMAKE_CURRENT_LIST_DIR}/rfm69_test.c
-    )
-elseif(${TARGET_RFM} STREQUAL "rfm66")
-    target_sources(${PROJECT_NAME}
-        PRIVATE
-            ${CMAKE_CURRENT_LIST_DIR}/rfm66_test.c
-    )
+if(CONFIG_RFM_TEST_ENABLED EQUAL 1)
+    if(${TARGET_RFM} STREQUAL "rfm69")
+        target_sources(${PROJECT_NAME}
+            PRIVATE
+                ${CMAKE_CURRENT_LIST_DIR}/rfm69_test.c
+        )
+    elseif(${TARGET_RFM} STREQUAL "rfm66")
+        target_sources(${PROJECT_NAME}
+            PRIVATE
+                ${CMAKE_CURRENT_LIST_DIR}/rfm66_test.c
+        )
+    endif()
 endif()

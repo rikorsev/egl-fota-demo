@@ -15,7 +15,23 @@ static egl_result_t boot(unsigned int slot_idx)
         return EGL_INVALID_PARAM;
     }
 
-    const uint32_t slot_addr = slot_addr_get(slot_idx);
+    egl_result_t result;
+    uint32_t slot_addr;
+
+    switch(slot_idx)
+    {
+        case SLOT_A:
+            result = egl_value_u32_get(SLOT_A_ADDR, &slot_addr);
+            break;
+
+        case SLOT_B:
+            result = egl_value_u32_get(SLOT_B_ADDR, &slot_addr);
+            break;
+            
+        default:
+            return EGL_INVALID_PARAM;
+    }
+    EGL_RESULT_CHECK(result);
 
     if(slot_addr == 0)
     {
@@ -42,50 +58,10 @@ static egl_result_t boot(unsigned int slot_idx)
     return EGL_SUCCESS;
 }
 
-static void *slot_info(unsigned int slot_idx)
-{
-    if(slot_idx == PLAT_SLOT_BOOT)
-    {
-        return NULL;
-    }
-
-    uint32_t slot_addr = slot_addr_get(slot_idx);
-
-    if(slot_addr == 0)
-    {
-        return NULL;
-    }
-
-    /* Add 256 bytes of IVT offset */
-    slot_addr += 256;
-
-    /* Check magic value */
-    if(((slot_info_t *)slot_addr)->magic != CONFIG_PLAT_SLOT_INFO_MAGIC_VALUE)
-    {
-        return NULL;
-    }
-
-    return (void *)slot_addr;
-}
-
-static void *info(void)
-{
-    slot_info_t *info = (slot_info_t *)slot_info_get();
-
-    if(info->magic != CONFIG_PLAT_SLOT_INFO_MAGIC_VALUE)
-    {
-        return NULL;
-    }
-
-    return info;
-}
-
 egl_platform_t platform_inst =
 {
     .init      = init,
     .boot      = boot,
-    .info      = info,
-    .slot_info = slot_info
 };
 
 egl_platform_t *platform_get(void)
