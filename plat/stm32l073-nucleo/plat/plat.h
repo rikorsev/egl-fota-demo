@@ -9,6 +9,7 @@
 #include "plat_systimer.h"
 #include "plat_syspm.h"
 #include "plat_rfm.h"
+#include "plat_radio_iface.h"
 #include "plat_system.h"
 #include "plat_info.h"
 #include "slot.h"

@@ -29,6 +29,9 @@ static egl_result_t init(void)
     EGL_RESULT_CHECK(result);
 #endif
 
+    result = egl_itf_init(RADIO);
+    EGL_RESULT_CHECK(result);
+
     return result;
 }
 
