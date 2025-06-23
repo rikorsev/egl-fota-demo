@@ -11,7 +11,7 @@ static egl_result_t slot_boot_addr_get(uint32_t *val)
 static egl_value_u32_t slot_boot_addr_value =
 {
     .get = slot_boot_addr_get
-}
+};
 
 egl_value_u32_t *plat_slot_boot_addr_get(void)
 {

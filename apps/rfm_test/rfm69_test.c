@@ -355,6 +355,8 @@ static egl_result_t rfm_bw_test_run(void)
     uint8_t afc_bw_exp;
     egl_rfm69_bw_mant_t afc_bw_mant;
     uint8_t afc_dcc_freq;
+    egl_rfm69_bandwidth_t rx_bw;
+    egl_rfm69_bandwidth_t afc_bw;
 
     result = egl_rfm69_rx_bw_exp_get(PLAT_RFM69, &rx_bw_exp);
     EGL_RESULT_CHECK(result);
@@ -363,6 +365,9 @@ static egl_result_t rfm_bw_test_run(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rx_dcc_freq_get(PLAT_RFM69, &rx_dcc_freq);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_rx_bandwidth_get(PLAT_RFM69, &rx_bw);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_afc_bw_exp_get(PLAT_RFM69, &afc_bw_exp);
@@ -374,29 +379,28 @@ static egl_result_t rfm_bw_test_run(void)
     result = egl_rfm69_afc_dcc_freq_get(PLAT_RFM69, &afc_dcc_freq);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm69_afc_bandwidth_get(PLAT_RFM69, &afc_bw);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("RX BW exp: %u", rx_bw_exp);
     EGL_LOG_INFO("RX BW mant: %u", rx_bw_mant);
     EGL_LOG_INFO("RX DCC freq: %u", rx_dcc_freq);
+    EGL_LOG_INFO("RX BW: %u", rx_bw);
     EGL_LOG_INFO("AFC BW exp: %u", afc_bw_exp);
     EGL_LOG_INFO("AFC BW mant: %u", afc_bw_mant);
     EGL_LOG_INFO("AFC DCC freq: %u", afc_dcc_freq);
-
-    result = egl_rfm69_rx_bw_exp_set(PLAT_RFM69, 1);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_rfm69_rx_bw_mant_set(PLAT_RFM69, EGL_RFM69_BW_MANT_20);
-    EGL_RESULT_CHECK(result);
+    EGL_LOG_INFO("AFC BW: %u", afc_bw);
 
     result = egl_rfm69_rx_dcc_freq_set(PLAT_RFM69, 3);
     EGL_RESULT_CHECK(result);
 
-    result = egl_rfm69_afc_bw_exp_set(PLAT_RFM69, 4);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_rfm69_afc_bw_mant_set(PLAT_RFM69, EGL_RFM69_BW_MANT_24);
+    result = egl_rfm69_rx_bandwidth_set(PLAT_RFM69, EGL_RFM69_BANDWIDTH_FSK_3100_OOK_1600);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_afc_dcc_freq_set(PLAT_RFM69, 6);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm69_afc_bandwidth_set(PLAT_RFM69, EGL_RFM69_BANDWIDTH_FSK_3900_OOK_2000);
     EGL_RESULT_CHECK(result);
 
     return result;

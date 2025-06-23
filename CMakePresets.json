@@ -1,193 +1,179 @@
 {
-    "version": 5,
+    "version": 3,
     "configurePresets":
     [
         {
-            "name": "boot-stm32l412-nucleo-debug",
-            "binaryDir": "build/boot",
-            "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "name": "blink-stm32l073-nucleo-slot-boot-debug",
+            "binaryDir": "build/blink",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "debug",
-                "TARGET_APP": "boot",
-                "TARGET_PLATFORM": "stm32l412-nucleo",
+                "TARGET_APP": "blink",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
                 "TARGET_SLOT": "boot"
             }
         },
         {
-            "name": "boot-stm32l412-nucleo-release",
-            "binaryDir": "build/boot",
-            "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "name": "blink-stm32l073-nucleo-slot-boot-release",
+            "binaryDir": "build/blink",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "release",
-                "TARGET_APP": "boot",
-                "TARGET_PLATFORM": "stm32l412-nucleo",
+                "TARGET_APP": "blink",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
                 "TARGET_SLOT": "boot"
             }
         },
         {
-            "name": "main-stm32l412-nucleo-slot-a-debug",
-            "binaryDir": "build/main/a",
-            "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "name": "blink-stm32l073-nucleo-slot-a-debug",
+            "binaryDir": "build/blink",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "debug",
-                "TARGET_APP": "main",
-                "TARGET_PLATFORM": "stm32l412-nucleo",
+                "TARGET_APP": "blink",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
                 "TARGET_SLOT": "a"
             }
         },
         {
-            "name": "main-stm32l412-nucleo-slot-a-release",
-            "binaryDir": "build/main/a",
-            "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "name": "blink-stm32l073-nucleo-slot-a-release",
+            "binaryDir": "build/blink",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "release",
-                "TARGET_APP": "main",
-                "TARGET_PLATFORM": "stm32l412-nucleo",
+                "TARGET_APP": "blink",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
                 "TARGET_SLOT": "a"
             }
         },
         {
-            "name": "main-stm32l412-nucleo-slot-b-debug",
-            "binaryDir": "build/main/b",
-            "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "name": "blink-stm32l073-nucleo-slot-b-debug",
+            "binaryDir": "build/blink",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "debug",
-                "TARGET_APP": "main",
-                "TARGET_PLATFORM": "stm32l412-nucleo",
+                "TARGET_APP": "blink",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
                 "TARGET_SLOT": "b"
             }
         },
         {
-            "name": "main-stm32l412-nucleo-slot-b-release",
-            "binaryDir": "build/main/b",
-            "toolchainFile": "plat/stm32l412-nucleo/toolchain.cmake",
+            "name": "blink-stm32l073-nucleo-slot-b-release",
+            "binaryDir": "build/blink",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
-                "CMAKE_BUILD_TYPE": "release",
-                "TARGET_APP": "main",
-                "TARGET_PLATFORM": "stm32l412-nucleo",
+                "CMAKE_BUILD_TYPE": "debug",
+                "TARGET_APP": "blink",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
                 "TARGET_SLOT": "b"
             }
         },
         {
-            "name": "main-stm32l073-nucleo-rfm69-slot-boot-debug",
-            "binaryDir": "build/main/boot",
+            "name": "rfm-test-stm32l073-nucleo-debug",
+            "binaryDir": "build/rfm_test",
             "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "debug",
-                "TARGET_APP": "main",
+                "TARGET_APP": "rfm_test",
                 "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot",
-                "TARGET_RFM": "rfm69"
+                "TARGET_SLOT": "boot"
             }
         },
         {
-            "name": "main-stm32l073-nucleo-rfm69-slot-boot-release",
-            "binaryDir": "build/main/boot",
+            "name": "rfm-test-stm32l073-nucleo-release",
+            "binaryDir": "build/rfm_test",
             "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "release",
-                "TARGET_APP": "main",
+                "TARGET_APP": "rfm_test",
                 "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot",
-                "TARGET_RFM": "rfm69"
+                "TARGET_SLOT": "boot"
             }
         },
         {
-            "name": "main-stm32l073-nucleo-rfm66-slot-boot-debug",
-            "binaryDir": "build/main/boot",
+            "name": "radio-switch-stm32l073-nucleo-slot-boot-debug",
+            "binaryDir": "build/radio_switch",
             "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "debug",
-                "TARGET_APP": "main",
+                "TARGET_APP": "radio_switch",
                 "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot",
-                "TARGET_RFM": "rfm66"
+                "TARGET_SLOT": "boot"
             }
         },
         {
-            "name": "main-stm32l073-nucleo-rfm66-slot-boot-release",
-            "binaryDir": "build/main/boot",
+            "name": "radio-switch-stm32l073-nucleo-slot-boot-release",
+            "binaryDir": "build/radio_switch",
             "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
             "cacheVariables":
             {
                 "CMAKE_BUILD_TYPE": "release",
-                "TARGET_APP": "main",
+                "TARGET_APP": "radio_switch",
                 "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot",
-                "TARGET_RFM": "rfm66"
+                "TARGET_SLOT": "boot"
             }
         }
     ],
     "buildPresets":
     [
         {
-            "name": "boot-stm32l412-nucleo-debug",
-            "configurePreset": "boot-stm32l412-nucleo-debug",
-            "jobs": 4
+            "name": "blink-stm32l073-nucleo-slot-boot-debug",
+            "configurePreset": "blink-stm32l073-nucleo-slot-boot-debug"
         },
         {
-            "name": "boot-stm32l412-nucleo-release",
-            "configurePreset": "boot-stm32l412-nucleo-release",
-            "jobs": 4
+            "name": "blink-stm32l073-nucleo-slot-boot-release",
+            "configurePreset": "blink-stm32l073-nucleo-slot-boot-release"
         },
         {
-            "name": "main-stm32l412-nucleo-slot-a-debug",
-            "configurePreset": "main-stm32l412-nucleo-slot-a-debug",
-            "jobs": 4
+            "name": "blink-stm32l073-nucleo-slot-a-debug",
+            "configurePreset": "blink-stm32l073-nucleo-slot-a-debug"
         },
         {
-            "name": "main-stm32l412-nucleo-slot-a-release",
-            "configurePreset": "main-stm32l412-nucleo-slot-a-release",
-            "jobs": 4
+            "name": "blink-stm32l073-nucleo-slot-a-release",
+            "configurePreset": "blink-stm32l073-nucleo-slot-a-release"
         },
         {
-            "name": "main-stm32l412-nucleo-slot-b-debug",
-            "configurePreset": "main-stm32l412-nucleo-slot-a-debug",
-            "jobs": 4
+            "name": "blink-stm32l073-nucleo-slot-b-debug",
+            "configurePreset": "blink-stm32l073-nucleo-slot-b-debug"
         },
         {
-            "name": "main-stm32l412-nucleo-slot-b-release",
-            "configurePreset": "main-stm32l412-nucleo-slot-b-release",
-            "jobs": 4
+            "name": "blink-stm32l073-nucleo-slot-b-release",
+            "configurePreset": "blink-stm32l073-nucleo-slot-b-release"
         },
         {
-            "name": "main-stm32l073-nucleo-rfm66-slot-boot-debug",
-            "configurePreset": "main-stm32l073-nucleo-rfm66-slot-boot-debug",
-            "jobs": 4
+            "name": "rfm-test-stm32l073-nucleo-debug",
+            "configurePreset": "rfm-test-stm32l073-nucleo-debug"
         },
         {
-            "name": "main-stm32l073-nucleo-rfm66-slot-boot-release",
-            "configurePreset": "main-stm32l073-nucleo-rfm66-slot-boot-release",
-            "jobs": 4
+            "name": "rfm-test-stm32l073-nucleo-release",
+            "configurePreset": "rfm-test-stm32l073-nucleo-release"
         },
         {
-            "name": "main-stm32l073-nucleo-rfm69-slot-boot-debug",
-            "configurePreset": "main-stm32l073-nucleo-rfm69-slot-boot-debug",
-            "jobs": 4
+            "name": "radio-switch-stm32l073-nucleo-slot-boot-debug",
+            "configurePreset": "radio-switch-stm32l073-nucleo-slot-boot-debug"
         },
         {
-            "name": "main-stm32l073-nucleo-rfm69-slot-boot-release",
-            "configurePreset": "main-stm32l073-nucleo-rfm69-slot-boot-release",
-            "jobs": 4
+            "name": "radio-switch-stm32l073-nucleo-slot-boot-release",
+            "configurePreset": "radio-switch-stm32l073-nucleo-slot-boot-release"
         }
     ]
 }

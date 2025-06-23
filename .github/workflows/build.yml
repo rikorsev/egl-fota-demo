@@ -1,0 +1,71 @@
+name: Build All Targets
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Build blink-stm32l073-nucleo-slot-boot-debug
+        run: |
+          cmake --preset blink-stm32l073-nucleo-slot-boot-debug
+          cmake --build --preset blink-stm32l073-nucleo-slot-boot-debug
+
+      - name: Build blink-stm32l073-nucleo-slot-boot-release
+        run: |
+          cmake --preset blink-stm32l073-nucleo-slot-boot-release
+          cmake --build --preset blink-stm32l073-nucleo-slot-boot-release
+
+      - name: Build blink-stm32l073-nucleo-slot-a-debug
+        run: |
+          cmake --preset blink-stm32l073-nucleo-slot-a-debug
+          cmake --build --preset blink-stm32l073-nucleo-slot-a-debug
+
+      - name: Build blink-stm32l073-nucleo-slot-a-release
+        run: |
+          cmake --preset blink-stm32l073-nucleo-slot-a-release
+          cmake --build --preset blink-stm32l073-nucleo-slot-a-release
+
+      - name: Build blink-stm32l073-nucleo-slot-b-debug
+        run: |
+          cmake --preset blink-stm32l073-nucleo-slot-b-debug
+          cmake --build --preset blink-stm32l073-nucleo-slot-b-debug
+
+      - name: Build blink-stm32l073-nucleo-slot-b-release
+        run: |
+          cmake --preset blink-stm32l073-nucleo-slot-b-release
+          cmake --build --preset blink-stm32l073-nucleo-slot-b-release
+
+      - name: Build rfm-test-stm32l073-nucleo-debug
+        run: |
+          cmake --preset rfm-test-stm32l073-nucleo-debug
+          cmake --build --preset rfm-test-stm32l073-nucleo-debug
+
+      - name: Build rfm-test-stm32l073-nucleo-release
+        run: |
+          cmake --preset rfm-test-stm32l073-nucleo-release
+          cmake --build --preset rfm-test-stm32l073-nucleo-release
+
+      - name: Build radio-switch-stm32l073-nucleo-slot-boot-debug
+        run: |
+          cmake --preset radio-switch-stm32l073-nucleo-slot-boot-debug
+          cmake --build --preset radio-switch-stm32l073-nucleo-slot-boot-debug
+
+      - name: Build radio-switch-stm32l073-nucleo-slot-boot-release
+        run: |
+          cmake --preset radio-switch-stm32l073-nucleo-slot-boot-release
+          cmake --build --preset radio-switch-stm32l073-nucleo-slot-boot-release

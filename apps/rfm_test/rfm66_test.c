@@ -317,11 +317,16 @@ static egl_result_t rfm_bw_test_run(void)
     egl_rfm66_bw_mant_t rx_bw_mant;
     uint8_t afc_bw_exp;
     egl_rfm66_bw_mant_t afc_bw_mant;
+    egl_rfm66_bandwidth_t rx_bw;
+    egl_rfm66_bandwidth_t afc_bw;
 
     result = egl_rfm66_rx_bw_exp_get(PLAT_RFM66, &rx_bw_exp);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm66_rx_bw_mant_get(PLAT_RFM66, &rx_bw_mant);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_rfm66_rx_bandwidth_get(PLAT_RFM66, &rx_bw);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm66_afc_bw_exp_get(PLAT_RFM66, &afc_bw_exp);
@@ -330,21 +335,20 @@ static egl_result_t rfm_bw_test_run(void)
     result = egl_rfm66_afc_bw_mant_get(PLAT_RFM66, &afc_bw_mant);
     EGL_RESULT_CHECK(result);
 
+    result = egl_rfm66_afc_bandwidth_get(PLAT_RFM66, &afc_bw);
+    EGL_RESULT_CHECK(result);
+
     EGL_LOG_INFO("RX BW exp: %u", rx_bw_exp);
     EGL_LOG_INFO("RX BW mant: %u", rx_bw_mant);
+    EGL_LOG_INFO("RX BW: %u", rx_bw);
     EGL_LOG_INFO("AFC BW exp: %u", afc_bw_exp);
     EGL_LOG_INFO("AFC BW mant: %u", afc_bw_mant);
+    EGL_LOG_INFO("AFC BW: %u", afc_bw);
 
-    result = egl_rfm66_rx_bw_exp_set(PLAT_RFM66, 1);
+    result = egl_rfm66_rx_bandwidth_set(PLAT_RFM66, EGL_RFM66_BANDWIDTH_3100);
     EGL_RESULT_CHECK(result);
 
-    result = egl_rfm66_rx_bw_mant_set(PLAT_RFM66, EGL_RFM66_BW_MANT_20);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_rfm66_afc_bw_exp_set(PLAT_RFM66, 4);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_rfm66_afc_bw_mant_set(PLAT_RFM66, EGL_RFM66_BW_MANT_24);
+    result = egl_rfm66_afc_bandwidth_set(PLAT_RFM66, EGL_RFM66_BANDWIDTH_3900);
     EGL_RESULT_CHECK(result);
 
     return result;
