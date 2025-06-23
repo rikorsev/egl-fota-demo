@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        build_type: [Debug, Release]
+        build_type: [debug, release]
 
     steps:
       - name: Install ARM GCC Toolchain
@@ -23,56 +23,34 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Set up CMake
         uses: lukka/get-cmake@latest
 
-      - name: Build blink-stm32l073-nucleo-slot-boot-debug
+      - name: Build blink-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
         run: |
-          cmake --preset blink-stm32l073-nucleo-slot-boot-debug
-          cmake --build --preset blink-stm32l073-nucleo-slot-boot-debug
+          cmake --preset blink-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
+          cmake --build --preset blink-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
 
-      - name: Build blink-stm32l073-nucleo-slot-boot-release
+      - name: Build blink-stm32l073-nucleo-slot-a-${{ matrix.build_type }}
         run: |
-          cmake --preset blink-stm32l073-nucleo-slot-boot-release
-          cmake --build --preset blink-stm32l073-nucleo-slot-boot-release
+          cmake --preset blink-stm32l073-nucleo-slot-a-${{ matrix.build_type }}
+          cmake --build --preset blink-stm32l073-nucleo-slot-a-${{ matrix.build_type }}
 
-      - name: Build blink-stm32l073-nucleo-slot-a-debug
+      - name: Build blink-stm32l073-nucleo-slot-b-${{ matrix.build_type }}
         run: |
-          cmake --preset blink-stm32l073-nucleo-slot-a-debug
-          cmake --build --preset blink-stm32l073-nucleo-slot-a-debug
+          cmake --preset blink-stm32l073-nucleo-slot-b-${{ matrix.build_type }}
+          cmake --build --preset blink-stm32l073-nucleo-slot-b-${{ matrix.build_type }}
 
-      - name: Build blink-stm32l073-nucleo-slot-a-release
+      - name: Build rfm-test-stm32l073-nucleo-${{ matrix.build_type }}
         run: |
-          cmake --preset blink-stm32l073-nucleo-slot-a-release
-          cmake --build --preset blink-stm32l073-nucleo-slot-a-release
+          cmake --preset rfm-test-stm32l073-nucleo-${{ matrix.build_type }}
+          cmake --build --preset rfm-test-stm32l073-nucleo-${{ matrix.build_type }}
 
-      - name: Build blink-stm32l073-nucleo-slot-b-debug
+      - name: Build radio-switch-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
         run: |
-          cmake --preset blink-stm32l073-nucleo-slot-b-debug
-          cmake --build --preset blink-stm32l073-nucleo-slot-b-debug
+          cmake --preset radio-switch-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
+          cmake --build --preset radio-switch-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
 
-      - name: Build blink-stm32l073-nucleo-slot-b-release
-        run: |
-          cmake --preset blink-stm32l073-nucleo-slot-b-release
-          cmake --build --preset blink-stm32l073-nucleo-slot-b-release
-
-      - name: Build rfm-test-stm32l073-nucleo-debug
-        run: |
-          cmake --preset rfm-test-stm32l073-nucleo-debug
-          cmake --build --preset rfm-test-stm32l073-nucleo-debug
-
-      - name: Build rfm-test-stm32l073-nucleo-release
-        run: |
-          cmake --preset rfm-test-stm32l073-nucleo-release
-          cmake --build --preset rfm-test-stm32l073-nucleo-release
-
-      - name: Build radio-switch-stm32l073-nucleo-slot-boot-debug
-        run: |
-          cmake --preset radio-switch-stm32l073-nucleo-slot-boot-debug
-          cmake --build --preset radio-switch-stm32l073-nucleo-slot-boot-debug
-
-      - name: Build radio-switch-stm32l073-nucleo-slot-boot-release
-        run: |
-          cmake --preset radio-switch-stm32l073-nucleo-slot-boot-release
-          cmake --build --preset radio-switch-stm32l073-nucleo-slot-boot-release
