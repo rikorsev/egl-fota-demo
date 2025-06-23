@@ -232,7 +232,7 @@
             "configurePreset": "radio-switch-stm32l073-nucleo-rfm66-slot-boot-debug"
         },
         {
-            "name": "radio-switch-stm32l073-nucleo-slot-boot-rfm66-release",
+            "name": "radio-switch-stm32l073-nucleo-rfm66-slot-boot-release",
             "configurePreset": "radio-switch-stm32l073-nucleo-rfm66-slot-boot-release"
         },
         {
