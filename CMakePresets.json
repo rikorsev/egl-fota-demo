@@ -81,33 +81,7 @@
             }
         },
         {
-            "name": "rfm-test-stm32l073-nucleo-debug",
-            "binaryDir": "build/rfm_test",
-            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
-            "generator": "Ninja",
-            "cacheVariables":
-            {
-                "CMAKE_BUILD_TYPE": "debug",
-                "TARGET_APP": "rfm_test",
-                "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot"
-            }
-        },
-        {
-            "name": "rfm-test-stm32l073-nucleo-release",
-            "binaryDir": "build/rfm_test",
-            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
-            "generator": "Ninja",
-            "cacheVariables":
-            {
-                "CMAKE_BUILD_TYPE": "release",
-                "TARGET_APP": "rfm_test",
-                "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot"
-            }
-        },
-        {
-            "name": "radio-switch-stm32l073-nucleo-slot-boot-debug",
+            "name": "radio-switch-stm32l073-nucleo-rfm69-slot-boot-debug",
             "binaryDir": "build/radio_switch",
             "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
@@ -116,11 +90,12 @@
                 "CMAKE_BUILD_TYPE": "debug",
                 "TARGET_APP": "radio_switch",
                 "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot"
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm69"
             }
         },
         {
-            "name": "radio-switch-stm32l073-nucleo-slot-boot-release",
+            "name": "radio-switch-stm32l073-nucleo-rfm69-slot-boot-release",
             "binaryDir": "build/radio_switch",
             "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
             "generator": "Ninja",
@@ -129,7 +104,92 @@
                 "CMAKE_BUILD_TYPE": "release",
                 "TARGET_APP": "radio_switch",
                 "TARGET_PLATFORM": "stm32l073-nucleo",
-                "TARGET_SLOT": "boot"
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm69"
+            }
+        },
+        {
+            "name": "radio-switch-stm32l073-nucleo-rfm66-slot-boot-debug",
+            "binaryDir": "build/radio_switch",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "debug",
+                "TARGET_APP": "radio_switch",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm66"
+            }
+        },
+        {
+            "name": "radio-switch-stm32l073-nucleo-rfm66-slot-boot-release",
+            "binaryDir": "build/radio_switch",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "release",
+                "TARGET_APP": "radio_switch",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm66"
+            }
+        },
+        {
+            "name": "rfm-test-stm32l073-nucleo-rfm66-debug",
+            "binaryDir": "build/rfm_test",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "debug",
+                "TARGET_APP": "rfm_test",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm66"
+            }
+        },
+        {
+            "name": "rfm-test-stm32l073-nucleo-rfm66-release",
+            "binaryDir": "build/rfm_test",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "release",
+                "TARGET_APP": "rfm_test",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm66"
+            }
+        },
+                {
+            "name": "rfm-test-stm32l073-nucleo-rfm69-debug",
+            "binaryDir": "build/rfm_test",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "debug",
+                "TARGET_APP": "rfm_test",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm69"
+            }
+        },
+        {
+            "name": "rfm-test-stm32l073-nucleo-rfm69-release",
+            "binaryDir": "build/rfm_test",
+            "toolchainFile": "plat/stm32l073-nucleo/toolchain.cmake",
+            "generator": "Ninja",
+            "cacheVariables":
+            {
+                "CMAKE_BUILD_TYPE": "release",
+                "TARGET_APP": "rfm_test",
+                "TARGET_PLATFORM": "stm32l073-nucleo",
+                "TARGET_SLOT": "boot",
+                "TARGET_RFM": "rfm69"
             }
         }
     ],
@@ -160,20 +220,36 @@
             "configurePreset": "blink-stm32l073-nucleo-slot-b-release"
         },
         {
-            "name": "rfm-test-stm32l073-nucleo-debug",
-            "configurePreset": "rfm-test-stm32l073-nucleo-debug"
+            "name": "rfm-test-stm32l073-nucleo-rfm66-debug",
+            "configurePreset": "rfm-test-stm32l073-nucleo-rfm66-debug"
         },
         {
-            "name": "rfm-test-stm32l073-nucleo-release",
-            "configurePreset": "rfm-test-stm32l073-nucleo-release"
+            "name": "rfm-test-stm32l073-nucleo-rfm66-release",
+            "configurePreset": "rfm-test-stm32l073-nucleo-rfm66-release"
         },
         {
-            "name": "radio-switch-stm32l073-nucleo-slot-boot-debug",
-            "configurePreset": "radio-switch-stm32l073-nucleo-slot-boot-debug"
+            "name": "radio-switch-stm32l073-nucleo-rfm66-slot-boot-debug",
+            "configurePreset": "radio-switch-stm32l073-nucleo-rfm66-slot-boot-debug"
         },
         {
-            "name": "radio-switch-stm32l073-nucleo-slot-boot-release",
-            "configurePreset": "radio-switch-stm32l073-nucleo-slot-boot-release"
+            "name": "radio-switch-stm32l073-nucleo-slot-boot-rfm66-release",
+            "configurePreset": "radio-switch-stm32l073-nucleo-rfm66-slot-boot-release"
+        },
+        {
+            "name": "rfm-test-stm32l073-nucleo-rfm69-debug",
+            "configurePreset": "rfm-test-stm32l073-nucleo-rfm69-debug"
+        },
+        {
+            "name": "rfm-test-stm32l073-nucleo-rfm69-release",
+            "configurePreset": "rfm-test-stm32l073-nucleo-rfm69-release"
+        },
+        {
+            "name": "radio-switch-stm32l073-nucleo-rfm69-slot-boot-debug",
+            "configurePreset": "radio-switch-stm32l073-nucleo-rfm69-slot-boot-debug"
+        },
+        {
+            "name": "radio-switch-stm32l073-nucleo-rfm69-slot-boot-release",
+            "configurePreset": "radio-switch-stm32l073-nucleo-rfm69-slot-boot-release"
         }
     ]
 }

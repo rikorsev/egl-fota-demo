@@ -52,13 +52,22 @@ jobs:
           cmake --preset blink-stm32l073-nucleo-slot-b-${{ matrix.build_type }}
           cmake --build --preset blink-stm32l073-nucleo-slot-b-${{ matrix.build_type }}
 
-      - name: Build rfm-test-stm32l073-nucleo-${{ matrix.build_type }}
+      - name: Build rfm-test-stm32l073-nucleo-rfm66-${{ matrix.build_type }}
         run: |
-          cmake --preset rfm-test-stm32l073-nucleo-${{ matrix.build_type }}
-          cmake --build --preset rfm-test-stm32l073-nucleo-${{ matrix.build_type }}
+          cmake --preset rfm-test-stm32l073-nucleo-rfm66-${{ matrix.build_type }}
+          cmake --build --preset rfm-test-stm32l073-nucleo-rfm66-${{ matrix.build_type }}
 
-      - name: Build radio-switch-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
+      - name: Build rfm-test-stm32l073-nucleo-rfm69-${{ matrix.build_type }}
         run: |
-          cmake --preset radio-switch-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
-          cmake --build --preset radio-switch-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
+          cmake --preset rfm-test-stm32l073-nucleo-rfm69-${{ matrix.build_type }}
+          cmake --build --preset rfm-test-stm32l073-nucleo-rfm69-${{ matrix.build_type }}
 
+      - name: Build radio-switch-stm32l073-nucleo-rfm66-slot-boot-${{ matrix.build_type }}
+        run: |
+          cmake --preset radio-switch-stm32l073-nucleo-rfm66-slot-boot-${{ matrix.build_type }}
+          cmake --build --preset radio-switch-stm32l073-nucleo-rfm66-slot-boot-${{ matrix.build_type }}
+
+      - name: Build radio-switch-stm32l073-nucleo-rfm69-slot-boot-${{ matrix.build_type }}
+        run: |
+          cmake --preset radio-switch-stm32l073-nucleo-rfm69-slot-boot-${{ matrix.build_type }}
+          cmake --build --preset radio-switch-stm32l073-nucleo-rfm69-slot-boot-${{ matrix.build_type }}
