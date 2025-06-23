@@ -8,12 +8,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ARMGCC_DIR : "/usr"
 
     strategy:
       matrix:
         build_type: [Debug, Release]
 
     steps:
+      - name: Install ARM GCC Toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi
+
       - name: Checkout code
         uses: actions/checkout@v3
 
