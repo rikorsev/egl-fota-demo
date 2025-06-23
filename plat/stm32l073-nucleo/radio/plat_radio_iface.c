@@ -2,6 +2,10 @@
 #include "plat.h"
 
 #if CONFIG_APP_TARGET_RFM_69
+egl_interface_t *plat_radio_iface_get(void)
+{
+    return NULL;
+}
 
 #elif CONFIG_APP_TARGET_RFM_66
 static egl_result_t init(void)
