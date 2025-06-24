@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         build_type: [debug, release]
+        target_app: [blink, radio_switch, rfm_test]
 
     steps:
       - name: Install ARM GCC Toolchain
@@ -37,37 +38,20 @@ jobs:
       - name: Set up CMake
         uses: lukka/get-cmake@latest
 
-      - name: Build blink-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
+      - name: Config
         run: |
-          cmake --preset blink-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
-          cmake --build --preset blink-stm32l073-nucleo-slot-boot-${{ matrix.build_type }}
+          cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} |
+                -DTARGET_APP=${{matrix.target_app}} |
+                -DTARGET_PLATFORM=stm32l073-nucleo |
+                -DTARGET_SLOT=boot |
+                -DTARGET_RFM=rfm69 |
+                -DCMAKE_TOOLCHAIN_FILE=plat/stm32l073-nucleo/toolchain.cmake |
+                -S./ |
+                -B./build/${{matrix.target_app}} |
+                -G Ninjacmake.EXE" |
+                --build ./build/${{matrix.target_app}} |
+                --target all --
 
-      - name: Build blink-stm32l073-nucleo-slot-a-${{ matrix.build_type }}
+      - name: Build
         run: |
-          cmake --preset blink-stm32l073-nucleo-slot-a-${{ matrix.build_type }}
-          cmake --build --preset blink-stm32l073-nucleo-slot-a-${{ matrix.build_type }}
-
-      - name: Build blink-stm32l073-nucleo-slot-b-${{ matrix.build_type }}
-        run: |
-          cmake --preset blink-stm32l073-nucleo-slot-b-${{ matrix.build_type }}
-          cmake --build --preset blink-stm32l073-nucleo-slot-b-${{ matrix.build_type }}
-
-      - name: Build rfm-test-stm32l073-nucleo-rfm66-${{ matrix.build_type }}
-        run: |
-          cmake --preset rfm-test-stm32l073-nucleo-rfm66-${{ matrix.build_type }}
-          cmake --build --preset rfm-test-stm32l073-nucleo-rfm66-${{ matrix.build_type }}
-
-      - name: Build rfm-test-stm32l073-nucleo-rfm69-${{ matrix.build_type }}
-        run: |
-          cmake --preset rfm-test-stm32l073-nucleo-rfm69-${{ matrix.build_type }}
-          cmake --build --preset rfm-test-stm32l073-nucleo-rfm69-${{ matrix.build_type }}
-
-      - name: Build radio-switch-stm32l073-nucleo-rfm66-slot-boot-${{ matrix.build_type }}
-        run: |
-          cmake --preset radio-switch-stm32l073-nucleo-rfm66-slot-boot-${{ matrix.build_type }}
-          cmake --build --preset radio-switch-stm32l073-nucleo-rfm66-slot-boot-${{ matrix.build_type }}
-
-      - name: Build radio-switch-stm32l073-nucleo-rfm69-slot-boot-${{ matrix.build_type }}
-        run: |
-          cmake --preset radio-switch-stm32l073-nucleo-rfm69-slot-boot-${{ matrix.build_type }}
-          cmake --build --preset radio-switch-stm32l073-nucleo-rfm69-slot-boot-${{ matrix.build_type }}
+            cmake --build ./build/${{matrix.target_app}} --target all --
