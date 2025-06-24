@@ -15,6 +15,9 @@ jobs:
       matrix:
         build_type: [debug, release]
         target_app: [blink, radio_switch, rfm_test]
+        target_slot: [boot, a, b]
+        target_rfm: [rfm66, rfm69]
+        targer_plat: [stm32l073-nucleo]
 
     steps:
       - name: Install ARM GCC Toolchain
@@ -40,12 +43,12 @@ jobs:
 
       - name: Config
         run: |
-          cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
                 -DTARGET_APP=${{matrix.target_app}} \
-                -DTARGET_PLATFORM=stm32l073-nucleo \
-                -DTARGET_SLOT=boot \
-                -DTARGET_RFM=rfm69 \
-                --toolchain ./plat/stm32l073-nucleo/toolchain.cmake \
+                -DTARGET_PLATFORM=${{matrix.targer_plat}} \
+                -DTARGET_SLOT=${{matrix.target_slot}} \
+                -DTARGET_RFM=${{matrix.target_rfm}} \
+                --toolchain ./plat/${{matrix.targer_plat}}/toolchain.cmake \
                 -S ./ \
                 -B ./build/${{matrix.target_app}}
 
