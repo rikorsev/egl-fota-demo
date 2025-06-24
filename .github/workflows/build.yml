@@ -47,8 +47,7 @@ jobs:
                 -DTARGET_RFM=rfm69 \
                 --toolchain ./plat/stm32l073-nucleo/toolchain.cmake \
                 -S ./ \
-                -B ./build/${{matrix.target_app}} \
-                --build ./build/${{matrix.target_app}}
+                -B ./build/${{matrix.target_app}}
 
       - name: Build
         run: |
