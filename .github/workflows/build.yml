@@ -48,7 +48,6 @@ jobs:
                 -DCMAKE_TOOLCHAIN_FILE=plat/stm32l073-nucleo/toolchain.cmake |
                 -S./ |
                 -B./build/${{matrix.target_app}} |
-                -G Ninjacmake.EXE" |
                 --build ./build/${{matrix.target_app}} |
                 --target all --
 
