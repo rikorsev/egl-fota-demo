@@ -49,8 +49,8 @@ jobs:
                 -S ./ \
                 -B ./build/${{matrix.target_app}} \
                 --build ./build/${{matrix.target_app}} \
-                --target all --
+                --target all
 
       - name: Build
         run: |
-            cmake --build ./build/${{matrix.target_app}} --target all --
+            cmake --build ./build/${{matrix.target_app}} --target all
