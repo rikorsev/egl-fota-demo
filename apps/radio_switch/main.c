@@ -49,6 +49,18 @@ static egl_result_t info(void)
     return result;
 }
 
+static void radio_ping(void)
+{
+    uint8_t buff[] = { 0xDE, 0xAD, 0xBE, 0xEF };
+    size_t size = sizeof(buff);
+    egl_result_t result = egl_itf_write(RADIO, buff, &size);
+    if(result != EGL_SUCCESS)
+    {
+        EGL_LOG_FAIL("Fatal error");
+        EGL_RESULT_FATAL();
+    }
+}
+
 int main(void)
 {
     egl_result_t result = init();
@@ -68,7 +80,7 @@ int main(void)
     while(1)
     {
         EGL_LOG_INFO("Tick...");
-
+        radio_ping();
         egl_sys_delay(1000);
     }
 

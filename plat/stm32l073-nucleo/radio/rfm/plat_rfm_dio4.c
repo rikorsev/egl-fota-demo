@@ -32,7 +32,7 @@ static egl_result_t get(void)
     return result;
 }
 
-const egl_pio_t plat_rfm_dio4_pin_inst =
+const egl_pio_t plat_rfm_dio4_inst =
 {
     .init = init,
     .get = get,

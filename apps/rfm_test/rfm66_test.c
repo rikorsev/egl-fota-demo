@@ -752,7 +752,7 @@ static egl_result_t rfm_fifo_thresh_test_run(void)
     result = egl_rfm66_fifo_thresh_set(PLAT_RFM66, 31);
     EGL_RESULT_CHECK(result);
 
-    result = egl_rfm66_tx_start_condition_set(PLAT_RFM66, EGL_RFM66_TX_START_CONDITION_FIFO_EMPTY);
+    result = egl_rfm66_tx_start_condition_set(PLAT_RFM66, EGL_RFM66_TX_START_CONDITION_FIFO_NOT_EMPTY);
     EGL_RESULT_CHECK(result);
 
     return result;

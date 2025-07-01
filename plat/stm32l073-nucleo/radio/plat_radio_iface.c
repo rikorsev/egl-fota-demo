@@ -15,9 +15,10 @@ static egl_result_t init(void)
     static const egl_rfm66_config_t config =
     {
         .frequency = 915000000,
-        .bandwith = 83300,
         .deviation = 30000,
         .bitrate = 115200,
+        .preamble = 16,
+        .bandwidth = EGL_RFM66_BANDWIDTH_100000,
     };
 
     result = egl_rfm66_iface_init(PLAT_RFM66, (egl_rfm66_config_t *)&config);
@@ -26,9 +27,15 @@ static egl_result_t init(void)
     return result;
 }
 
+static size_t write(void *data, size_t len)
+{
+    return egl_rfm66_iface_write(PLAT_RFM66, data, len);
+}
+
 static const egl_interface_t plat_radio_iface_inst =
 {
     .init = init,
+    .write = write,
 };
 
 egl_interface_t *plat_radio_iface_get(void)

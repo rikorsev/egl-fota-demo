@@ -69,6 +69,7 @@ int main(void)
     while(1)
     {
         rfm_test_run();
+        egl_sys_delay(1000);
     }
 
     return 0;
