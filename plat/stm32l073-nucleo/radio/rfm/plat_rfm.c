@@ -13,7 +13,7 @@ extern const egl_clock_t plat_rfm_clock_inst;
 
 #if CONFIG_APP_TARGET_RFM_69
 
-static const egl_rfm69_t plat_rfm69_inst =
+const egl_rfm69_t plat_rfm69_inst =
 {
     .pm    = (egl_pm_t *) &plat_rfm_pm_inst,
     .clock = (egl_clock_t *) &plat_rfm_clock_inst,
@@ -24,7 +24,6 @@ static const egl_rfm69_t plat_rfm69_inst =
     .dio3  = (egl_pio_t *) &plat_rfm_dio3_inst,
     .dio4  = (egl_pio_t *) &plat_rfm_dio4_inst,
     .dio5  = (egl_pio_t *) &plat_rfm_dio5_inst,
-    .pm_wait = PLAT_SYSPM_RUN
 };
 
 egl_rfm69_t *plat_rfm69_get(void)
@@ -34,7 +33,7 @@ egl_rfm69_t *plat_rfm69_get(void)
 
 #elif CONFIG_APP_TARGET_RFM_66
 
-static const egl_rfm66_t plat_rfm66_inst =
+const egl_rfm66_t plat_rfm66_inst =
 {
     .pm    = (egl_pm_t *) &plat_rfm_pm_inst,
     .clock = (egl_clock_t *) &plat_rfm_clock_inst,

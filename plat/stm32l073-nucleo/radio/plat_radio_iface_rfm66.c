@@ -3,6 +3,14 @@
 #include "plat_radio_tx_led.h"
 #include "plat_radio_rx_led.h"
 
+extern egl_rfm66_t plat_rfm66_inst;
+
+static egl_rfm66_iface_t rfm66_iface_inst =
+{
+    .rfm = &plat_rfm66_inst,
+    .pm_wait = PLAT_SYSPM_RUN,
+};
+
 static egl_result_t init(void)
 {
     egl_result_t result;
@@ -26,40 +34,42 @@ static egl_result_t init(void)
     result = egl_pio_init(RADIO_RX_LED);
     EGL_RESULT_CHECK(result);
 
-    result = egl_rfm66_iface_init(PLAT_RFM66, (egl_rfm66_config_t *)&config);
+    result = egl_rfm66_iface_init(&rfm66_iface_inst, (egl_rfm66_config_t *)&config);
     EGL_RESULT_CHECK(result);
 
     return result;
 }
 
-static size_t write(void *data, size_t len)
+static egl_result_t write(void *data, size_t *len)
 {
     egl_result_t result;
 
     result = egl_pio_set(RADIO_TX_LED, true);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
+    EGL_RESULT_CHECK(result);
 
-    len = egl_rfm66_iface_write(PLAT_RFM66, data, len);
+    result = egl_rfm66_iface_write(&rfm66_iface_inst, data, len);
+    EGL_RESULT_CHECK(result);
 
     result = egl_pio_set(RADIO_TX_LED, false);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
+    EGL_RESULT_CHECK(result);
 
-    return len;
+    return result;
 }
 
-static size_t read(void *data, size_t len)
+static egl_result_t read(void *data, size_t *len)
 {
     egl_result_t result;
 
     result = egl_pio_set(RADIO_RX_LED, true);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
+    EGL_RESULT_CHECK(result);
 
-    len = egl_rfm66_iface_read(PLAT_RFM66, data, &len);
+    result = egl_rfm66_iface_read(&rfm66_iface_inst, data, len);
+    EGL_RESULT_CHECK(result);
 
     result = egl_pio_set(RADIO_RX_LED, false);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
+    EGL_RESULT_CHECK(result);
 
-    return len;
+    return result;
 }
 
 static const egl_iface_t plat_radio_iface_inst =
