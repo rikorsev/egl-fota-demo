@@ -9,6 +9,8 @@ static egl_rfm66_iface_t rfm66_iface_inst =
 {
     .rfm = &plat_rfm66_inst,
     .pm_wait = PLAT_SYSPM_RUN,
+    .rx_timeout = 1000,
+    .tx_timeout = 1000
 };
 
 static egl_result_t init(void)
