@@ -20,7 +20,7 @@ static egl_result_t init(void)
 
     egl_result_error_hook_set(&error_hook);
 
-    result = egl_itf_init(RADIO);
+    result = egl_iface_init(RADIO);
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -53,7 +53,7 @@ static void radio_ping(void)
 {
     uint8_t buff[] = { 0xDE, 0xAD, 0xBE, 0xEF };
     size_t len = sizeof(buff);
-    egl_result_t result = egl_itf_write(RADIO, buff, &len);
+    egl_result_t result = egl_iface_write(RADIO, buff, &len);
     if(result != EGL_SUCCESS)
     {
         EGL_LOG_FAIL("Ping fail. Result: %s", EGL_RESULT(result));
@@ -65,7 +65,7 @@ static void radio_scan(void)
 {
     size_t len;
     uint8_t buff[64] = { 0 };
-    egl_result_t result = egl_itf_read(RADIO, buff, &len);
+    egl_result_t result = egl_iface_read(RADIO, buff, &len);
     if(result == EGL_SUCCESS)
     {
         EGL_LOG_INFO("Received(%u):", len);

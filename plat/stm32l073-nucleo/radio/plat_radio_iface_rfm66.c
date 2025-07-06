@@ -62,14 +62,14 @@ static size_t read(void *data, size_t len)
     return len;
 }
 
-static const egl_interface_t plat_radio_iface_inst =
+static const egl_iface_t plat_radio_iface_inst =
 {
     .init = init,
     .write = write,
     .read = read
 };
 
-egl_interface_t *plat_radio_iface_get(void)
+egl_iface_t *plat_radio_iface_get(void)
 {
-    return (egl_interface_t *)&plat_radio_iface_inst;
+    return (egl_iface_t *)&plat_radio_iface_inst;
 }

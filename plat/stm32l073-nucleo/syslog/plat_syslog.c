@@ -53,9 +53,9 @@ static egl_result_t init(void)
     return EGL_SUCCESS;
 }
 
-static size_t write(void *data, size_t len)
+static egl_result_t write(void *data, size_t *len)
 {
-    for(uint32_t i = 0; i < len; i++)
+    for(uint32_t i = 0; i < *len; i++)
     {
         while(!(USART2->ISR & USART_ISR_TXE))
         {
@@ -64,10 +64,10 @@ static size_t write(void *data, size_t len)
         USART2->TDR = ((uint8_t *)data)[i];
     }
 
-    return len;
+    return EGL_SUCCESS;
 }
 
-static egl_interface_t plat_syslog_iface =
+static const egl_iface_t plat_syslog_iface =
 {
     .init = init,
     .write = write
@@ -75,7 +75,7 @@ static egl_interface_t plat_syslog_iface =
 
 egl_log_t plat_syslog_inst =
 {
-    .iface = &plat_syslog_iface,
+    .iface = (egl_iface_t *)&plat_syslog_iface,
     .timer = &plat_systimer_inst
 };
 

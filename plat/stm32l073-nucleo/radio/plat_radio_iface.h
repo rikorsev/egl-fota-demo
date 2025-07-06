@@ -12,6 +12,6 @@
 #define RADIO_SYNC_SIZE (8U)
 #define RADIO_POWER_DB  (13)
 
-egl_interface_t *plat_radio_iface_get(void);
+egl_iface_t *plat_radio_iface_get(void);
 
 #endif

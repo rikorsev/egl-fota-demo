@@ -32,44 +32,46 @@ static egl_result_t init(void)
     return result;
 }
 
-static size_t write(void *data, size_t len)
+static egl_result_t write(void *data, size_t *len)
 {
     egl_result_t result;
 
     result = egl_pio_set(RADIO_TX_LED, true);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
+    EGL_RESULT_CHECK(result);
 
-    len = egl_rfm69_iface_write(PLAT_RFM69, data, len);
+    result = egl_rfm69_iface_write(PLAT_RFM69, data, len);
+    EGL_RESULT_CHECK(result);
 
     result = egl_pio_set(RADIO_TX_LED, false);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
+    EGL_RESULT_CHECK(result);
 
-    return len;
+    return result;
 }
 
-static size_t read(void *data, size_t len)
+static egl_result_t read(void *data, size_t *len)
 {
     egl_result_t result;
 
     result = egl_pio_set(RADIO_RX_LED, true);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
+    EGL_RESULT_CHECK(result);
 
-    len = egl_rfm69_iface_read(PLAT_RFM69, data, &len);
+    result = egl_rfm69_iface_read(PLAT_RFM69, data, len);
+    EGL_RESULT_CHECK(result);
 
     result = egl_pio_set(RADIO_RX_LED, false);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
+    EGL_RESULT_CHECK(result);
 
-    return len;
+    return result;
 }
 
-static const egl_interface_t plat_radio_iface_inst =
+static const egl_iface_t plat_radio_iface_inst =
 {
     .init = init,
     .write = write,
     .read = read
 };
 
-egl_interface_t *plat_radio_iface_get(void)
+egl_iface_t *plat_radio_iface_get(void)
 {
-    return (egl_interface_t *)&plat_radio_iface_inst;
+    return (egl_iface_t *)&plat_radio_iface_inst;
 }
