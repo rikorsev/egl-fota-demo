@@ -52,12 +52,38 @@ static egl_result_t info(void)
 static void radio_ping(void)
 {
     uint8_t buff[] = { 0xDE, 0xAD, 0xBE, 0xEF };
-    size_t size = sizeof(buff);
-    egl_result_t result = egl_itf_write(RADIO, buff, &size);
+    size_t len = sizeof(buff);
+    egl_result_t result = egl_itf_write(RADIO, buff, &len);
     if(result != EGL_SUCCESS)
     {
-        EGL_LOG_FAIL("Fatal error");
+        EGL_LOG_FAIL("Ping fail. Result: %s", EGL_RESULT(result));
         EGL_RESULT_FATAL();
+    }
+}
+
+static void radio_scan(void)
+{
+    size_t len;
+    uint8_t buff[64] = { 0 };
+    egl_result_t result = egl_itf_read(RADIO, buff, &len);
+    if(result == EGL_SUCCESS)
+    {
+        EGL_LOG_INFO("Received(%u):", len);
+        for(unsigned int i = 0; i < len; i += 8)
+        {
+            EGL_LOG_INFO("%02x %02x %02x %02x %02x %02x %02x %02x", buff[i],
+                                                                    buff[i + 1],
+                                                                    buff[i + 2],
+                                                                    buff[i + 3],
+                                                                    buff[i + 4],
+                                                                    buff[i + 5],
+                                                                    buff[i + 6],
+                                                                    buff[i + 7]);
+        }
+    }
+    else
+    {
+        EGL_LOG_WARN("Scan fail. Result: %s", EGL_RESULT(result));
     }
 }
 
@@ -80,8 +106,9 @@ int main(void)
     while(1)
     {
         EGL_LOG_INFO("Tick...");
-        radio_ping();
-        egl_sys_delay(1000);
+        // radio_ping();
+        radio_scan();
+        // egl_sys_delay(1000);
     }
 
     return 0;

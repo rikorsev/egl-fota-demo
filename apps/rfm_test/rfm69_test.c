@@ -147,7 +147,7 @@ static egl_result_t rfm_rc_calib_test_run(void)
     egl_result_t result;
     egl_rfm69_rc_calib_state_t state;
 
-    result = egl_rfm69_mode_set(PLAT_RFM69, EGL_RFM69_STANDBY_MODE);
+    result = egl_rfm69_mode_set(PLAT_RFM69, EGL_RFM69_STDBY_MODE);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_rc_calib_state_get(PLAT_RFM69, &state);
