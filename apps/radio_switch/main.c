@@ -69,11 +69,7 @@ static void radio_ping(void)
     uint8_t buff[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x11, 0x22, 0x33, 0x44 };
     size_t len = sizeof(buff);
     egl_result_t result = egl_iface_write(RADIO, buff, &len);
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_FAIL("Ping fail. Result: %s", EGL_RESULT(result));
-        EGL_RESULT_FATAL();
-    }
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, );
 }
 
 static void radio_scan(void)
@@ -117,19 +113,13 @@ void loop(void)
 
 int main(void)
 {
-    egl_result_t result = init();
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_FAIL("Fatal error");
-        EGL_RESULT_FATAL();
-    }
+    egl_result_t result;
+
+    result = init();
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
 
     result = info();
-    if(result != EGL_SUCCESS)
-    {
-        EGL_LOG_FAIL("Fatal error");
-        EGL_RESULT_FATAL();
-    }
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
 
     while(1)
     {
