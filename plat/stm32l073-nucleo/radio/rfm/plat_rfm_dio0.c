@@ -16,20 +16,11 @@ static egl_result_t init(void)
     return EGL_SUCCESS;
 }
 
-static egl_result_t get(void)
+static egl_result_t get(bool *state)
 {
-    egl_result_t result;
+    *state = PORT->IDR & GPIO_IDR_ID8;
 
-    if(PORT->IDR & GPIO_IDR_ID8)
-    {
-        result = EGL_SET;
-    }
-    else
-    {
-        result = EGL_RESET;
-    }
-
-    return result;
+    return EGL_SUCCESS;
 }
 
 const egl_pio_t plat_rfm_dio0_inst =

@@ -1,6 +1,8 @@
 #include "egl_lib.h"
 #include "plat.h"
 
+bool is_ping = false;
+
 static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned int line, void *ctx)
 {
 #if CONFIG_EGL_LOG_ENABLED
@@ -8,6 +10,11 @@ static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned in
 #endif
 
     return result;
+}
+
+static void user_button_callback(void *data)
+{
+    is_ping = true;
 }
 
 static egl_result_t init(void)
@@ -21,6 +28,12 @@ static egl_result_t init(void)
     egl_result_error_hook_set(&error_hook);
 
     result = egl_iface_init(RADIO);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_pio_init(USER_BUTTON);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_pio_callback_set(USER_BUTTON, user_button_callback);
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -51,6 +64,8 @@ static egl_result_t info(void)
 
 static void radio_ping(void)
 {
+    EGL_LOG_INFO("Ping...");
+
     uint8_t buff[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x11, 0x22, 0x33, 0x44 };
     size_t len = sizeof(buff);
     egl_result_t result = egl_iface_write(RADIO, buff, &len);
@@ -87,6 +102,19 @@ static void radio_scan(void)
     }
 }
 
+void loop(void)
+{
+    EGL_LOG_INFO("Tick...");
+
+    if(is_ping)
+    {
+        is_ping = false;
+        radio_ping();
+    }
+
+    radio_scan();
+}
+
 int main(void)
 {
     egl_result_t result = init();
@@ -105,10 +133,7 @@ int main(void)
 
     while(1)
     {
-        EGL_LOG_INFO("Tick...");
-        radio_ping();
-        // radio_scan();
-        egl_sys_delay(1000);
+        loop();
     }
 
     return 0;

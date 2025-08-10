@@ -12,6 +12,7 @@
 #include "plat_radio_iface.h"
 #include "plat_system.h"
 #include "plat_info.h"
+#include "plat_usrbtn.h"
 #include "slot.h"
 
 #define PLATFORM platform_get()

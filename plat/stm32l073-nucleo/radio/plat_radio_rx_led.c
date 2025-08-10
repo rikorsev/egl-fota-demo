@@ -39,9 +39,11 @@ static egl_result_t set(bool state)
     return EGL_SUCCESS;
 }
 
-static egl_result_t get(void)
+static egl_result_t get(bool *state)
 {
-    return PORT->ODR & GPIO_ODR_OD0_Msk ? EGL_SET : EGL_RESET;
+    *state = PORT->ODR & GPIO_ODR_OD0_Msk;
+
+    return EGL_SUCCESS;
 }
 
 static egl_pio_t plat_radio_rx_led_inst =
