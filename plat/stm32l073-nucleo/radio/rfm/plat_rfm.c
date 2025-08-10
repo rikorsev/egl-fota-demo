@@ -37,7 +37,7 @@ const egl_rfm66_t plat_rfm66_inst =
 {
     .pm    = (egl_pm_t *) &plat_rfm_pm_inst,
     .clock = (egl_clock_t *) &plat_rfm_clock_inst,
-    .iface = (egl_interface_t *) &plat_rfm_iface_inst,
+    .iface = (egl_iface_t *) &plat_rfm_iface_inst,
     .dio0  = (egl_pio_t *) &plat_rfm_dio0_inst,
     .dio1  = (egl_pio_t *) &plat_rfm_dio1_inst,
     .dio2  = (egl_pio_t *) &plat_rfm_dio2_inst,

@@ -17,6 +17,7 @@ static egl_result_t init(void)
 {
     egl_result_t result;
 
+    static const uint8_t sync[] = { 0x91, 0xD3 };
     const egl_rfm69_config_t config =
     {
         .frequency = RADIO_FREQ,
@@ -25,8 +26,8 @@ static egl_result_t init(void)
         .preamble  = RADIO_PREAMBLE,
         .bandwidth = EGL_RFM69_BANDWIDTH_FSK_100000_OOK_50000,
         .node_addr = RADIO_NODE_ADDR,
-        .sync      = RADIO_SYNC,
-        .sync_size = RADIO_SYNC_SIZE,
+        .sync      = sync,
+        .sync_size = sizeof(sync),
         .power     = RADIO_POWER_DB
     };
 
@@ -62,13 +63,13 @@ static egl_result_t read(void *data, size_t *len)
 {
     egl_result_t result;
 
-    result = egl_pio_set(RADIO_RX_LED, true);
+    result = egl_pio_set(RADIO_RX_LED, false);
     EGL_RESULT_CHECK(result);
 
     result = egl_rfm69_iface_read(&rfm69_iface_inst, data, len);
     EGL_RESULT_CHECK(result);
 
-    result = egl_pio_set(RADIO_RX_LED, false);
+    result = egl_pio_set(RADIO_RX_LED, true);
     EGL_RESULT_CHECK(result);
 
     return result;

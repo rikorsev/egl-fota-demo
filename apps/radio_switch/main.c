@@ -51,7 +51,7 @@ static egl_result_t info(void)
 
 static void radio_ping(void)
 {
-    uint8_t buff[] = { 0xDE, 0xAD, 0xBE, 0xEF };
+    uint8_t buff[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x11, 0x22, 0x33, 0x44 };
     size_t len = sizeof(buff);
     egl_result_t result = egl_iface_write(RADIO, buff, &len);
     if(result != EGL_SUCCESS)
@@ -106,9 +106,9 @@ int main(void)
     while(1)
     {
         EGL_LOG_INFO("Tick...");
-        // radio_ping();
-        radio_scan();
-        // egl_sys_delay(1000);
+        radio_ping();
+        // radio_scan();
+        egl_sys_delay(1000);
     }
 
     return 0;
