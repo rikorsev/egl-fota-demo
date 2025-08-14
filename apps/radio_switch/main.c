@@ -69,33 +69,20 @@ static void radio_ping(void)
     uint8_t buff[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x11, 0x22, 0x33, 0x44 };
     size_t len = sizeof(buff);
     egl_result_t result = egl_iface_write(RADIO, buff, &len);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, );
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 }
 
 static void radio_scan(void)
 {
     size_t len;
     uint8_t buff[64] = { 0 };
-    egl_result_t result = egl_iface_read(RADIO, buff, &len);
-    if(result == EGL_SUCCESS)
-    {
-        EGL_LOG_INFO("Received(%u):", len);
-        for(unsigned int i = 0; i < len; i += 8)
-        {
-            EGL_LOG_INFO("%02x %02x %02x %02x %02x %02x %02x %02x", buff[i],
-                                                                    buff[i + 1],
-                                                                    buff[i + 2],
-                                                                    buff[i + 3],
-                                                                    buff[i + 4],
-                                                                    buff[i + 5],
-                                                                    buff[i + 6],
-                                                                    buff[i + 7]);
-        }
-    }
-    else
-    {
-        EGL_LOG_WARN("Scan fail. Result: %s", EGL_RESULT(result));
-    }
+    egl_result_t result;
+
+    result = egl_iface_read(RADIO, buff, &len);
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+
+    result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_INFO, "received", buff, len, 8);
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 }
 
 void loop(void)
