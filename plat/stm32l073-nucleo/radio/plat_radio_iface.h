@@ -1,6 +1,9 @@
 #ifndef PLAT_RADIO_IFACE_H
 #define PLAT_RADIO_IFACE_H
 
+#include "plat_radio_sw1.h"
+#include "plat_radio_sw2.h"
+
 #define RADIO plat_radio_iface_get()
 
 #define RADIO_FREQ      (915000000U)

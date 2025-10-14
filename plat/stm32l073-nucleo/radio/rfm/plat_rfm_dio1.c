@@ -3,23 +3,23 @@
 
 #define PORT GPIOB
 
-/* PB3 */
+/* PB10 */
 static egl_result_t init(void)
 {
     RCC->IOPENR |= RCC_IOPENR_GPIOBEN;
 
     /* Set input mode */
-    PORT->MODER &= ~GPIO_MODER_MODE3;
+    PORT->MODER &= ~GPIO_MODER_MODE10;
 
     /* Configure no pull up/down */
-    PORT->PUPDR &= ~GPIO_PUPDR_PUPD3;
+    PORT->PUPDR &= ~GPIO_PUPDR_PUPD10;
 
     return EGL_SUCCESS;
 }
 
 static egl_result_t get(bool *state)
 {
-    *state = PORT->IDR & GPIO_IDR_ID3;
+    *state = PORT->IDR & GPIO_IDR_ID10;
 
     return EGL_SUCCESS;
 }

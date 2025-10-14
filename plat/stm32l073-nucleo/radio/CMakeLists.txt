@@ -5,10 +5,14 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/plat_radio_iface_${TARGET_RFM}.c
         ${CMAKE_CURRENT_LIST_DIR}/plat_radio_tx_led.c
         ${CMAKE_CURRENT_LIST_DIR}/plat_radio_rx_led.c
+        ${CMAKE_CURRENT_LIST_DIR}/plat_radio_sw1.c
+        ${CMAKE_CURRENT_LIST_DIR}/plat_radio_sw2.c
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/plat_radio_iface.h
         ${CMAKE_CURRENT_LIST_DIR}/plat_radio_tx_led.h
         ${CMAKE_CURRENT_LIST_DIR}/plat_radio_rx_led.h
+        ${CMAKE_CURRENT_LIST_DIR}/plat_radio_sw1.h
+        ${CMAKE_CURRENT_LIST_DIR}/plat_radio_sw2.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
