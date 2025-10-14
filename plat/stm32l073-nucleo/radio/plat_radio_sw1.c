@@ -2,6 +2,9 @@
 #include "plat.h"
 
 #define PORT GPIOA
+#define DEBONCE_THRESHOLD (100U)
+
+static uint32_t dtime = 0; /* Debounce timestamp */
 
 /* A4 */
 static void init_pio(void)
@@ -14,10 +17,6 @@ static void init_pio(void)
 
     /* Configure Low Speed */
     PORT->OSPEEDR &= ~GPIO_OSPEEDER_OSPEED4_Msk;
-
-    /* Configure pull up */
-    PORT->PUPDR &= ~GPIO_PUPDR_PUPD4_Msk;
-    PORT->PUPDR |= GPIO_PUPDR_PUPD4_0;
 }
 
 static void init_exti(void)
@@ -67,8 +66,15 @@ egl_pio_t *plat_radio_sw1_get(void)
 
 void plat_radio_sw1_irq_handler(void)
 {
-    if(plat_radio_sw1_inst.callback != NULL)
+    uint32_t ctime = egl_timer_get(SYSTIMER);
+
+    if(ctime > DEBONCE_THRESHOLD + dtime)
     {
-        plat_radio_sw1_inst.callback(NULL);
+        dtime = ctime;
+
+        if(plat_radio_sw1_inst.callback != NULL)
+        {
+            plat_radio_sw1_inst.callback(NULL);
+        }
     }
 }
