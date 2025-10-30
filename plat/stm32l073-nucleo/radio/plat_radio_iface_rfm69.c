@@ -7,10 +7,12 @@ extern egl_rfm69_t plat_rfm69_inst;
 
 static egl_rfm69_iface_t rfm69_iface_inst =
 {
-    .rfm = &plat_rfm69_inst,
-    .pm_wait = PLAT_SYSPM_RUN,
-    .rx_timeout = 1000,
-    .tx_timeout = 1000
+    .rfm          = &plat_rfm69_inst,
+    .pm_wait      = PLAT_SYSPM_RUN,
+    .rx_timeout   = 1000,
+    .tx_timeout   = 1000,
+    .rx_exit_mode = EGL_RFM69_RX_MODE,
+    .tx_exit_mode = EGL_RFM69_RX_MODE
 };
 
 static egl_result_t init(void)
@@ -20,15 +22,16 @@ static egl_result_t init(void)
     static const uint8_t sync[] = { 0x91, 0xD3 };
     const egl_rfm69_config_t config =
     {
-        .frequency = RADIO_FREQ,
-        .deviation = RADIO_DEVIATION,
-        .bitrate   = RADIO_BITRATE,
-        .preamble  = RADIO_PREAMBLE,
-        .bandwidth = EGL_RFM69_BANDWIDTH_FSK_100000_OOK_50000,
-        .node_addr = RADIO_NODE_ADDR,
-        .sync      = sync,
-        .sync_size = sizeof(sync),
-        .power     = RADIO_POWER_DB
+        .frequency   = RADIO_FREQ,
+        .deviation   = RADIO_DEVIATION,
+        .bitrate     = RADIO_BITRATE,
+        .preamble    = RADIO_PREAMBLE,
+        .bandwidth   = EGL_RFM69_BANDWIDTH_FSK_100000_OOK_50000,
+        .node_addr   = RADIO_NODE_ADDR,
+        .sync        = sync,
+        .sync_size   = sizeof(sync),
+        .power       = RADIO_POWER_DB,
+        .rssi_thresh = RADIO_RSSI_THRESH
     };
 
     result = egl_pio_init(RADIO_TX_LED);
