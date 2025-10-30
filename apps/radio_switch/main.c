@@ -7,7 +7,7 @@ static bool is_ping = false;
 static unsigned int size_index = 0;
 static const size_t size_table[] = { 16, 32, 64, 254 };
 
-static egl_result_t error_hook_func(egl_result_t result, char *file, unsigned int line, void *ctx)
+static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned int line, void *ctx)
 {
 #if CONFIG_EGL_LOG_ENABLED
     egl_log(SYSLOG, EGL_LOG_LEVEL_ERROR, file, "line: %u: Result: %s", line, EGL_RESULT(result));
@@ -40,12 +40,12 @@ static void radio_sw2_callback(void *data)
 static egl_result_t init(void)
 {
     egl_result_t result;
-    static egl_result_error_hook_t error_hook = { error_hook_func };
+    static egl_result_error_handler_t error_handler = { error_handler_func };
 
     result = egl_system_init(SYSTEM);
     EGL_RESULT_CHECK(result);
 
-    egl_result_error_hook_set(&error_hook);
+    egl_result_error_handler_set(&error_handler);
 
     result = egl_iface_init(RADIO);
     EGL_RESULT_CHECK(result);
