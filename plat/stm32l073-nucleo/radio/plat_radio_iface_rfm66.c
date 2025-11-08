@@ -7,12 +7,14 @@ extern egl_rfm66_t plat_rfm66_inst;
 
 static egl_rfm66_iface_t rfm66_iface_inst =
 {
-    .rfm          = &plat_rfm66_inst,
-    .pm_wait      = PLAT_SYSPM_RUN,
-    .rx_timeout   = 10000,
-    .tx_timeout   = 10000,
-    .rx_exit_mode = EGL_RFM66_RX_MODE,
-    .tx_exit_mode = EGL_RFM66_RX_MODE
+    .rfm            = &plat_rfm66_inst,
+    .pm_wait        = PLAT_SYSPM_RUN,
+    .rx_timeout     = 1000,
+    .tx_timeout     = 2000,
+    .rx_exit_mode   = EGL_RFM66_RX_MODE,
+    .tx_exit_mode   = EGL_RFM66_RX_MODE,
+    .is_rx_partial  = true,
+    .is_rx_inc_tout = true
 };
 
 static egl_result_t init(void)
