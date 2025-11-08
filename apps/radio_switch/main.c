@@ -75,6 +75,11 @@ static egl_result_t init(void)
         memset(send_buff + i, j, 256);
     }
 
+    // for(unsigned int i = 0; i < sizeof(send_buff); i++)
+    // {
+    //     send_buff[i] = i & 0xff;
+    // }
+
     return result;
 }
 
@@ -116,9 +121,9 @@ static void radio_ping(void)
 
 static void radio_scan(void)
 {
-    size_t len;
     static uint8_t buff[4096];
     egl_result_t result;
+    size_t len = sizeof(buff);
 
     memset(buff, 0, sizeof(buff));
 
