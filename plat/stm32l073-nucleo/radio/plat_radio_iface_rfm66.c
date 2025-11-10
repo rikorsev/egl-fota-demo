@@ -7,31 +7,31 @@ extern egl_rfm66_t plat_rfm66_inst;
 
 static egl_rfm66_iface_t rfm66_iface_inst =
 {
-    .rfm            = &plat_rfm66_inst,
-    .pm_wait        = PLAT_SYSPM_RUN,
-    .rx_timeout     = 1000,
-    .tx_timeout     = 2000,
-    .rx_exit_mode   = EGL_RFM66_RX_MODE,
-    .tx_exit_mode   = EGL_RFM66_RX_MODE,
-    .is_rx_partial  = true,
-    .is_rx_inc_tout = true
+    .rfm                   = &plat_rfm66_inst,
+    .pm_wait               = PLAT_SYSPM_RUN,
+    .rx_timeout            = 1000,
+    .tx_timeout            = 1000,
+    .rx_exit_mode          = EGL_RFM66_RX_MODE,
+    .tx_exit_mode          = EGL_RFM66_RX_MODE,
+    .is_rx_partial         = true,
+    .is_rx_inc_tout        = true,
+    .tx_inter_packet_delay = RADIO_TX_INTER_PACKET_DELAY
 };
 
 static egl_result_t init(void)
 {
     egl_result_t result;
 
-    static const uint8_t sync[] = { 0x91, 0xD3 };
     const egl_rfm66_config_t config =
     {
         .frequency = RADIO_FREQ,
         .deviation = RADIO_DEVIATION,
         .bitrate   = RADIO_BITRATE,
         .preamble  = RADIO_PREAMBLE,
-        .bandwidth = EGL_RFM66_BANDWIDTH_100000,
+        .bandwidth = EGL_RFM66_BANDWIDTH_200000,
         .node_addr = RADIO_NODE_ADDR,
-        .sync      = sync,
-        .sync_size = sizeof(sync),
+        .sync      = RADIO_SYNC,
+        .sync_size = sizeof(RADIO_SYNC),
         .power     = RADIO_POWER_DB
     };
 

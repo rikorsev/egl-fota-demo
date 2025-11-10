@@ -75,11 +75,6 @@ static egl_result_t init(void)
         memset(send_buff + i, j, 256);
     }
 
-    // for(unsigned int i = 0; i < sizeof(send_buff); i++)
-    // {
-    //     send_buff[i] = i & 0xff;
-    // }
-
     return result;
 }
 
