@@ -6,7 +6,7 @@
 #define PORT GPIOB
 
 /* PB3 */
-static egl_result_t init(void)
+static egl_result_t init_pio(void)
 {
     RCC->IOPENR |= RCC_IOPENR_GPIOBEN;
 
@@ -15,6 +15,32 @@ static egl_result_t init(void)
 
     /* Configure no pull up/down */
     PORT->PUPDR &= ~GPIO_PUPDR_PUPD3;
+
+    return EGL_SUCCESS;
+}
+
+static void init_exti(void)
+{
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+    EXTI->IMR  |= EXTI_IMR_IM3;
+    EXTI->RTSR |= EXTI_RTSR_RT3;
+
+    SYSCFG->EXTICR[0] &= ~SYSCFG_EXTICR1_EXTI3;
+    SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI3_PB;
+}
+
+static void init_nvic(void)
+{
+    NVIC_EnableIRQ(EXTI2_3_IRQn);
+    NVIC_SetPriority(EXTI2_3_IRQn, 0); /* set Priority for Systick Interrupt */
+}
+
+static egl_result_t init(void)
+{
+    init_pio();
+    init_exti();
+    init_nvic();
 
     return EGL_SUCCESS;
 }
@@ -55,8 +81,18 @@ static egl_result_t get(bool *state)
 #error "Target RFM is not set"
 #endif
 
-const egl_pio_t plat_rfm_dio2_inst =
+egl_pio_t plat_rfm_dio2_inst =
 {
     .init = init,
     .get = get,
 };
+
+#if CONFIG_APP_TARGET_RFM_69
+void plat_rfm_dio2_irq_handler(void)
+{
+    if(plat_rfm_dio2_inst.callback != NULL)
+    {
+        plat_rfm_dio2_inst.callback(NULL);
+    }
+}
+#endif

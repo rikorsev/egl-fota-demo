@@ -1,6 +1,7 @@
 #ifndef PLAT_RADIO_IFACE_H
 #define PLAT_RADIO_IFACE_H
 
+#include "plat_rfm.h"
 #include "plat_radio_sw1.h"
 #include "plat_radio_sw2.h"
 
@@ -16,6 +17,12 @@
 #define RADIO_POWER_DB              (10)
 #define RADIO_RSSI_THRESH           (-80)
 #define RADIO_TX_INTER_PACKET_DELAY (5U)
+
+enum
+{
+    RADIO_IOCTL_RTS_CALLBACK_SET = 1,
+    RADIO_IOCTL_RX_MODE_SET,
+};
 
 egl_iface_t *plat_radio_iface_get(void);
 

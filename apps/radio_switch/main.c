@@ -3,7 +3,8 @@
 #include "egl_lib.h"
 #include "plat.h"
 
-static bool is_ping = false;
+static bool is_send = false;
+static bool is_recv = false;
 static unsigned int size_index = 0;
 static const size_t size_table[] = { 16, 32, 64, 254, 4096 };
 static uint8_t send_buff[4096] = {0};
@@ -19,7 +20,7 @@ static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned
 
 static void user_button_callback(void *data)
 {
-    is_ping = true;
+    is_send = true;
 }
 
 static void radio_sw1_callback(void *data)
@@ -36,6 +37,11 @@ static void radio_sw2_callback(void *data)
     size_index %= EGL_ARRAY_SIZE(size_table);
 
     EGL_LOG_INFO("TX packet size: %u", size_table[size_index]);
+}
+
+static void radio_rts_callback(void *data)
+{
+    is_recv = true;
 }
 
 static egl_result_t init(void)
@@ -69,10 +75,17 @@ static egl_result_t init(void)
     result = egl_pio_callback_set(RADIO_SW2, radio_sw2_callback);
     EGL_RESULT_CHECK(result);
 
+    size_t len = sizeof(radio_rts_callback);
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RTS_CALLBACK_SET, radio_rts_callback, &len);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_MODE_SET, NULL, &len);
+    EGL_RESULT_CHECK(result);
+
     /* init send buffer */
-    for(unsigned int i = 0, j = 0; i < sizeof(send_buff); i += 256, j++)
+    for(unsigned int i= 0; i < sizeof(send_buff); i++)
     {
-        memset(send_buff + i, j, 256);
+        send_buff[i] = i & 0xFF;
     }
 
     return result;
@@ -101,9 +114,9 @@ static egl_result_t info(void)
     return result;
 }
 
-static void radio_ping(void)
+static void radio_send(void)
 {
-    EGL_LOG_INFO("Ping...");
+    EGL_LOG_INFO("Sending...");
 
     size_t len = size_table[size_index];
 
@@ -114,32 +127,35 @@ static void radio_ping(void)
     EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 }
 
-static void radio_scan(void)
+static void radio_recv(void)
 {
-    static uint8_t buff[4096];
+    static uint8_t buff[4096] = {0};
     egl_result_t result;
     size_t len = sizeof(buff);
-
-    memset(buff, 0, sizeof(buff));
 
     result = egl_iface_read(RADIO, buff, &len);
     EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 
     result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_INFO, "recv", buff, len, 8);
     EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+
+    /* Buffer content not needed any more, so clear it */
+    memset(buff, 0, sizeof(buff));
 }
 
 void loop(void)
 {
-    EGL_LOG_INFO("Tick...");
-
-    if(is_ping)
+    if(is_recv)
     {
-        is_ping = false;
-        radio_ping();
+        radio_recv();
+        is_recv = false;
     }
 
-    radio_scan();
+    if(is_send)
+    {
+        radio_send();
+        is_send = false;
+    }
 }
 
 int main(void)
