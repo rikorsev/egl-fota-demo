@@ -3,22 +3,18 @@
 #include "egl_lib.h"
 #include "plat.h"
 
-typedef struct __attribute__((packed))
-{
-    uint8_t cmd;
-    uint8_t len;
-    uint8_t payload;
-}packet_t;
-
 enum
 {
-    REMOTE_LED_OFF,
-    REMOTE_LED_ON
+    CMD_NONE,
+    CMD_LED_OFF,
+    CMD_LED_ON,
+    CMD_UPLOAD_SLOT_A,
+    CMD_UPLOAD_SLOT_B
 };
 
-static bool is_send = false;
 static bool is_recv = false;
 static bool rm_led_state = false;
+static uint8_t cmd = CMD_NONE;
 
 static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned int line, void *ctx)
 {
@@ -31,17 +27,18 @@ static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned
 
 static void user_button_callback(void *data)
 {
-    is_send = true;
+    cmd = rm_led_state ? CMD_LED_OFF : CMD_LED_ON;
+    rm_led_state = !rm_led_state;
 }
 
 static void radio_sw1_callback(void *data)
 {
-    /* TBD */
+    cmd = CMD_UPLOAD_SLOT_A;
 }
 
 static void radio_sw2_callback(void *data)
 {
-    /* TBD */
+    cmd = CMD_UPLOAD_SLOT_B;
 }
 
 static void radio_rts_callback(void *data)
@@ -119,17 +116,21 @@ static egl_result_t info(void)
     return result;
 }
 
-static egl_result_t radio_send(void)
+static egl_result_t handle(uint8_t *cmd)
 {
-    packet_t packet = { .cmd = rm_led_state ? REMOTE_LED_OFF : REMOTE_LED_ON };
-    size_t len = sizeof(packet);
+    if(*cmd == CMD_NONE)
+    {
+        return EGL_SUCCESS;
+    }
 
-    egl_result_t result = egl_iface_write(RADIO, &packet, &len);
+    size_t len = sizeof(*cmd);
+
+    egl_result_t result = egl_iface_write(RADIO, cmd, &len);
     EGL_RESULT_CHECK(result);
 
-    rm_led_state = !rm_led_state;
+    EGL_LOG_INFO("Send CMD: %u", *cmd);
 
-    EGL_LOG_INFO("Send remote LED State: %s", rm_led_state ? "ON" : "OFF");
+    *cmd = CMD_NONE;
 
     return result;
 }
@@ -137,26 +138,34 @@ static egl_result_t radio_send(void)
 static egl_result_t radio_recv(void)
 {
     egl_result_t result;
-    packet_t packet;
-    size_t len = sizeof(packet);
+    uint8_t recv_cmd;
+    size_t len = sizeof(recv_cmd);
 
-    result = egl_iface_read(RADIO, &packet, &len);
+    result = egl_iface_read(RADIO, &recv_cmd, &len);
     EGL_RESULT_CHECK(result);
 
-    switch(packet.cmd)
+    switch(recv_cmd)
     {
-        case REMOTE_LED_OFF:
+        case CMD_LED_OFF:
             result = egl_pio_set(SYSLED, false);
             EGL_RESULT_CHECK(result);
             break;
 
-        case REMOTE_LED_ON:
+        case CMD_LED_ON:
             result = egl_pio_set(SYSLED, true);
             EGL_RESULT_CHECK(result);
             break;
 
+        case CMD_UPLOAD_SLOT_A:
+            EGL_LOG_INFO("TBD: Update slot A");
+            break;
+
+        case CMD_UPLOAD_SLOT_B:
+            EGL_LOG_INFO("TBD: Update slot B");
+            break;
+
         default:
-            EGL_LOG_WARN("Unknown command: %u", packet.cmd);
+            EGL_LOG_WARN("Unknown command: %u", recv_cmd);
     }
 
     return result;
@@ -174,13 +183,8 @@ egl_result_t loop(void)
         EGL_RESULT_CHECK(result);
     }
 
-    if(is_send)
-    {
-        is_send = false;
-
-        result = radio_send();
-        EGL_RESULT_CHECK(result);
-    }
+    result = handle(&cmd);
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
