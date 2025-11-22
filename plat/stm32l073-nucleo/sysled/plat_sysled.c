@@ -1,26 +1,26 @@
 #include "egl_lib.h"
 #include "plat.h"
 
-#define PORT GPIOA
+#define PORT GPIOB
 
-/* A5 */
+/* B7 */
 static egl_result_t init(void)
 {
     /* Enable GPIOA clock */
-    RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
+    RCC->IOPENR |= RCC_IOPENR_GPIOBEN;
 
     /* Configure the GPIO as an output */
-    PORT->MODER &= ~GPIO_MODER_MODE5;
-    PORT->MODER |= GPIO_MODER_MODE5_0;
+    PORT->MODER &= ~GPIO_MODER_MODE7;
+    PORT->MODER |= GPIO_MODER_MODE7_0;
 
     /* Configure as push/pull output */
-    PORT->OTYPER &= ~GPIO_OTYPER_OT_5;
+    PORT->OTYPER &= ~GPIO_OTYPER_OT_7;
 
     /* Configure Low Speed */
-    PORT->OSPEEDR &= ~GPIO_OSPEEDER_OSPEED5;
+    PORT->OSPEEDR &= ~GPIO_OSPEEDER_OSPEED7;
 
     /* Configure no pull up/down */
-    PORT->PUPDR &= ~GPIO_PUPDR_PUPD5;
+    PORT->PUPDR &= ~GPIO_PUPDR_PUPD7;
 
     return EGL_SUCCESS;
 }
@@ -29,11 +29,11 @@ static egl_result_t set(bool state)
 {
     if(state)
     {
-        PORT->BSRR |= GPIO_BSRR_BS_5;
+        PORT->BSRR |= GPIO_BSRR_BS_7;
     }
     else
     {
-        PORT->BSRR |= GPIO_BSRR_BR_5;
+        PORT->BSRR |= GPIO_BSRR_BR_7;
     }
 
     return EGL_SUCCESS;
@@ -41,7 +41,7 @@ static egl_result_t set(bool state)
 
 static egl_result_t get(bool *state)
 {
-    *state = PORT->ODR & GPIO_ODR_OD5_Msk;
+    *state = PORT->ODR & GPIO_ODR_OD7_Msk;
 
     return EGL_SUCCESS;
 }
