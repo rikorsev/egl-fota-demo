@@ -116,20 +116,32 @@ static egl_result_t info(void)
     return result;
 }
 
-static egl_result_t handle(uint8_t *cmd)
+static egl_result_t cmd_handle(uint8_t *cmd)
 {
-    if(*cmd == CMD_NONE)
-    {
-        return EGL_SUCCESS;
-    }
-
+    egl_result_t result;
     size_t len = sizeof(*cmd);
 
-    egl_result_t result = egl_iface_write(RADIO, cmd, &len);
-    EGL_RESULT_CHECK(result);
+    switch(*cmd)
+    {
+        case CMD_NONE:
+            result = EGL_SUCCESS;
+            break;
 
-    EGL_LOG_INFO("Send CMD: %u", *cmd);
+        case CMD_LED_OFF:
+        case CMD_LED_ON:
+            result = egl_iface_write(RADIO, cmd, &len);
+            EGL_RESULT_CHECK_EXIT(result);
+            break;
 
+        case CMD_UPLOAD_SLOT_A:
+        case CMD_UPLOAD_SLOT_B:
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, (void *)PLAT_SLOT_BOOT, NULL);
+            EGL_RESULT_CHECK_EXIT(result);
+            break;
+    }
+
+exit:
+    /* Reset command */
     *cmd = CMD_NONE;
 
     return result;
@@ -157,11 +169,13 @@ static egl_result_t radio_recv(void)
             break;
 
         case CMD_UPLOAD_SLOT_A:
-            EGL_LOG_INFO("TBD: Update slot A");
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, (void *)PLAT_SLOT_BOOT, NULL);
+            EGL_RESULT_CHECK(result);
             break;
 
         case CMD_UPLOAD_SLOT_B:
-            EGL_LOG_INFO("TBD: Update slot B");
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, (void *)PLAT_SLOT_BOOT, NULL);
+            EGL_RESULT_CHECK(result);
             break;
 
         default:
@@ -183,7 +197,7 @@ egl_result_t loop(void)
         EGL_RESULT_CHECK(result);
     }
 
-    result = handle(&cmd);
+    result = cmd_handle(&cmd);
     EGL_RESULT_CHECK(result);
 
     return result;
