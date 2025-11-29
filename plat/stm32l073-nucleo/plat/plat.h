@@ -25,6 +25,11 @@ enum
     PLAT_SLOT_B
 };
 
+enum
+{
+    PLAT_CMD_BOOT,
+};
+
 egl_platform_t *platform_get(void);
 
 #endif

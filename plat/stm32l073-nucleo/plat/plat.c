@@ -10,21 +10,20 @@ static egl_result_t init(void)
 
 static egl_result_t boot(unsigned int slot_idx)
 {
-    if(slot_idx == PLAT_SLOT_BOOT)
-    {
-        return EGL_INVALID_PARAM;
-    }
-
     egl_result_t result;
     uint32_t slot_addr;
 
     switch(slot_idx)
     {
-        case SLOT_A:
+        case PLAT_SLOT_BOOT:
+            result = egl_value_u32_get(SLOT_BOOT_ADDR, &slot_addr);
+            break;
+
+        case PLAT_SLOT_A:
             result = egl_value_u32_get(SLOT_A_ADDR, &slot_addr);
             break;
 
-        case SLOT_B:
+        case PLAT_SLOT_B:
             result = egl_value_u32_get(SLOT_B_ADDR, &slot_addr);
             break;
             
@@ -58,10 +57,27 @@ static egl_result_t boot(unsigned int slot_idx)
     return EGL_SUCCESS;
 }
 
+static egl_result_t cmd(unsigned int id, void *data, size_t *len)
+{
+    egl_result_t result;
+
+    switch(id)
+    {
+        case PLAT_CMD_BOOT:
+            result = boot((unsigned int)data);
+            break;
+
+        default:
+            result = EGL_NOT_SUPPORTED;
+    }
+
+    return result;
+}
+
 egl_platform_t platform_inst =
 {
     .init      = init,
-    .boot      = boot,
+    .cmd       = cmd,
 };
 
 egl_platform_t *platform_get(void)
