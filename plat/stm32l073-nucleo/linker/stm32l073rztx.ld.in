@@ -44,7 +44,9 @@ MEMORY
   IVT  (rx):  ORIGIN = @CONFIG_PLAT_SLOT_ORIGIN@, LENGTH = @CONFIG_PLAT_SLOT_INFO_OFFSET@
   META (r):   ORIGIN = ORIGIN(IVT) + LENGTH(IVT), LENGTH = @CONFIG_PLAT_SLOT_INFO_SECTION_SIZE@
   FLASH (rx): ORIGIN = ORIGIN(META) + LENGTH(META), LENGTH = @CONFIG_PLAT_SLOT_LENGTH@
-  RAM (xrw):  ORIGIN = 0x20000000, LENGTH = 20K
+
+  BOOT_INFO(rw): ORIGIN = 0x20000000, LENGTH = @CONFIG_PLAT_BOOT_INFO_SIZE@
+  RAM (xrw):     ORIGIN = ORIGIN(BOOT_INFO) + LENGTH(BOOT_INFO), LENGTH = 20K - LENGTH(BOOT_INFO)
 }
 
 /* Define output sections */
@@ -123,6 +125,15 @@ SECTIONS
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
 
+  /* Section that keeps information for bootloader */
+  .boot_info :
+  {
+    . = ALIGN(4);
+    *(.boot_info)
+    *(.boot_info*)
+    . = ALIGN(4);
+  } >BOOT_INFO
+
   /* Initialized data sections goes into RAM, load LMA copy after code */
   .data : 
   {
@@ -135,7 +146,6 @@ SECTIONS
     _edata = .;        /* define a global symbol at data end */
   } >RAM AT> FLASH
 
-  
   /* Uninitialized data section */
   . = ALIGN(4);
   .bss :

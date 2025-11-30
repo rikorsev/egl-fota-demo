@@ -13,22 +13,40 @@
 #include "plat_system.h"
 #include "plat_info.h"
 #include "plat_usrbtn.h"
+#include "plat_crc.h"
 #include "slot.h"
 
 #define PLATFORM platform_get()
 #define PLAT_NUM_SLOTS (3U)
 
-enum
+typedef enum
 {
     PLAT_SLOT_BOOT,
     PLAT_SLOT_A,
     PLAT_SLOT_B
-};
+}plat_boot_slot_t;
 
 enum
 {
     PLAT_CMD_BOOT,
+    PLAT_CMD_GET_BOOT_INFO
 };
+
+typedef enum
+{
+    PLAT_BOOT_TASK_NONE,
+    PLAT_BOOT_TASK_UPLOAD_SLOT_A,
+    PLAT_BOOT_TASK_UPLOAD_SLOT_B,
+    PLAT_BOOT_TASK_DOWNLOAD_SLOT_A,
+    PLAT_BOOT_TASK_DOWNLOAD_SLOT_B
+}plat_boot_task_t;
+
+typedef struct
+{
+    plat_boot_slot_t slot;
+    plat_boot_task_t task;
+    uint32_t checksum;
+}plat_boot_info_t;
 
 egl_platform_t *platform_get(void);
 

@@ -9,7 +9,9 @@ enum
     CMD_LED_OFF,
     CMD_LED_ON,
     CMD_UPLOAD_SLOT_A,
-    CMD_UPLOAD_SLOT_B
+    CMD_UPLOAD_SLOT_B,
+    CMD_DOWNLOAD_SLOT_A,
+    CMD_DOWNLOAD_SLOT_B
 };
 
 static bool is_recv = false;
@@ -120,6 +122,7 @@ static egl_result_t cmd_handle(uint8_t *cmd)
 {
     egl_result_t result;
     size_t len = sizeof(*cmd);
+    plat_boot_info_t boot_info = { .slot = PLAT_SLOT_BOOT };
 
     switch(*cmd)
     {
@@ -130,19 +133,23 @@ static egl_result_t cmd_handle(uint8_t *cmd)
         case CMD_LED_OFF:
         case CMD_LED_ON:
             result = egl_iface_write(RADIO, cmd, &len);
-            EGL_RESULT_CHECK_EXIT(result);
             break;
 
         case CMD_UPLOAD_SLOT_A:
+            boot_info.task = PLAT_BOOT_TASK_UPLOAD_SLOT_A;
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_info, NULL);
+            break;
+
         case CMD_UPLOAD_SLOT_B:
-            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, (void *)PLAT_SLOT_BOOT, NULL);
-            EGL_RESULT_CHECK_EXIT(result);
+            boot_info.task = PLAT_BOOT_TASK_UPLOAD_SLOT_B;
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_info, NULL);
             break;
     }
 
-exit:
-    /* Reset command */
+    /* Reset current command */
     *cmd = CMD_NONE;
+
+    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -152,6 +159,7 @@ static egl_result_t radio_recv(void)
     egl_result_t result;
     uint8_t recv_cmd;
     size_t len = sizeof(recv_cmd);
+    plat_boot_info_t boot_info = { .slot = PLAT_SLOT_BOOT };
 
     result = egl_iface_read(RADIO, &recv_cmd, &len);
     EGL_RESULT_CHECK(result);
@@ -160,27 +168,26 @@ static egl_result_t radio_recv(void)
     {
         case CMD_LED_OFF:
             result = egl_pio_set(SYSLED, false);
-            EGL_RESULT_CHECK(result);
             break;
 
         case CMD_LED_ON:
             result = egl_pio_set(SYSLED, true);
-            EGL_RESULT_CHECK(result);
             break;
 
-        case CMD_UPLOAD_SLOT_A:
-            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, (void *)PLAT_SLOT_BOOT, NULL);
-            EGL_RESULT_CHECK(result);
+        case CMD_DOWNLOAD_SLOT_A:
+            boot_info.task = PLAT_BOOT_TASK_DOWNLOAD_SLOT_A;
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_info, NULL);
             break;
 
-        case CMD_UPLOAD_SLOT_B:
-            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, (void *)PLAT_SLOT_BOOT, NULL);
-            EGL_RESULT_CHECK(result);
+        case CMD_DOWNLOAD_SLOT_B:
+            boot_info.task = PLAT_BOOT_TASK_DOWNLOAD_SLOT_B;
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_info, NULL);
             break;
 
         default:
-            EGL_LOG_WARN("Unknown command: %u", recv_cmd);
+            result = EGL_NOT_SUPPORTED;
     }
+    EGL_RESULT_CHECK(result);
 
     return result;
 }

@@ -1,5 +1,10 @@
+#include <string.h>
+
 #include "egl_lib.h"
 #include "plat.h"
+
+__attribute__((section(".boot_info")))
+static plat_boot_info_t boot_info = {0};
 
 static egl_result_t init(void)
 {
@@ -8,12 +13,19 @@ static egl_result_t init(void)
     return EGL_SUCCESS;
 }
 
-static egl_result_t boot(unsigned int slot_idx)
+static egl_result_t boot(plat_boot_info_t *info)
 {
     egl_result_t result;
     uint32_t slot_addr;
 
-    switch(slot_idx)
+    memcpy(&boot_info, info, sizeof(boot_info) - sizeof(boot_info.checksum));
+
+    result = egl_crc_reset(PLAT_CRC);
+    EGL_RESULT_CHECK(result);
+
+    boot_info.checksum = egl_crc32_calc(PLAT_CRC, &boot_info, sizeof(boot_info) - sizeof(boot_info.checksum));
+
+    switch(info->slot)
     {
         case PLAT_SLOT_BOOT:
             result = egl_value_u32_get(SLOT_BOOT_ADDR, &slot_addr);
@@ -26,9 +38,9 @@ static egl_result_t boot(unsigned int slot_idx)
         case PLAT_SLOT_B:
             result = egl_value_u32_get(SLOT_B_ADDR, &slot_addr);
             break;
-            
+
         default:
-            return EGL_INVALID_PARAM;
+            result = EGL_NOT_SUPPORTED;
     }
     EGL_RESULT_CHECK(result);
 
@@ -57,6 +69,13 @@ static egl_result_t boot(unsigned int slot_idx)
     return EGL_SUCCESS;
 }
 
+static egl_result_t get_boot_info(plat_boot_info_t *info, size_t *len)
+{
+    memcpy(info, &boot_info, sizeof(boot_info));
+
+    return EGL_SUCCESS;
+}
+
 static egl_result_t cmd(unsigned int id, void *data, size_t *len)
 {
     egl_result_t result;
@@ -64,7 +83,11 @@ static egl_result_t cmd(unsigned int id, void *data, size_t *len)
     switch(id)
     {
         case PLAT_CMD_BOOT:
-            result = boot((unsigned int)data);
+            result = boot(data);
+            break;
+
+        case PLAT_CMD_GET_BOOT_INFO:
+            result = get_boot_info(data, len);
             break;
 
         default:
