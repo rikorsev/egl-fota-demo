@@ -1,5 +1,6 @@
 add_executable(${PROJECT_NAME})
-set(CMAKE_EXECUTABLE_SUFFIX ".${TARGET_SLOT}.elf")
+
+set(CMAKE_EXECUTABLE_SUFFIX ".${CONFIG_APP_PROJECT_SUFFIX}.elf")
 
 target_sources(${PROJECT_NAME}
     PRIVATE

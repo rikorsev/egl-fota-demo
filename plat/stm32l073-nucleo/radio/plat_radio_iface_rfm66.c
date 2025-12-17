@@ -120,6 +120,10 @@ static egl_result_t ioctl(uint8_t opcode, void *data, size_t *len)
             EGL_RESULT_CHECK(result);
             break;
 
+        case RADIO_IOCTL_RX_TIMEOUT_SET:
+            result = egl_rfm66_iface_ioctl(&rfm66_iface_inst, EGL_RFM66_IOCTL_RX_TIMEOUT_SET, data, len);
+            break;
+
         default:
             return EGL_NOT_SUPPORTED;
     }

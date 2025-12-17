@@ -51,3 +51,54 @@ egl_value_u32_t *plat_slot_b_addr_get(void)
 {
     return &slot_b_addr_value;
 }
+
+static egl_result_t slot_boot_info_get(void **info)
+{
+    *info = (uint8_t *)(@CONFIG_PLAT_SLOT_BOOT_ADDR@ + @CONFIG_PLAT_SLOT_INFO_OFFSET@);
+
+    return EGL_SUCCESS;
+}
+
+egl_value_ptr_t slot_boot_info_value =
+{
+    .get = slot_boot_info_get
+};
+
+egl_value_ptr_t *plat_slot_boot_info_get(void)
+{
+    return &slot_boot_info_value;
+}
+
+static egl_result_t slot_a_info_get(void **info)
+{
+    *info = (uint8_t *)(@CONFIG_PLAT_SLOT_A_ADDR@ + @CONFIG_PLAT_SLOT_INFO_OFFSET@);
+
+    return EGL_SUCCESS;
+}
+
+egl_value_ptr_t slot_a_info_value =
+{
+    .get = slot_a_info_get
+};
+
+egl_value_ptr_t *plat_slot_a_info_get(void)
+{
+    return &slot_a_info_value;
+}
+
+static egl_result_t slot_b_info_get(void **info)
+{
+    *info = (uint8_t *)(@CONFIG_PLAT_SLOT_B_ADDR@ + @CONFIG_PLAT_SLOT_INFO_OFFSET@);
+
+    return EGL_SUCCESS;
+}
+
+egl_value_ptr_t slot_b_info_value =
+{
+    .get = slot_b_info_get
+};
+
+egl_value_ptr_t *plat_slot_b_info_get(void)
+{
+    return &slot_b_info_value;
+}

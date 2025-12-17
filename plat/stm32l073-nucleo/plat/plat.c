@@ -4,7 +4,7 @@
 #include "plat.h"
 
 __attribute__((section(".boot_info")))
-static plat_boot_info_t boot_info = {0};
+static plat_boot_config_t boot_config = {0};
 
 static egl_result_t init(void)
 {
@@ -13,17 +13,17 @@ static egl_result_t init(void)
     return EGL_SUCCESS;
 }
 
-static egl_result_t boot(plat_boot_info_t *info)
+static egl_result_t boot(plat_boot_config_t *info)
 {
     egl_result_t result;
     uint32_t slot_addr;
 
-    memcpy(&boot_info, info, sizeof(boot_info) - sizeof(boot_info.checksum));
+    memcpy(&boot_config, info, sizeof(boot_config) - sizeof(boot_config.checksum));
 
     result = egl_crc_reset(PLAT_CRC);
     EGL_RESULT_CHECK(result);
 
-    boot_info.checksum = egl_crc32_calc(PLAT_CRC, &boot_info, sizeof(boot_info) - sizeof(boot_info.checksum));
+    boot_config.checksum = egl_crc32_calc(PLAT_CRC, &boot_config, sizeof(boot_config) - sizeof(boot_config.checksum));
 
     switch(info->slot)
     {
@@ -69,9 +69,9 @@ static egl_result_t boot(plat_boot_info_t *info)
     return EGL_SUCCESS;
 }
 
-static egl_result_t get_boot_info(plat_boot_info_t *info, size_t *len)
+static egl_result_t boot_config_get(plat_boot_config_t *info, size_t *len)
 {
-    memcpy(info, &boot_info, sizeof(boot_info));
+    memcpy(info, &boot_config, sizeof(boot_config));
 
     return EGL_SUCCESS;
 }
@@ -86,8 +86,8 @@ static egl_result_t cmd(unsigned int id, void *data, size_t *len)
             result = boot(data);
             break;
 
-        case PLAT_CMD_GET_BOOT_INFO:
-            result = get_boot_info(data, len);
+        case PLAT_CMD_BOOT_CONFIG_GET:
+            result = boot_config_get(data, len);
             break;
 
         default:

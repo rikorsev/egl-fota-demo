@@ -22,6 +22,7 @@ enum
 {
     RADIO_IOCTL_RTS_CALLBACK_SET = 1,
     RADIO_IOCTL_RX_MODE_SET,
+    RADIO_IOCTL_RX_TIMEOUT_SET
 };
 
 egl_iface_t *plat_radio_iface_get(void);

@@ -14,6 +14,7 @@
 #include "plat_info.h"
 #include "plat_usrbtn.h"
 #include "plat_crc.h"
+#include "plat_flash.h"
 #include "slot.h"
 
 #define PLATFORM platform_get()
@@ -29,24 +30,24 @@ typedef enum
 enum
 {
     PLAT_CMD_BOOT,
-    PLAT_CMD_GET_BOOT_INFO
+    PLAT_CMD_BOOT_CONFIG_GET
 };
 
 typedef enum
 {
-    PLAT_BOOT_TASK_NONE,
-    PLAT_BOOT_TASK_UPLOAD_SLOT_A,
-    PLAT_BOOT_TASK_UPLOAD_SLOT_B,
-    PLAT_BOOT_TASK_DOWNLOAD_SLOT_A,
-    PLAT_BOOT_TASK_DOWNLOAD_SLOT_B
-}plat_boot_task_t;
+    PLAT_FOTA_TASK_NONE,
+    PLAT_FOTA_TASK_UPLOAD_SLOT_A,
+    PLAT_FOTA_TASK_UPLOAD_SLOT_B,
+    PLAT_FOTA_TASK_DOWNLOAD_SLOT_A,
+    PLAT_FOTA_TASK_DOWNLOAD_SLOT_B
+}plat_fota_task_t;
 
 typedef struct
 {
     plat_boot_slot_t slot;
-    plat_boot_task_t task;
+    plat_fota_task_t task;
     uint32_t checksum;
-}plat_boot_info_t;
+}plat_boot_config_t;
 
 egl_platform_t *platform_get(void);
 

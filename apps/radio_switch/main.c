@@ -2,21 +2,22 @@
 
 #include "egl_lib.h"
 #include "plat.h"
+#include "protocol.h"
 
 enum
 {
-    CMD_NONE,
-    CMD_LED_OFF,
-    CMD_LED_ON,
-    CMD_UPLOAD_SLOT_A,
-    CMD_UPLOAD_SLOT_B,
-    CMD_DOWNLOAD_SLOT_A,
-    CMD_DOWNLOAD_SLOT_B
+    EVENT_NONE,
+    EVENT_LED_OFF,
+    EVENT_LED_ON,
+    EVENT_UPLOAD_SLOT_A,
+    EVENT_UPLOAD_SLOT_B,
+    EVENT_DOWNLOAD_SLOT_A,
+    EVENT_DOWNLOAD_SLOT_B
 };
 
 static bool is_recv = false;
 static bool rm_led_state = false;
-static uint8_t cmd = CMD_NONE;
+static uint8_t event = EVENT_NONE;
 
 static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned int line, void *ctx)
 {
@@ -29,18 +30,18 @@ static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned
 
 static void user_button_callback(void *data)
 {
-    cmd = rm_led_state ? CMD_LED_OFF : CMD_LED_ON;
+    event = rm_led_state ? EVENT_LED_OFF : EVENT_LED_ON;
     rm_led_state = !rm_led_state;
 }
 
 static void radio_sw1_callback(void *data)
 {
-    cmd = CMD_UPLOAD_SLOT_A;
+    event = EVENT_UPLOAD_SLOT_A;
 }
 
 static void radio_sw2_callback(void *data)
 {
-    cmd = CMD_UPLOAD_SLOT_B;
+    event = EVENT_UPLOAD_SLOT_B;
 }
 
 static void radio_rts_callback(void *data)
@@ -89,7 +90,10 @@ static egl_result_t init(void)
     result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RTS_CALLBACK_SET, radio_rts_callback, &len);
     EGL_RESULT_CHECK(result);
 
-    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_MODE_SET, NULL, &len);
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_MODE_SET, NULL, NULL);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_TIMEOUT_SET, (void *)100, NULL);
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -118,37 +122,85 @@ static egl_result_t info(void)
     return result;
 }
 
-static egl_result_t cmd_handle(uint8_t *cmd)
+static egl_result_t event_switch_handle(bool target_state)
 {
     egl_result_t result;
-    size_t len = sizeof(*cmd);
-    plat_boot_info_t boot_info = { .slot = PLAT_SLOT_BOOT };
+    uint8_t target_state_value = target_state ? 1 : 0;
 
-    switch(*cmd)
+    PROTOCOL_PACKET_DECLARE(packet, sizeof(target_state_value));
+    size_t len = sizeof(packet);
+
+    result = protocol_packet_build((protocol_packet_t *)packet,
+                                   PROTOCOL_CMD_SWITCH,
+                                   &target_state_value, sizeof(target_state_value));
+    EGL_RESULT_CHECK(result);
+
+    result = egl_iface_write(RADIO, packet, &len);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+static egl_result_t event_handle(uint8_t *event)
+{
+    egl_result_t result;
+    plat_boot_config_t boot_config = { .slot = PLAT_SLOT_BOOT };
+
+    switch(*event)
     {
-        case CMD_NONE:
+        case EVENT_NONE:
             result = EGL_SUCCESS;
             break;
 
-        case CMD_LED_OFF:
-        case CMD_LED_ON:
-            result = egl_iface_write(RADIO, cmd, &len);
+        case EVENT_LED_OFF:
+        case EVENT_LED_ON:
+            result = event_switch_handle(*event == EVENT_LED_ON);
             break;
 
-        case CMD_UPLOAD_SLOT_A:
-            boot_info.task = PLAT_BOOT_TASK_UPLOAD_SLOT_A;
-            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_info, NULL);
+        case EVENT_UPLOAD_SLOT_A:
+            boot_config.task = PLAT_FOTA_TASK_UPLOAD_SLOT_A;
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_config, NULL);
             break;
 
-        case CMD_UPLOAD_SLOT_B:
-            boot_info.task = PLAT_BOOT_TASK_UPLOAD_SLOT_B;
-            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_info, NULL);
+        case EVENT_UPLOAD_SLOT_B:
+            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_config, NULL);
             break;
     }
 
     /* Reset current command */
-    *cmd = CMD_NONE;
+    *event = EVENT_NONE;
 
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+static egl_result_t switch_handle(protocol_packet_t *packet)
+{
+    return egl_pio_set(SYSLED, packet->payload[0]);
+}
+
+static egl_result_t request_to_download_handle(protocol_packet_t *packet)
+{
+    egl_result_t result;
+    plat_boot_config_t boot_config = { .slot = PLAT_SLOT_BOOT };
+    plat_boot_slot_t target_slot = packet->payload[0];
+
+    switch(target_slot)
+    {
+        case PLAT_SLOT_A:
+            boot_config.task = PLAT_FOTA_TASK_DOWNLOAD_SLOT_A;
+            break;
+
+        case PLAT_SLOT_B:
+            boot_config.task = PLAT_FOTA_TASK_DOWNLOAD_SLOT_B;
+            break;
+
+        default:
+            return EGL_NOT_SUPPORTED;
+    }
+
+    result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_config, NULL);
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -157,31 +209,24 @@ static egl_result_t cmd_handle(uint8_t *cmd)
 static egl_result_t radio_recv(void)
 {
     egl_result_t result;
-    uint8_t recv_cmd;
-    size_t len = sizeof(recv_cmd);
-    plat_boot_info_t boot_info = { .slot = PLAT_SLOT_BOOT };
+    uint8_t packet_buff[16];
+    protocol_packet_t *packet_ptr = (protocol_packet_t *)packet_buff;
+    size_t len = sizeof(packet_buff);
 
-    result = egl_iface_read(RADIO, &recv_cmd, &len);
+    result = egl_iface_read(RADIO, packet_buff, &len);
     EGL_RESULT_CHECK(result);
 
-    switch(recv_cmd)
+    result = protocol_packet_validate(packet_ptr);
+    EGL_RESULT_CHECK(result);
+
+    switch(packet_ptr->cmd)
     {
-        case CMD_LED_OFF:
-            result = egl_pio_set(SYSLED, false);
+        case PROTOCOL_CMD_SWITCH:
+            result = switch_handle(packet_ptr);
             break;
 
-        case CMD_LED_ON:
-            result = egl_pio_set(SYSLED, true);
-            break;
-
-        case CMD_DOWNLOAD_SLOT_A:
-            boot_info.task = PLAT_BOOT_TASK_DOWNLOAD_SLOT_A;
-            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_info, NULL);
-            break;
-
-        case CMD_DOWNLOAD_SLOT_B:
-            boot_info.task = PLAT_BOOT_TASK_DOWNLOAD_SLOT_B;
-            result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &boot_info, NULL);
+        case PROTOCOL_CMD_REQUEST_TO_DOWNLOAD:
+            result = request_to_download_handle(packet_ptr);
             break;
 
         default:
@@ -204,7 +249,7 @@ egl_result_t loop(void)
         EGL_RESULT_CHECK(result);
     }
 
-    result = cmd_handle(&cmd);
+    result = event_handle(&event);
     EGL_RESULT_CHECK(result);
 
     return result;
