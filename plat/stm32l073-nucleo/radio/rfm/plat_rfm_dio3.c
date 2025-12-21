@@ -78,7 +78,7 @@ static egl_result_t get(bool *state)
 }
 
 #else
-#error "Target RFM is not set"
+#error "Target RFM is not set or not correct"
 #endif
 
 egl_pio_t plat_rfm_dio3_inst =

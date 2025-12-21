@@ -1,6 +1,7 @@
 #include "egl_lib.h"
 #include "plat.h"
 #include "protocol.h"
+#include "fota_mgr.h"
 
 #define FOTA_UPLOAD_TIMEOUT (60000U)
 
@@ -295,11 +296,8 @@ static fota_state_t fota_mgr_statemachine_step(plat_boot_slot_t target_slot, fot
             break;
 
         case FOTA_STATE_END:
-            state = fota_mgr_end_step(target_slot, state);
-            break;
-
         case FOTA_STATE_FAIL:
-            state = FOTA_STATE_END;
+            state = fota_mgr_end_step(target_slot, state);
             break;
 
         default:
@@ -310,17 +308,31 @@ static fota_state_t fota_mgr_statemachine_step(plat_boot_slot_t target_slot, fot
     return state;
 }
 
-static egl_result_t fota_mgr_statemachine_run(plat_boot_slot_t target_slot, fota_state_t initial_state)
+egl_result_t fota_mgr_process(plat_boot_slot_t target_slot, fota_task_t task)
 {
-    EGL_LOG_INFO("FOTA process started. Slot: %u", target_slot);
+    fota_state_t curr_state;
 
-    fota_state_t curr_state = initial_state;
+    switch(task)
+    {
+        case FOTA_MGR_TASK_DOWNLOAD:
+            curr_state = FOTA_STATE_DOWNLOAD_INIT;
+            break;
+
+        case FOTA_MGR_TASK_UPLOAD:
+            curr_state = FOTA_STATE_UPLOAD_INIT;
+            break;
+
+        default:
+            EGL_LOG_WARN("Unknown task %u", task);
+            curr_state = FOTA_STATE_FAIL;
+    }
+
     fota_state_t prev_state = FOTA_STATE_END;
 
     EGL_LOG_INFO("%s -> %s", fota_mgr_state_str_get(prev_state),
                              fota_mgr_state_str_get(curr_state));
 
-    while(curr_state != FOTA_STATE_END)
+    while(curr_state != FOTA_STATE_END && curr_state != FOTA_STATE_FAIL)
     {
         curr_state = fota_mgr_statemachine_step(target_slot, curr_state);
 
@@ -332,66 +344,37 @@ static egl_result_t fota_mgr_statemachine_run(plat_boot_slot_t target_slot, fota
         }
     }
 
-    return EGL_SUCCESS;
+    return curr_state == FOTA_STATE_END ? EGL_SUCCESS : EGL_FAIL;
 }
 
-static egl_result_t fota_mgr_iface_init(void)
+
+static egl_result_t event_fota_check_handle(void)
 {
     egl_result_t result;
+    size_t packet_len;
 
-    result = egl_iface_init(RADIO);
+    EGL_LOG_INFO("Check for new FOTA available");
+
+    PROTOCOL_PACKET_DECLARE(request, 0);
+    PROTOCOL_PACKET_DECLARE(response, sizeof(uint8_t));
+
+    result = protocol_packet_build(request, PROTOCOL_CMD_FOTA_STATUS_REQUEST, NULL, 0);
     EGL_RESULT_CHECK(result);
 
-    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_TIMEOUT_SET, (void *)1000, NULL);
+    packet_len = sizeof(request_buff);
+    result = egl_iface_write(RADIO, request, &packet_len);
     EGL_RESULT_CHECK(result);
 
-    return result;
-}
-
-egl_result_t fota_mgr_process(void)
-{
-    egl_result_t result;
-    plat_boot_config_t boot_config;
-
-    result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT_CONFIG_GET, &boot_config, NULL);
+    packet_len = sizeof(response_buff);
+    result = egl_iface_read(RADIO, response, &packet_len);
     EGL_RESULT_CHECK(result);
 
-    result = egl_crc_reset(PLAT_CRC);
+    result = protocol_packet_validate(response, PROTOCOL_CMD_FOTA_STATUS_RESPONSE, sizeof(uint8_t));
     EGL_RESULT_CHECK(result);
 
-    uint32_t calculated = egl_crc32_calc(PLAT_CRC, &boot_config, sizeof(plat_boot_config_t) - sizeof(uint32_t));
-    EGL_ASSERT_CHECK(calculated == boot_config.checksum, EGL_CHECKSUM_MISMATCH);
+    is_fota_available = response->payload[0];
 
-    result = fota_mgr_iface_init();
-    EGL_RESULT_CHECK(result);
-
-    switch(boot_config.task)
-    {
-        case PLAT_FOTA_TASK_NONE:
-            EGL_LOG_INFO("No boot task assigned");
-            result = EGL_SUCCESS;
-            break;
-
-        case PLAT_FOTA_TASK_UPLOAD_SLOT_A:
-            result = fota_mgr_statemachine_run(PLAT_SLOT_A, FOTA_STATE_UPLOAD_INIT);
-            break;
-
-        case PLAT_FOTA_TASK_UPLOAD_SLOT_B:
-            result = fota_mgr_statemachine_run(PLAT_SLOT_B, FOTA_STATE_UPLOAD_INIT);
-            break;
-
-        case PLAT_FOTA_TASK_DOWNLOAD_SLOT_A:
-            result = fota_mgr_statemachine_run(PLAT_SLOT_A, FOTA_STATE_DOWNLOAD_INIT);
-            break;
-
-        case PLAT_FOTA_TASK_DOWNLOAD_SLOT_B:
-            result = fota_mgr_statemachine_run(PLAT_SLOT_B, FOTA_STATE_DOWNLOAD_INIT);
-            break;
-
-        default:
-            result = EGL_NOT_SUPPORTED;
-    }
-    EGL_RESULT_CHECK(result);
+    EGL_LOG_INFO("FOTA status: %d", is_fota_available);
 
     return result;
 }

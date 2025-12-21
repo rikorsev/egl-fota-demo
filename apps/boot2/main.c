@@ -1,6 +1,5 @@
 #include "egl_lib.h"
 #include "plat.h"
-#include "fota_mgr.h"
 #include "boot_mgr.h"
 
 #define BOOT_CRC_POLY ((uint32_t)0x4C11DB7)
@@ -63,9 +62,6 @@ int main(void)
 
     result = info();
     EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
-
-    result = fota_mgr_process();
-    EGL_LOG_INFO("FOTA complete. Result: %s", EGL_RESULT(result));
 
     result = boot_mgr_process();
     EGL_LOG_INFO("Boot complete. Result: %s", EGL_RESULT(result));

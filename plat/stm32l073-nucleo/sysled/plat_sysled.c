@@ -46,11 +46,27 @@ static egl_result_t get(bool *state)
     return EGL_SUCCESS;
 }
 
+static egl_result_t toggle(void)
+{
+    bool state = PORT->ODR & GPIO_ODR_OD7_Msk;
+    if(state)
+    {
+        PORT->BSRR |= GPIO_BSRR_BR_7;
+    }
+    else
+    {
+        PORT->BSRR |= GPIO_BSRR_BS_7;
+    }
+
+    return EGL_SUCCESS;
+}
+
 static egl_pio_t plat_sysled_inst =
 {
-    .init = init,
-    .set  = set,
-    .get  = get
+    .init   = init,
+    .set    = set,
+    .get    = get,
+    .toggle = toggle
 };
 
 egl_pio_t *plat_sysled_get(void)

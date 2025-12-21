@@ -8,14 +8,17 @@
 #include "plat_syslog.h"
 #include "plat_systimer.h"
 #include "plat_syspm.h"
-#include "plat_rfm.h"
-#include "plat_radio_iface.h"
 #include "plat_system.h"
 #include "plat_info.h"
 #include "plat_usrbtn.h"
 #include "plat_crc.h"
 #include "plat_flash.h"
 #include "slot.h"
+
+#if CONFIG_APP_TARGET_RFM_69 || CONFIG_APP_TARGET_RFM_66
+#include "plat_rfm.h"
+#include "plat_radio_iface.h"
+#endif
 
 #define PLATFORM platform_get()
 #define PLAT_NUM_SLOTS (3U)

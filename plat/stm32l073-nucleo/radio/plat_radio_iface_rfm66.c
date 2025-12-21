@@ -70,6 +70,7 @@ static egl_result_t init(void)
 static egl_result_t write(void *data, size_t *len)
 {
     egl_result_t result;
+    egl_result_t result2;
 
     is_writing = true;
 
@@ -82,8 +83,8 @@ static egl_result_t write(void *data, size_t *len)
 exit:
     is_writing = false;
 
-    result = egl_pio_set(RADIO_TX_LED, false);
-    EGL_RESULT_CHECK(result);
+    result2 = egl_pio_set(RADIO_TX_LED, false);
+    EGL_RESULT_CHECK(result2);
 
     return result;
 }
@@ -91,15 +92,17 @@ exit:
 static egl_result_t read(void *data, size_t *len)
 {
     egl_result_t result;
+    egl_result_t result2;
 
     result = egl_pio_set(RADIO_RX_LED, true);
-    EGL_RESULT_CHECK(result);
+    EGL_RESULT_CHECK_EXIT(result);
 
     result = egl_rfm66_iface_read(&rfm66_iface_inst, data, len);
-    EGL_RESULT_CHECK(result);
+    EGL_RESULT_CHECK_EXIT(result);
 
-    result = egl_pio_set(RADIO_RX_LED, false);
-    EGL_RESULT_CHECK(result);
+exit:
+    result2 = egl_pio_set(RADIO_RX_LED, false);
+    EGL_RESULT_CHECK(result2);
 
     return result;
 }

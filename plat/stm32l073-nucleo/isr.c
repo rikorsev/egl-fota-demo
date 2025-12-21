@@ -1,7 +1,10 @@
 #include "stm32l0xx.h"
 #include "plat_systimer.h"
 #include "plat_usrbtn.h"
+
+#if CONFIG_APP_TARGET_RFM_69 || CONFIG_APP_TARGET_RFM_66
 #include "plat_radio_iface.h"
+#endif
 
 void SysTick_Handler(void)
 {
@@ -10,11 +13,13 @@ void SysTick_Handler(void)
 
 void EXTI4_15_IRQHandler(void)
 {
+#if CONFIG_APP_TARGET_RFM_69 || CONFIG_APP_TARGET_RFM_66
     if(EXTI->PR & EXTI_PR_PIF4)
     {
         EXTI->PR = EXTI_PR_PIF4;
         plat_radio_sw1_irq_handler();
     }
+#endif
 
     if(EXTI->PR & EXTI_PR_PIF13)
     {
@@ -23,6 +28,7 @@ void EXTI4_15_IRQHandler(void)
     }
 }
 
+#if CONFIG_APP_TARGET_RFM_69 || CONFIG_APP_TARGET_RFM_66
 void EXTI0_1_IRQHandler(void)
 {
     if(EXTI->PR & EXTI_PR_PIF0)
@@ -45,3 +51,4 @@ void EXTI2_3_IRQHandler(void)
     }
 }
 
+#endif
