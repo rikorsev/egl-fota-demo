@@ -6,8 +6,19 @@
 __attribute__((section(".boot_info")))
 static plat_boot_config_t boot_config = {0};
 
+/* Required for ThreadX */
+void _tx_initialize_low_level(void)
+{
+    
+}
+
 static egl_result_t init(void)
 {
+    extern uint32_t __Vectors;
+    SCB->VTOR = (uint32_t) &__Vectors;
+
+    NVIC_SetPriority(PendSV_IRQn, 1);
+
     __enable_irq();
 
     return EGL_SUCCESS;

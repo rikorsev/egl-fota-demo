@@ -21,24 +21,7 @@ static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned
 static void user_button_callback(void *data)
 {
     egl_result_t result;
-    result = radio_task_set(RADIO_TASK_LED_TOGGLE_SEND);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
-}
-
-static void radio_sw1_callback(void *data)
-{
-
-}
-
-static void radio_sw2_callback(void *data)
-{
-
-}
-
-static void radio_rts_callback(void *data)
-{
-    egl_result_t result;
-    result = radio_task_set(RADIO_TASK_RECV);
+    result = radio_flag_set(RADIO_LED_TOGGLE_SEND_FLAG);
     EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 }
 
@@ -52,41 +35,10 @@ static egl_result_t init(void)
 
     egl_result_error_handler_set(&error_handler);
 
-    result = egl_iface_init(RADIO);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_pio_init(SYSLED);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_pio_set(SYSLED, false);
-    EGL_RESULT_CHECK(result);
-
     result = egl_pio_init(USER_BUTTON);
     EGL_RESULT_CHECK(result);
 
     result = egl_pio_callback_set(USER_BUTTON, user_button_callback);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_pio_init(RADIO_SW1);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_pio_callback_set(RADIO_SW1, radio_sw1_callback);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_pio_init(RADIO_SW2);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_pio_callback_set(RADIO_SW2, radio_sw2_callback);
-    EGL_RESULT_CHECK(result);
-
-    size_t len = sizeof(radio_rts_callback);
-    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RTS_CALLBACK_SET, radio_rts_callback, &len);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_MODE_SET, NULL, NULL);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_TIMEOUT_SET, (void *)100, NULL);
     EGL_RESULT_CHECK(result);
 
     result = egl_crc_init(PLAT_CRC, APP_CRC_POLY, APP_CRC_INIT);
@@ -118,14 +70,14 @@ static egl_result_t info(void)
     return result;
 }
 
-egl_result_t loop(void)
+static egl_result_t app_start(void *param, ...)
 {
     egl_result_t result;
 
-    result = radio_task();
+    result = switch_init();
     EGL_RESULT_CHECK(result);
 
-    result = switch_task();
+    result = radio_init();
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -141,14 +93,8 @@ int main(void)
     result = info();
     EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
 
-    while(1)
-    {
-        result = loop();
-        if(result != EGL_SUCCESS)
-        {
-            EGL_LOG_WARN("loop - fail. Result: %s", EGL_RESULT(result));
-        }
-    }
+    result = egl_os_start(SYSOS, app_start);
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, 0);
 
     return 0;
 }

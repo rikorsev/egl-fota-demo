@@ -1,4 +1,8 @@
-# Platform configuration
+set(CONFIG_EGL_OS_THREADEX_ENABLED 1)
+set(CONFIG_EGL_OS_THREADEX_PATH ${CMAKE_SOURCE_DIR}/plat/${TARGET_PLATFORM}/threadx)
+set(THREADX_ARCH "cortex_m0")
+set(THREADX_TOOLCHAIN "gnu")
+
 add_definitions(-DSTM32L073xx)
 set(CONFIG_PLAT_SLOT_INFO_SECTION_SIZE 256)
 add_definitions(-DCONFIG_PLAT_SLOT_INFO_SECTION_SIZE=${CONFIG_PLAT_SLOT_INFO_SECTION_SIZE})
@@ -33,4 +37,3 @@ else()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/flags.cmake)
-

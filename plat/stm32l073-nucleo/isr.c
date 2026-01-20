@@ -8,6 +8,10 @@
 
 void SysTick_Handler(void)
 {
+#if CONFIG_EGL_OS_ENABLED
+    extern void _tx_timer_interrupt(void);
+    _tx_timer_interrupt();
+#endif
     plat_systimer_irq_handler();
 }
 

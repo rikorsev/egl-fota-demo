@@ -15,7 +15,13 @@ static egl_result_t init(void)
     is_inited = true;
 
     /* Init SysTick timer */
-    return SysTick_Config(egl_clock_get(SYSCLOCK) / 1000) == 0 ? EGL_SUCCESS : EGL_FAIL;
+    uint32_t ret = SysTick_Config(egl_clock_get(SYSCLOCK) / 1000);
+    EGL_ASSERT_CHECK(ret == 0, EGL_FAIL);
+
+    NVIC_SetPriority(SysTick_IRQn, 0);
+    NVIC_EnableIRQ(SysTick_IRQn);
+
+    return EGL_SUCCESS;
 }
 
 static egl_result_t wait(uint32_t delay)

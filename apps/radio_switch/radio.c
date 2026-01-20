@@ -4,24 +4,40 @@
 #include "switch.h"
 #include "radio.h"
 
-#define TASK_CLEAR(__task) (g_task &= ~__task)
+static void *thread_handle = NULL;
+static void *flags_handle = NULL;
 
-static radio_task_t g_task;
+static void radio_sw1_callback(void *data)
+{
 
-static egl_result_t radio_task_switch_cmd_handle(protocol_packet_t *packet)
+}
+
+static void radio_sw2_callback(void *data)
+{
+
+}
+
+static void radio_rts_callback(void *data)
+{
+    egl_result_t result;
+    result = radio_flag_set(RADIO_RECV_FLAG);
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+}
+
+static egl_result_t radio_switch_cmd_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
 
     result = protocol_packet_validate(packet, PROTOCOL_CMD_SWITCH, 0);
     EGL_RESULT_CHECK(result);
 
-    result = switch_task_set(SWITCH_TASK_LOCAL_STATE_TOGGLE);
+    result = switch_flag_set(SWITCH_TOGGLE_FLAG);
     EGL_RESULT_CHECK(result);
 
     return result;
 }
 
-static egl_result_t radio_task_recv_handle(void)
+static egl_result_t radio_recv_handle(void)
 {
     egl_result_t result;
     uint8_t packet_buff[16];
@@ -37,7 +53,7 @@ static egl_result_t radio_task_recv_handle(void)
     switch(packet_ptr->cmd)
     {
         case PROTOCOL_CMD_SWITCH:
-            result = radio_task_switch_cmd_handle(packet_ptr);
+            result = radio_switch_cmd_handle(packet_ptr);
             break;
 
         default:
@@ -48,7 +64,7 @@ static egl_result_t radio_task_recv_handle(void)
     return result;
 }
 
-static egl_result_t radio_task_led_toggle_send_handle(void)
+static egl_result_t radio_led_toggle_send_handle(void)
 {
     egl_result_t result;
 
@@ -67,35 +83,81 @@ static egl_result_t radio_task_led_toggle_send_handle(void)
     return result;
 }
 
-egl_result_t radio_task_set(radio_task_t task)
+static void radio_thread_entry(void *param)
 {
-    g_task |= task;
+    egl_result_t result;
+    unsigned int flags = 0;
+
+    while(1)
+    {
+        result = egl_os_flags_wait(SYSOS, flags_handle, RADIO_RECV_FLAG | RADIO_LED_TOGGLE_SEND_FLAG, &flags,
+                                   EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREWER);
+        EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+
+        if(flags & RADIO_RECV_FLAG)
+        {
+            result = radio_recv_handle();
+            EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+        }
+
+        if(flags & RADIO_LED_TOGGLE_SEND_FLAG)
+        {
+            result = radio_led_toggle_send_handle();
+            EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+        }
+    }
+}
+
+egl_result_t radio_flag_set(unsigned int flag)
+{
+    egl_result_t result;
+
+    result = egl_os_flags_set(SYSOS, flags_handle, flag);
+    EGL_RESULT_CHECK(result);
 
     return EGL_SUCCESS;
 }
 
-egl_result_t radio_task(void)
+egl_result_t radio_init(void)
 {
-    egl_result_t result = EGL_SUCCESS;
+    egl_result_t result;
 
-    while(g_task)
-    {
-        if(g_task & RADIO_TASK_RECV)
-        {
-            EGL_LOG_DEBUG("handle: RADIO_TASK_RECV");
-            TASK_CLEAR(RADIO_TASK_RECV);
-            result = radio_task_recv_handle();
-            EGL_RESULT_CHECK(result);
-        }
+    static egl_os_flags_ctx flags_ctx;
+    static egl_os_thread_ctx thread_ctx;
+    static uint8_t stack[1024];
 
-        if(g_task & RADIO_TASK_LED_TOGGLE_SEND)
-        {
-            EGL_LOG_DEBUG("handle: RADIO_TASK_LED_TOGGLE_SEND");
-            TASK_CLEAR(RADIO_TASK_LED_TOGGLE_SEND);
-            result = radio_task_led_toggle_send_handle();
-            EGL_RESULT_CHECK(result);
-        }
-    }
+    result = egl_iface_init(RADIO);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_pio_init(RADIO_SW1);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_pio_callback_set(RADIO_SW1, radio_sw1_callback);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_pio_init(RADIO_SW2);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_pio_callback_set(RADIO_SW2, radio_sw2_callback);
+    EGL_RESULT_CHECK(result);
+
+    size_t len = sizeof(radio_rts_callback);
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RTS_CALLBACK_SET, radio_rts_callback, &len);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_MODE_SET, NULL, NULL);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_TIMEOUT_SET, (void *)100, NULL);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_os_flags_create(SYSOS, &flags_handle, "RadioFlags", &flags_ctx);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_os_thread_create(SYSOS, &thread_handle, "Radio",
+                                  radio_thread_entry, NULL,
+                                  stack, sizeof(stack),
+                                  1, &thread_ctx);
 
     return result;
 }

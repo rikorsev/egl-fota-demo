@@ -32,3 +32,7 @@ add_subdirectory(flash)
 if(TARGET_RFM STREQUAL "rfm66" OR TARGET_RFM STREQUAL "rfm69")
     add_subdirectory(radio)
 endif()
+
+if(CONFIG_EGL_OS_ENABLED EQUAL 1)
+    add_subdirectory(threadx)
+endif()

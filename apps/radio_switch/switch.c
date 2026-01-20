@@ -4,41 +4,60 @@
 #include "switch.h"
 #include "radio.h"
 
-#define TASK_CLEAR(__task) (g_task &= ~__task)
+static void *thread_handle = NULL;
+static void *flags_handle = NULL;
 
-static switch_task_t g_task;
+static void switch_thread_entry(void *param)
+{
+    egl_result_t result;
+    unsigned int flags = 0;
 
-static egl_result_t switch_task_local_state_toggle_handle(void)
+    while(1)
+    {
+        result = egl_os_flags_wait(SYSOS, flags_handle, SWITCH_TOGGLE_FLAG, &flags,
+                                   EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREWER);
+        EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+
+        if(flags & SWITCH_TOGGLE_FLAG)
+        {
+            result = egl_pio_toggle(SYSLED);
+            EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+        }
+    }
+}
+
+egl_result_t switch_flag_set(unsigned int flag)
 {
     egl_result_t result;
 
-    result = egl_pio_toggle(SYSLED);
+    result = egl_os_flags_set(SYSOS, flags_handle, flag);
     EGL_RESULT_CHECK(result);
-
-    return result;
-}
-
-egl_result_t switch_task_set(switch_task_t task)
-{
-    g_task |= task;
 
     return EGL_SUCCESS;
 }
 
-egl_result_t switch_task(void)
+egl_result_t switch_init(void)
 {
-    egl_result_t result = EGL_SUCCESS;
+    egl_result_t result;
 
-    while(g_task)
-    {
-        if(g_task & SWITCH_TASK_LOCAL_STATE_TOGGLE)
-        {
-            EGL_LOG_DEBUG("handle: SWITCH_TASK_LOCAL_STATE_TOGGLE");
-            TASK_CLEAR(SWITCH_TASK_LOCAL_STATE_TOGGLE);
-            result = switch_task_local_state_toggle_handle();
-            EGL_RESULT_CHECK(result);
-        }
-    }
+    static egl_os_flags_ctx flags_ctx;
+    static egl_os_thread_ctx thread_ctx;
+    static uint8_t stack[1024];
+
+    result = egl_pio_init(SYSLED);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_pio_set(SYSLED, false);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_os_flags_create(SYSOS, &flags_handle, "SwitchFlags", &flags_ctx);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_os_thread_create(SYSOS, &thread_handle, "Switch",
+                                  switch_thread_entry, NULL,
+                                  stack, sizeof(stack),
+                                  1, &thread_ctx);
+    EGL_RESULT_CHECK(result);
 
     return result;
 }

@@ -1,13 +1,13 @@
 #ifndef RADIO_H
 #define RADIO_H
 
-typedef enum
+enum
 {
-    RADIO_TASK_RECV = 1,
-    RADIO_TASK_LED_TOGGLE_SEND = 2,
-}radio_task_t;
+    RADIO_RECV_FLAG = 1,
+    RADIO_LED_TOGGLE_SEND_FLAG = 2,
+};
 
-egl_result_t radio_task_set(radio_task_t task);
-egl_result_t radio_task(void);
+egl_result_t radio_flag_set(unsigned int flag);
+egl_result_t radio_init(void);
 
 #endif
