@@ -36,4 +36,6 @@ else()
     set(CONFIG_PLAT_HEAP_SIZE 512)
 endif()
 
+add_definitions(-DCONFIG_PLAT_SYSLOG_BUFF_SIZE=256)
+
 include(${CMAKE_CURRENT_LIST_DIR}/flags.cmake)

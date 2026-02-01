@@ -13,10 +13,8 @@ endif()
 
 if(CONFIG_EGL_LOG_ENABLED EQUAL 1)
     add_definitions(-DCONFIG_EGL_LOG_ENABLED=1)
-    add_definitions(-DCONFIG_EGL_LOG_BUFF_SIZE=256)
 else()
     add_definitions(-DCONFIG_EGL_LOG_ENABLED=0)
-    add_definitions(-DCONFIG_EGL_LOG_BUFF_SIZE=0)
 endif()
 
 if(CONFIG_EGL_RESULT_CHECK_ENABLED EQUAL 1)

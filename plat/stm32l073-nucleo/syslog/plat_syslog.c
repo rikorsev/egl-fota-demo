@@ -4,7 +4,7 @@
 #define BAUDRATE_115200 (0x12U)
 
 extern egl_timer_t plat_systimer_inst;
-
+static char syslog_buff[CONFIG_PLAT_SYSLOG_BUFF_SIZE];
 
 static void init_tx_pin(void)
 {
@@ -76,7 +76,10 @@ static const egl_iface_t plat_syslog_iface =
 egl_log_t plat_syslog_inst =
 {
     .iface = (egl_iface_t *)&plat_syslog_iface,
-    .timer = &plat_systimer_inst
+    .frontend = egl_log_frontend_default_bare,
+    .timer = &plat_systimer_inst,
+    .buff = syslog_buff,
+    .size = sizeof(syslog_buff)
 };
 
 egl_log_t *plat_syslog_get(void)
