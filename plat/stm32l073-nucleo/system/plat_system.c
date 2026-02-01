@@ -14,7 +14,7 @@ static egl_system_t plat_system_inst =
     .sysclock = &plat_sysclock_inst,
     .syspm    = &plat_syspm_inst,
     .systimer = &plat_systimer_inst,
-#if EGL_OS_ENABLED && EGL_OS_THREADX_ENABLED
+#if CONFIG_EGL_OS_ENABLED && CONFIG_EGL_OS_THREADX_ENABLED
     .sysos    = &egl_os_threadx_port,
 #endif
 };

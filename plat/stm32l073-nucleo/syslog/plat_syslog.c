@@ -76,7 +76,11 @@ static const egl_iface_t plat_syslog_iface =
 egl_log_t plat_syslog_inst =
 {
     .iface = (egl_iface_t *)&plat_syslog_iface,
+#if CONFIG_EGL_OS_ENABLED
+    .frontend = egl_log_frontend_default_os,
+#else
     .frontend = egl_log_frontend_default_bare,
+#endif
     .timer = &plat_systimer_inst,
     .buff = syslog_buff,
     .size = sizeof(syslog_buff)
