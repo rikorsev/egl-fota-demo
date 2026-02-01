@@ -14,7 +14,9 @@ static void radio_sw1_callback(void *data)
 
 static void radio_sw2_callback(void *data)
 {
-
+    egl_result_t result;
+    result = radio_flag_set(RADIO_TEST_CMD_SEND_FLAG);
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 }
 
 static void radio_rts_callback(void *data)
@@ -40,8 +42,7 @@ static egl_result_t radio_switch_cmd_handle(protocol_packet_t *packet)
 static egl_result_t radio_recv_handle(void)
 {
     egl_result_t result;
-    uint8_t packet_buff[16];
-    protocol_packet_t *packet_ptr = (protocol_packet_t *)packet_buff;
+    static PROTOCOL_PACKET_DECLARE(packet, 4096);
     size_t len = sizeof(packet_buff);
 
     result = egl_iface_read(RADIO, packet_buff, &len);
@@ -50,10 +51,10 @@ static egl_result_t radio_recv_handle(void)
     result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "recv", packet_buff, len, 8);
     EGL_RESULT_CHECK(result);
 
-    switch(packet_ptr->cmd)
+    switch(packet->cmd)
     {
         case PROTOCOL_CMD_SWITCH:
-            result = radio_switch_cmd_handle(packet_ptr);
+            result = radio_switch_cmd_handle(packet);
             break;
 
         default:
@@ -83,6 +84,32 @@ static egl_result_t radio_led_toggle_send_handle(void)
     return result;
 }
 
+static egl_result_t radio_test_cmd_send_handle(void)
+{
+    #define TEST_COMMAND_PAYLOAD_LEN (128U)
+
+    egl_result_t result;
+
+    PROTOCOL_PACKET_DECLARE(packet, 128);
+    size_t len = sizeof(packet_buff);
+
+    for(unsigned int i = 0; i < 128; i++)
+    {
+        packet->payload[i] = i;
+    }
+
+    result = protocol_packet_build((protocol_packet_t *)packet, PROTOCOL_CMD_SWITCH, NULL, 128);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "send", packet_buff, sizeof(packet_buff), 8);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_iface_write(RADIO, packet, &len);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
 static void radio_thread_entry(void *param)
 {
     egl_result_t result;
@@ -90,20 +117,40 @@ static void radio_thread_entry(void *param)
 
     while(1)
     {
-        result = egl_os_flags_wait(SYSOS, flags_handle, RADIO_RECV_FLAG | RADIO_LED_TOGGLE_SEND_FLAG, &flags,
+        result = egl_os_flags_wait(SYSOS, flags_handle, RADIO_ALL_FLAGS, &flags,
                                    EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREWER);
-        EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+        if(result != EGL_SUCCESS)
+        {
+            EGL_LOG_WARN("Wait for events - fail. Result: %s", EGL_RESULT(result));
+
+            continue;
+        }
 
         if(flags & RADIO_RECV_FLAG)
         {
             result = radio_recv_handle();
-            EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+            if(result != EGL_SUCCESS)
+            {
+                EGL_LOG_WARN("Receive command - fail. Result: %s", EGL_RESULT(result));
+            }
         }
 
         if(flags & RADIO_LED_TOGGLE_SEND_FLAG)
         {
             result = radio_led_toggle_send_handle();
-            EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+            if(result != EGL_SUCCESS)
+            {
+                EGL_LOG_WARN("Send LED toggle - fail. Result: %s", EGL_RESULT(result));
+            }
+        }
+
+        if(flags & RADIO_TEST_CMD_SEND_FLAG)
+        {
+            result = radio_test_cmd_send_handle();
+            if(result != EGL_SUCCESS)
+            {
+                EGL_LOG_WARN("Send test command - fail. Result: %s", EGL_RESULT(result));
+            }
         }
     }
 }

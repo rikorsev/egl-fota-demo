@@ -14,7 +14,7 @@
 #define RADIO_NODE_ADDR             (1U)
 #define RADIO_SYNC                  "kolosov"
 #define RADIO_SYNC_SIZE             (8U)
-#define RADIO_POWER_DB              (10)
+#define RADIO_POWER_DB              (0)
 #define RADIO_RSSI_THRESH           (-80)
 #define RADIO_TX_INTER_PACKET_DELAY (5U)
 
@@ -22,7 +22,8 @@ enum
 {
     RADIO_IOCTL_RTS_CALLBACK_SET = 1,
     RADIO_IOCTL_RX_MODE_SET,
-    RADIO_IOCTL_RX_TIMEOUT_SET
+    RADIO_IOCTL_RX_TIMEOUT_SET,
+    RADIO_IOCTL_IRQ_FLAGS_GET
 };
 
 egl_iface_t *plat_radio_iface_get(void);

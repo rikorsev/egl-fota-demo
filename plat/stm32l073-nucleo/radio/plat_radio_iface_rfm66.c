@@ -41,15 +41,16 @@ static egl_result_t init(void)
 
     const egl_rfm66_config_t config =
     {
-        .frequency = RADIO_FREQ,
-        .deviation = RADIO_DEVIATION,
-        .bitrate   = RADIO_BITRATE,
-        .preamble  = RADIO_PREAMBLE,
-        .bandwidth = EGL_RFM66_BANDWIDTH_200000,
-        .node_addr = RADIO_NODE_ADDR,
-        .sync      = RADIO_SYNC,
-        .sync_size = sizeof(RADIO_SYNC),
-        .power     = RADIO_POWER_DB
+        .frequency   = RADIO_FREQ,
+        .deviation   = RADIO_DEVIATION,
+        .bitrate     = RADIO_BITRATE,
+        .preamble    = RADIO_PREAMBLE,
+        .bandwidth   = EGL_RFM66_BANDWIDTH_200000,
+        .node_addr   = RADIO_NODE_ADDR,
+        .sync        = RADIO_SYNC,
+        .sync_size   = sizeof(RADIO_SYNC),
+        .power       = RADIO_POWER_DB,
+        .rssi_thresh = RADIO_RSSI_THRESH
     };
 
     result = egl_pio_init(RADIO_TX_LED);

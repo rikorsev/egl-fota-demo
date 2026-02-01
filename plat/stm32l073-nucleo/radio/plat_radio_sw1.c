@@ -4,8 +4,6 @@
 #define PORT GPIOA
 #define DEBONCE_THRESHOLD (100U)
 
-static uint32_t dtime = 0; /* Debounce timestamp */
-
 /* A4 */
 static void init_pio(void)
 {
@@ -66,6 +64,7 @@ egl_pio_t *plat_radio_sw1_get(void)
 
 void plat_radio_sw1_irq_handler(void)
 {
+    static uint32_t dtime = 0;
     uint32_t ctime = egl_timer_get(SYSTIMER);
 
     if(ctime > DEBONCE_THRESHOLD + dtime)
