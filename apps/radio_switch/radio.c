@@ -44,9 +44,19 @@ static egl_result_t radio_recv_handle(void)
     egl_result_t result;
     static PROTOCOL_PACKET_DECLARE(packet, 4096);
     size_t len = sizeof(packet_buff);
+    int8_t rssi;
+    int16_t freq_error;
 
     result = egl_iface_read(RADIO, packet_buff, &len);
     EGL_RESULT_CHECK(result);
+
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RSSI_GET, &rssi, NULL);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_FREQ_ERROR_GET, &freq_error, NULL);
+    EGL_RESULT_CHECK(result);
+
+    EGL_LOG_DEBUG("RSSI: %d, freq_error: %d", rssi, freq_error);
 
     result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "recv", packet_buff, len, 8);
     EGL_RESULT_CHECK(result);
@@ -193,9 +203,6 @@ egl_result_t radio_init(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_MODE_SET, NULL, NULL);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_iface_ioctl(RADIO, RADIO_IOCTL_RX_TIMEOUT_SET, (void *)100, NULL);
     EGL_RESULT_CHECK(result);
 
     result = egl_os_flags_create(SYSOS, &flags_handle, "RadioFlags", &flags_ctx);

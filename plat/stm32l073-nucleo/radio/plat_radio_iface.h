@@ -10,7 +10,7 @@
 #define RADIO_FREQ                  (915000000U)
 #define RADIO_DEVIATION             (35000)
 #define RADIO_BITRATE               (115200)
-#define RADIO_PREAMBLE              (16U)
+#define RADIO_PREAMBLE              (32U)
 #define RADIO_NODE_ADDR             (1U)
 #define RADIO_SYNC                  "kolosov"
 #define RADIO_SYNC_SIZE             (8U)
@@ -23,7 +23,9 @@ enum
     RADIO_IOCTL_RTS_CALLBACK_SET = 1,
     RADIO_IOCTL_RX_MODE_SET,
     RADIO_IOCTL_RX_TIMEOUT_SET,
-    RADIO_IOCTL_IRQ_FLAGS_GET
+    RADIO_IOCTL_IRQ_FLAGS_GET,
+    RADIO_IOCTL_RSSI_GET,
+    RADIO_IOCTL_FREQ_ERROR_GET,
 };
 
 egl_iface_t *plat_radio_iface_get(void);

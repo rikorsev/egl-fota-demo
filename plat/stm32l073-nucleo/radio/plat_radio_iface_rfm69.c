@@ -110,7 +110,7 @@ exit:
 
 static egl_result_t ioctl(uint8_t opcode, void *data, size_t *len)
 {
-    egl_result_t result;
+    egl_result_t result = EGL_SUCCESS;
 
     switch(opcode)
     {
@@ -126,6 +126,14 @@ static egl_result_t ioctl(uint8_t opcode, void *data, size_t *len)
 
         case RADIO_IOCTL_RX_TIMEOUT_SET:
             result = egl_rfm69_iface_ioctl(&rfm69_iface_inst, EGL_RFM69_IOCTL_RX_TIMEOUT_SET, data, len);
+            break;
+
+        case RADIO_IOCTL_RSSI_GET:
+            result = egl_rfm69_rssi_get(rfm69_iface_inst.rfm, data);
+            break;
+
+        case RADIO_IOCTL_FREQ_ERROR_GET:
+            result = egl_rfm69_fei_get(rfm69_iface_inst.rfm, data);
             break;
 
         default:

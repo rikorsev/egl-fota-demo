@@ -126,6 +126,15 @@ static egl_result_t ioctl(uint8_t opcode, void *data, size_t *len)
 
         case RADIO_IOCTL_RX_TIMEOUT_SET:
             result = egl_rfm66_iface_ioctl(&rfm66_iface_inst, EGL_RFM66_IOCTL_RX_TIMEOUT_SET, data, len);
+            EGL_RESULT_CHECK(result);
+            break;
+
+        case RADIO_IOCTL_RSSI_GET:
+            *(int8_t *)data = rfm66_iface_inst.last_rssi;
+            break;
+
+        case RADIO_IOCTL_FREQ_ERROR_GET:
+            *(int16_t *)data = rfm66_iface_inst.last_freq_error;
             break;
 
         default:
