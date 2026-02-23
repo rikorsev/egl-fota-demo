@@ -5,6 +5,7 @@
 #include "radio.h"
 #include "fota.h"
 #include "switch.h"
+#include "protocol.h"
 
 #define APP_CRC_POLY ((uint32_t)0x4C11DB7)
 #define APP_CRC_INIT ((uint32_t)0xFFFFFFFF)
@@ -21,8 +22,26 @@ static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned
 static void user_button_callback(void *data)
 {
     egl_result_t result;
-    result = radio_flag_set(RADIO_LED_TOGGLE_SEND_FLAG);
+    result = switch_flag_set(SWITCH_TOGGLE_SEND_FLAG);
     EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+}
+
+static egl_result_t recv_handler(protocol_packet_t *packet)
+{
+    egl_result_t result;
+
+    switch(packet->cmd)
+    {
+        case PROTOCOL_CMD_SWITCH:
+            result = switch_toggle_recv_cmd_handle(packet);
+            break;
+
+        default:
+            result = EGL_NOT_SUPPORTED;
+    }
+    EGL_RESULT_CHECK(result);
+
+    return result;
 }
 
 static egl_result_t init(void)
@@ -77,7 +96,7 @@ static egl_result_t app_start(void *param, ...)
     result = switch_init();
     EGL_RESULT_CHECK(result);
 
-    result = radio_init();
+    result = radio_init(recv_handler);
     EGL_RESULT_CHECK(result);
 
     return result;

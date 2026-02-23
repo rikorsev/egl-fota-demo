@@ -126,7 +126,8 @@ static egl_result_t init_thread(void)
     EGL_RESULT_CHECK(result);
 
     result = egl_os_queue_create(SYSOS, &syslog_queue, "syslog_queue",
-                                 CONFIG_PLAT_SYSLOG_BUFF_SIZE, SYSLOG_MSG_CHUNK_SIZE,
+                                 sizeof(queue) / SYSLOG_MSG_CHUNK_SIZE,
+                                 SYSLOG_MSG_CHUNK_SIZE,
                                  queue, sizeof(queue), &queue_ctx);
     EGL_RESULT_CHECK(result);
 

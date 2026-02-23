@@ -1,18 +1,13 @@
 #ifndef RADIO_H
 #define RADIO_H
 
-enum
-{
-    RADIO_RECV_FLAG = 1,
-    RADIO_LED_TOGGLE_SEND_FLAG = 2,
-    RADIO_TEST_CMD_SEND_FLAG = 4,
+#include "egl_lib.h"
+#include "protocol.h"
 
-    RADIO_ALL_FLAGS = RADIO_RECV_FLAG |
-                      RADIO_LED_TOGGLE_SEND_FLAG |
-                      RADIO_TEST_CMD_SEND_FLAG,
-};
+typedef egl_result_t (*radio_packet_recv_handler_func_t)(protocol_packet_t *packet);
 
-egl_result_t radio_flag_set(unsigned int flag);
-egl_result_t radio_init(void);
+egl_result_t radio_init(radio_packet_recv_handler_func_t handler);
+egl_result_t radio_packet_send(protocol_packet_t *packet);
+
 
 #endif

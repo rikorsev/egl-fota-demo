@@ -24,6 +24,8 @@ typedef struct
     uint8_t payload[];
 }__attribute__((packed)) protocol_packet_t;
 
+#define PROTOCOL_PACKET_SIZE(packet) (sizeof(protocol_packet_t) + packet->len + 4) // four bytes for crc
+
 #define PROTOCOL_PACKET_DECLARE(name, payload) \
 uint8_t name##_buff[sizeof(protocol_packet_t) + (payload) + sizeof(uint32_t)]; \
 protocol_packet_t *name = (protocol_packet_t *)name##_buff
