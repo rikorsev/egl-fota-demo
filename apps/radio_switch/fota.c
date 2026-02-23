@@ -1,380 +1,123 @@
 #include "egl_lib.h"
 #include "plat.h"
 #include "protocol.h"
-#include "fota_mgr.h"
+#include "fota.h"
+#include "radio.h"
 
-#define FOTA_UPLOAD_TIMEOUT (60000U)
+#define FOTA_CHUNK_SIZE (4096U)
 
-typedef enum
+static void *thread_handle = NULL;
+static void *flags_handle = NULL;
+
+enum
 {
-    FOTA_STATE_UPLOAD_INIT,
-    FOTA_STATE_DOWNLOAD_INIT,
-    FOTA_STATE_UPLOAD,
-    FOTS_STATE_DOWNLOAD,
-    FOTA_STATE_FAIL,
-    FOTA_STATE_END
-}fota_state_t;
+    FOTA_START_FLAG = 1,
+};
 
-static const char *fota_mgr_state_str_get(fota_state_t state)
+typedef struct
 {
-    static const char *fota_state_str[] =
-    {
-        "FOTA_STATE_UPLOAD_INIT",
-        "FOTA_STATE_DOWNLOAD_INIT",
-        "FOTA_STATE_UPLOAD",
-        "FOTS_STATE_DOWNLOAD",
-        "FOTA_STATE_FAIL",
-        "FOTA_STATE_END"
-    };
+    uint32_t size;
+    uint32_t offset;
+}__attribute__((packed)) fota_request_t;
 
-    EGL_ASSERT_CHECK(state <= FOTA_STATE_END, NULL);
-
-    return fota_state_str[state];
-}
-
-static fota_state_t fota_mgr_upload_init_step(plat_boot_slot_t target_slot, fota_state_t state)
-{
-    PROTOCOL_PACKET_DECLARE(request, sizeof(target_slot));
-    PROTOCOL_PACKET_DECLARE(response, 0);
-
-    egl_result_t result;
-    size_t len = sizeof(request_buff);
-    state = FOTA_STATE_FAIL;
-
-    result = protocol_packet_build(request, PROTOCOL_CMD_FOTA_REQUEST_TO_DOWNLOAD,
-                                   &target_slot, sizeof(target_slot));
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-    for(unsigned int attepmpts = 5; attepmpts > 0; attepmpts--)
-    {
-        EGL_LOG_INFO("Send request to download. Attempt: %u", attepmpts);
-
-        result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "send", request_buff, len, 8);
-        EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-        result = egl_iface_write(RADIO, request, &len);
-        EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-        result = egl_iface_read(RADIO, response, &len);
-        if(result == EGL_SUCCESS)
-        {
-            result = protocol_packet_validate(response, PROTOCOL_CMD_ACK, 0);
-            if(result == EGL_SUCCESS)
-            {
-                state = FOTA_STATE_UPLOAD;
-                break;
-            }
-        }
-
-        result = egl_sys_delay(1000);
-        EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-    }
-
-    return state;
-}
-
-static fota_state_t fota_mgr_download_init_step(plat_boot_slot_t target_slot, fota_state_t state)
-{
-    PROTOCOL_PACKET_DECLARE(response, 0);
-
-    egl_result_t result;
-    size_t len = sizeof(response_buff);
-    state = FOTA_STATE_FAIL;
-
-    result = protocol_packet_build(response, PROTOCOL_CMD_ACK, NULL, 0);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-    result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "send", response_buff, len, 8);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-    result = egl_iface_write(RADIO, response, &len);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-    state = FOTS_STATE_DOWNLOAD;
-
-    return state;
-}
-
-static egl_result_t fota_mgr_slot_start_addr_get(plat_boot_slot_t target_slot, uint32_t *slot_start)
+static egl_result_t fota_start_handle(void)
 {
     egl_result_t result;
+    PROTOCOL_PACKET_DECLARE(packet, sizeof(fota_request_t));
+    fota_request_t *fota_request = (fota_request_t *)packet->payload;
 
-    switch(target_slot)
-    {
-        case PLAT_SLOT_A:
-            result = egl_value_u32_get(SLOT_A_ADDR, slot_start);
-            break;
+    fota_request->size = FOTA_CHUNK_SIZE;
+    fota_request->offset = 0;
 
-        case PLAT_SLOT_B:
-            result = egl_value_u32_get(SLOT_B_ADDR, slot_start);
-            break;
+    EGL_LOG_INFO("[OUTPUT] Request. Size = %u, offset = %u", fota_request->size, fota_request->offset);
 
-        default:
-            result = EGL_NOT_SUPPORTED;
-    }
+    result = protocol_packet_build(packet, PROTOCOL_CMD_FOTA_REQUEST_CHUNK, NULL, sizeof(fota_request_t));
+    EGL_RESULT_CHECK(result);
+
+    result = radio_packet_send(packet);
     EGL_RESULT_CHECK(result);
 
     return result;
 }
 
-static egl_result_t fota_mgr_page_send(plat_boot_slot_t target_slot, uint32_t page_num)
+static void fota_thread_entry(void *param)
 {
-    uint32_t addr;
     egl_result_t result;
-    uint32_t slot_start;
+    unsigned int flags = 0;
 
-    PROTOCOL_PACKET_DECLARE(response, PLAT_FLASH_PAGE_SIZE);
-    size_t packet_len = sizeof(response_buff);
+    while(1)
+    {
+        result = egl_os_flags_wait(SYSOS, flags_handle, FOTA_START_FLAG, &flags,
+                                   EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREWER);
+        EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 
-    result = fota_mgr_slot_start_addr_get(target_slot, &slot_start);
+        if(flags & FOTA_START_FLAG)
+        {
+            result = fota_start_handle();
+            EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+        }
+    }
+}
+
+egl_result_t fota_request_chunk_handle(protocol_packet_t *packet)
+{
+    egl_result_t result;
+    PROTOCOL_PACKET_DECLARE(response, 0);
+
+    result = protocol_packet_validate(packet, PROTOCOL_CMD_FOTA_REQUEST_CHUNK, sizeof(fota_request_t));
     EGL_RESULT_CHECK(result);
 
-    addr = slot_start + page_num * PLAT_FLASH_PAGE_SIZE;
+    fota_request_t *fota_request = (fota_request_t *)packet->payload;
 
-    EGL_LOG_WARN("Requested page: %u, addr: %u", page_num, addr);
+    EGL_LOG_INFO("[INPUT] Request. Size = %u, offset = %u", fota_request->size, fota_request->offset);
 
-    /* Read page directly to packet */
-    result = egl_block_read(PLAT_FLASH, addr, response->payload);
+    result = protocol_packet_build(response, PROTOCOL_CMD_FOTA_COMPLETE, NULL, 0);
     EGL_RESULT_CHECK(result);
 
-    /* Left payload as NULL, cause it is already writted to the packet */
-    result = protocol_packet_build(response, PROTOCOL_CMD_FOTA_SEND_PAGE, NULL, PLAT_FLASH_PAGE_SIZE);
-    EGL_RESULT_CHECK(result);
-
-    result = egl_iface_write(RADIO, response, &packet_len);
+    result = radio_packet_send(response);
     EGL_RESULT_CHECK(result);
 
     return result;
 }
 
-static fota_state_t fota_mgr_upload_step(plat_boot_slot_t target_slot, fota_state_t state)
-{
-    size_t packet_len;
-    egl_result_t result;
-    uint32_t requested_page;
-    uint32_t start_timestamp = egl_timer_get(SYSTIMER);
-
-    PROTOCOL_PACKET_DECLARE(request, sizeof(requested_page));
-
-    while(true)
-    {
-        /* Check for timeout */
-        uint32_t current_timestamp = egl_timer_get(SYSTIMER);
-        if(current_timestamp - start_timestamp > FOTA_UPLOAD_TIMEOUT)
-        {
-            EGL_LOG_WARN("Fota upload timeout");
-            break;
-        }
-
-        /* Waiting for request page command */
-        packet_len = sizeof(request);
-        result = egl_iface_read(RADIO, request, &packet_len);
-        EGL_ASSERT_CHECK(result == EGL_SUCCESS || result == EGL_TIMEOUT, FOTA_STATE_FAIL);
-
-        if(result == EGL_SUCCESS)
-        {
-            result = protocol_packet_validate(request, PROTOCOL_CMD_FOTA_REQUEST_PAGE, sizeof(requested_page));
-            if(result == EGL_SUCCESS)
-            {
-                result = fota_mgr_page_send(target_slot, request->payload[0]);
-                EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-            }
-            else
-            {
-                /* May be it is complete command ? */
-                result = protocol_packet_validate(request, PROTOCOL_CMD_FOTA_COMPLETE, 0);
-                if(result == EGL_SUCCESS)
-                {
-                    EGL_LOG_INFO("FOTA complete command received");
-                    break;
-                }
-            }
-        }
-    }
-
-    return FOTA_STATE_END;
-}
-
-static fota_state_t fota_mgr_download_step(plat_boot_slot_t target_slot, fota_state_t state)
-{
-    egl_result_t result;
-    uint32_t current_page = 0;
-    uint32_t total_pages = -1;
-    size_t packet_len;
-    uint32_t slot_start_addr;
-
-    PROTOCOL_PACKET_DECLARE(request, sizeof(current_page));
-    PROTOCOL_PACKET_DECLARE(response, PLAT_FLASH_PAGE_SIZE);
-
-    result = fota_mgr_slot_start_addr_get(target_slot, &slot_start_addr);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-    do
-    {
-        result = protocol_packet_build(request, PROTOCOL_CMD_FOTA_REQUEST_PAGE,
-                                                (uint8_t *) &current_page, sizeof(current_page));
-        EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-        packet_len = sizeof(request_buff);
-        result = egl_iface_write(RADIO, request, &packet_len);
-        EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-        packet_len = sizeof(response_buff);
-        result = egl_iface_read(RADIO, response, &packet_len);
-        EGL_ASSERT_CHECK(result == EGL_SUCCESS || result == EGL_TIMEOUT, FOTA_STATE_FAIL);
-
-        if(result == EGL_SUCCESS)
-        {
-            result = protocol_packet_validate(response, PROTOCOL_CMD_FOTA_SEND_PAGE, PLAT_FLASH_PAGE_SIZE);
-            if(result == EGL_SUCCESS)
-            {
-                if(current_page == 0)
-                {
-                    app_info_t *info = (app_info_t *)(response->payload + CONFIG_PLAT_SLOT_INFO_OFFSET);
-                    EGL_ASSERT_CHECK(info->magic == CONFIG_PLAT_SLOT_INFO_MAGIC_VALUE, FOTA_STATE_FAIL);
-                    total_pages = info->size / PLAT_FLASH_PAGE_SIZE + 1;
-                }
-
-                uint32_t addr = slot_start_addr + PLAT_FLASH_PAGE_SIZE * current_page;
-                result = egl_block_write(PLAT_FLASH, addr, response->payload);
-                EGL_RESULT_CHECK(result);
-
-                EGL_LOG_INFO("Download page %u/%u", current_page, total_pages);
-
-                current_page++;
-            }
-            else
-            {
-                /* May be it is complete command ? */
-                result = protocol_packet_validate(request, PROTOCOL_CMD_FOTA_COMPLETE, 0);
-                if(result == EGL_SUCCESS)
-                {
-                    EGL_LOG_INFO("FOTA complete command received");
-                    break;
-                }
-            }
-        }
-    }while(current_page != total_pages);
-
-    return FOTA_STATE_END;
-}
-
-static fota_state_t fota_mgr_end_step(plat_boot_slot_t target_slot, fota_state_t state)
+egl_result_t fota_complete_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
 
-    PROTOCOL_PACKET_DECLARE(request, 0);
-    size_t packet_len = sizeof(request_buff);
+    result = protocol_packet_validate(packet, PROTOCOL_CMD_FOTA_COMPLETE, 0);
+    EGL_RESULT_CHECK(result);
 
-    result = protocol_packet_build(request, PROTOCOL_CMD_FOTA_COMPLETE, NULL, 0);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
+    EGL_LOG_INFO("FOTA complete");
 
-    result = egl_iface_write(RADIO, request, &packet_len);
-    EGL_ASSERT_CHECK(result == EGL_SUCCESS, FOTA_STATE_FAIL);
-
-    return FOTA_STATE_END;
+    return result;
 }
 
-static fota_state_t fota_mgr_statemachine_step(plat_boot_slot_t target_slot, fota_state_t state)
-{
-    switch(state)
-    {
-        case FOTA_STATE_UPLOAD_INIT:
-            state = fota_mgr_upload_init_step(target_slot, state);
-            break;
-
-        case FOTA_STATE_DOWNLOAD_INIT:
-            state = fota_mgr_download_init_step(target_slot, state);
-            break;
-
-        case FOTA_STATE_UPLOAD:
-            state = fota_mgr_upload_step(target_slot, state);
-            break;
-
-        case FOTS_STATE_DOWNLOAD:
-            state = fota_mgr_download_step(target_slot, state);
-            break;
-
-        case FOTA_STATE_END:
-        case FOTA_STATE_FAIL:
-            state = fota_mgr_end_step(target_slot, state);
-            break;
-
-        default:
-            EGL_LOG_WARN("Wrong fota state (%u)", state);
-            state = FOTA_STATE_END;
-    }
-
-    return state;
-}
-
-egl_result_t fota_mgr_process(plat_boot_slot_t target_slot, fota_task_t task)
-{
-    fota_state_t curr_state;
-
-    switch(task)
-    {
-        case FOTA_MGR_TASK_DOWNLOAD:
-            curr_state = FOTA_STATE_DOWNLOAD_INIT;
-            break;
-
-        case FOTA_MGR_TASK_UPLOAD:
-            curr_state = FOTA_STATE_UPLOAD_INIT;
-            break;
-
-        default:
-            EGL_LOG_WARN("Unknown task %u", task);
-            curr_state = FOTA_STATE_FAIL;
-    }
-
-    fota_state_t prev_state = FOTA_STATE_END;
-
-    EGL_LOG_INFO("%s -> %s", fota_mgr_state_str_get(prev_state),
-                             fota_mgr_state_str_get(curr_state));
-
-    while(curr_state != FOTA_STATE_END && curr_state != FOTA_STATE_FAIL)
-    {
-        curr_state = fota_mgr_statemachine_step(target_slot, curr_state);
-
-        if(prev_state != curr_state)
-        {
-            EGL_LOG_INFO("%s -> %s", fota_mgr_state_str_get(prev_state),
-                                     fota_mgr_state_str_get(curr_state));
-            prev_state = curr_state;
-        }
-    }
-
-    return curr_state == FOTA_STATE_END ? EGL_SUCCESS : EGL_FAIL;
-}
-
-
-static egl_result_t event_fota_check_handle(void)
+egl_result_t fota_start(void)
 {
     egl_result_t result;
-    size_t packet_len;
 
-    EGL_LOG_INFO("Check for new FOTA available");
-
-    PROTOCOL_PACKET_DECLARE(request, 0);
-    PROTOCOL_PACKET_DECLARE(response, sizeof(uint8_t));
-
-    result = protocol_packet_build(request, PROTOCOL_CMD_FOTA_STATUS_REQUEST, NULL, 0);
+    result = egl_os_flags_set(SYSOS, flags_handle, FOTA_START_FLAG);
     EGL_RESULT_CHECK(result);
 
-    packet_len = sizeof(request_buff);
-    result = egl_iface_write(RADIO, request, &packet_len);
+    return EGL_SUCCESS;
+}
+
+egl_result_t fota_init(void)
+{
+    egl_result_t result;
+
+    static egl_os_flags_ctx flags_ctx;
+    static egl_os_thread_ctx thread_ctx;
+    static uint8_t stack[1024];
+
+    result = egl_os_flags_create(SYSOS, &flags_handle, "fota_flags", &flags_ctx);
     EGL_RESULT_CHECK(result);
 
-    packet_len = sizeof(response_buff);
-    result = egl_iface_read(RADIO, response, &packet_len);
+    result = egl_os_thread_create(SYSOS, &thread_handle, "fota",
+                                  fota_thread_entry, NULL,
+                                  stack, sizeof(stack),
+                                  1, &thread_ctx);
     EGL_RESULT_CHECK(result);
-
-    result = protocol_packet_validate(response, PROTOCOL_CMD_FOTA_STATUS_RESPONSE, sizeof(uint8_t));
-    EGL_RESULT_CHECK(result);
-
-    is_fota_available = response->payload[0];
-
-    EGL_LOG_INFO("FOTA status: %d", is_fota_available);
 
     return result;
 }

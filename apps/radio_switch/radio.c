@@ -3,6 +3,7 @@
 #include "plat.h"
 #include "switch.h"
 #include "radio.h"
+#include "fota.h"
 
 static void *thread_handle = NULL;
 static void *mux_handle = NULL;
@@ -11,7 +12,9 @@ static radio_packet_recv_handler_func_t recv_handler = NULL;
 
 static void radio_sw1_callback(void *data)
 {
-
+    egl_result_t result;
+    result = fota_start();
+    EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 }
 
 static void radio_sw2_callback(void *data)

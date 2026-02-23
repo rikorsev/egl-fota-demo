@@ -8,8 +8,10 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/protocol.c
         ${CMAKE_CURRENT_LIST_DIR}/radio.c
         ${CMAKE_CURRENT_LIST_DIR}/switch.c
+        ${CMAKE_CURRENT_LIST_DIR}/fota.c
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/protocol.h
         ${CMAKE_CURRENT_LIST_DIR}/radio.h
         ${CMAKE_CURRENT_LIST_DIR}/switch.h
+        ${CMAKE_CURRENT_LIST_DIR}/fota.h
 )

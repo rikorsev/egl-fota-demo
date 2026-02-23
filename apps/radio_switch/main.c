@@ -36,6 +36,14 @@ static egl_result_t recv_handler(protocol_packet_t *packet)
             result = switch_toggle_recv_cmd_handle(packet);
             break;
 
+        case PROTOCOL_CMD_FOTA_REQUEST_CHUNK:
+            result = fota_request_chunk_handle(packet);
+            break;
+
+        case PROTOCOL_CMD_FOTA_COMPLETE:
+            result = fota_complete_handle(packet);
+            break;
+
         default:
             result = EGL_NOT_SUPPORTED;
     }
@@ -97,6 +105,9 @@ static egl_result_t app_start(void *param, ...)
     EGL_RESULT_CHECK(result);
 
     result = radio_init(recv_handler);
+    EGL_RESULT_CHECK(result);
+
+    result = fota_init();
     EGL_RESULT_CHECK(result);
 
     return result;
