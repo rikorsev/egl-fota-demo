@@ -75,7 +75,7 @@ static void radio_thread_entry(void *param)
         result = radio_recv_handle();
         if(result != EGL_SUCCESS)
         {
-            EGL_LOG_WARN("Faul to handle receive. Result: %s", EGL_RESULT(result));
+            EGL_LOG_WARN("Fail to handle receive. Result: %s", EGL_RESULT(result));
         }
     }
 }
@@ -114,7 +114,7 @@ egl_result_t radio_init(radio_packet_recv_handler_func_t handler)
     static egl_os_thread_ctx thread_ctx;
     static egl_os_mux_ctx mux_ctx;
     static egl_os_sem_ctx sem_ctx;
-    static uint8_t stack[1024];
+    static uint8_t stack[4096];
 
     recv_handler = handler;
 

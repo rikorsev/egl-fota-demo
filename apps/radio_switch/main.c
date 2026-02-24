@@ -36,6 +36,14 @@ static egl_result_t recv_handler(protocol_packet_t *packet)
             result = switch_toggle_recv_cmd_handle(packet);
             break;
 
+        case PROTOCOL_CMD_FOTA_REQUEST_META:
+            result = fota_request_meta_handle(packet);
+            break;
+
+        case PROTOCOL_CMD_FOTA_RESPONSE_META:
+            result = fota_response_meta_handle(packet);
+            break;
+
         case PROTOCOL_CMD_FOTA_REQUEST_CHUNK:
             result = fota_request_chunk_handle(packet);
             break;
