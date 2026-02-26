@@ -5,6 +5,8 @@
 #include "radio.h"
 #include "fota.h"
 
+#define RADIO_PAYLOAD_MAX (PLAT_FLASH_PAGE_SIZE + 8U) /* +8 bytes for meta data */
+
 static void *thread_handle = NULL;
 static void *mux_handle = NULL;
 static void *sem_handle = NULL;
@@ -32,7 +34,7 @@ static void radio_rts_callback(void *data)
 static egl_result_t radio_recv_handle(void)
 {
     egl_result_t result;
-    static PROTOCOL_PACKET_DECLARE(packet, 4096);
+    static PROTOCOL_PACKET_DECLARE(packet, RADIO_PAYLOAD_MAX);
     size_t len = sizeof(packet_buff);
     int8_t rssi;
     int16_t freq_error;
@@ -114,7 +116,7 @@ egl_result_t radio_init(radio_packet_recv_handler_func_t handler)
     static egl_os_thread_ctx thread_ctx;
     static egl_os_mux_ctx mux_ctx;
     static egl_os_sem_ctx sem_ctx;
-    static uint8_t stack[4096];
+    static uint8_t stack[2048];
 
     recv_handler = handler;
 

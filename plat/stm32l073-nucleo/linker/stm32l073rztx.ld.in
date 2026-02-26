@@ -127,7 +127,7 @@ SECTIONS
   _sidata = LOADADDR(.data);
 
   /* Section that keeps information for bootloader */
-  .boot_info :
+  .boot_info (NOLOAD):
   {
     . = ALIGN(4);
     *(.boot_info)

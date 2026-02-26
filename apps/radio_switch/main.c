@@ -48,6 +48,10 @@ static egl_result_t recv_handler(protocol_packet_t *packet)
             result = fota_request_chunk_handle(packet);
             break;
 
+        case PROTOCOL_CMD_FOTA_RESPONSE_CHUNK:
+            result = fota_response_chunk_handle(packet);
+            break;
+
         case PROTOCOL_CMD_FOTA_COMPLETE:
             result = fota_complete_handle(packet);
             break;

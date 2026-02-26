@@ -4,25 +4,31 @@
 #include "fota.h"
 #include "radio.h"
 
-#define FOTA_CHUNK_SIZE (4096U)
-
 static void *thread_handle = NULL;
 static void *flags_handle = NULL;
 
 enum
 {
-    FOTA_START_FLAG = 1,
+    FOTA_REQUEST_META_FLAG = 1,
+    FOTA_REQUEST_CHUNK_FLAG = 2,
 };
 
 typedef struct
 {
     uint32_t size;
     uint32_t offset;
-}__attribute__((packed)) fota_request_t;
+}__attribute__((packed)) fota_request_chunk_t;
+
+typedef struct
+{
+    uint32_t size;
+    uint32_t offset;
+    uint8_t chunk[PLAT_FLASH_PAGE_SIZE];
+}__attribute__((packed)) fota_response_chunk_t;
 
 static app_info_t fota_meta = {0};
 
-static egl_result_t fota_start_handle(void)
+static egl_result_t fota_meta_request(void)
 {
     egl_result_t result;
 
@@ -42,15 +48,15 @@ static egl_result_t fota_start_handle(void)
 static egl_result_t fota_chunk_request(void)
 {
     egl_result_t result;
-    PROTOCOL_PACKET_DECLARE(packet, sizeof(fota_request_t));
-    fota_request_t *fota_request = (fota_request_t *)packet->payload;
+    PROTOCOL_PACKET_DECLARE(packet, sizeof(fota_request_chunk_t));
+    fota_request_chunk_t *fota_request = (fota_request_chunk_t *)packet->payload;
 
-    fota_request->size = FOTA_CHUNK_SIZE;
+    fota_request->size = PLAT_FLASH_PAGE_SIZE;
     fota_request->offset = 0;
 
     EGL_LOG_INFO("[OUTPUT] Request chunk. Size = %u, offset = %u", fota_request->size, fota_request->offset);
 
-    result = protocol_packet_build(packet, PROTOCOL_CMD_FOTA_REQUEST_CHUNK, NULL, sizeof(fota_request_t));
+    result = protocol_packet_build(packet, PROTOCOL_CMD_FOTA_REQUEST_CHUNK, NULL, sizeof(fota_request_chunk_t));
     EGL_RESULT_CHECK(result);
 
     result = radio_packet_send(packet);
@@ -82,13 +88,19 @@ static void fota_thread_entry(void *param)
 
     while(1)
     {
-        result = egl_os_flags_wait(SYSOS, flags_handle, FOTA_START_FLAG, &flags,
-                                   EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREWER);
+        result = egl_os_flags_wait(SYSOS, flags_handle, FOTA_REQUEST_META_FLAG | FOTA_REQUEST_CHUNK_FLAG,
+                                   &flags, EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREWER);
         EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 
-        if(flags & FOTA_START_FLAG)
+        if(flags & FOTA_REQUEST_META_FLAG)
         {
-            result = fota_start_handle();
+            result = fota_meta_request();
+            EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
+        }
+
+        if(flags & FOTA_REQUEST_CHUNK_FLAG)
+        {
+            result = fota_chunk_request();
             EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
         }
     }
@@ -168,25 +180,64 @@ egl_result_t fota_response_meta_handle(protocol_packet_t *packet)
         return EGL_INVALID_PARAM;
     }
 
+    result = egl_os_flags_set(SYSOS, flags_handle, FOTA_REQUEST_CHUNK_FLAG);
+    EGL_RESULT_CHECK(result);
+
     return result;
 }
 
 egl_result_t fota_request_chunk_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
-    PROTOCOL_PACKET_DECLARE(response, 0);
+    static PROTOCOL_PACKET_DECLARE(response, sizeof(fota_response_chunk_t));
 
-    result = protocol_packet_validate(packet, PROTOCOL_CMD_FOTA_REQUEST_CHUNK, sizeof(fota_request_t));
+    result = protocol_packet_validate(packet, PROTOCOL_CMD_FOTA_REQUEST_CHUNK, sizeof(fota_request_chunk_t));
     EGL_RESULT_CHECK(result);
 
-    fota_request_t *fota_request = (fota_request_t *)packet->payload;
+    fota_request_chunk_t *fota_request = (fota_request_chunk_t *)packet->payload;
 
     EGL_LOG_INFO("[INPUT] Request. Size = %u, offset = %u", fota_request->size, fota_request->offset);
 
-    result = protocol_packet_build(response, PROTOCOL_CMD_FOTA_COMPLETE, NULL, 0);
+    fota_response_chunk_t *fota_response = (fota_response_chunk_t *)response->payload;
+
+    fota_response->offset = fota_request->offset;
+    fota_response->size = fota_request->size;
+
+    uint32_t addr;
+    result = egl_value_u32_get(SLOT_B_ADDR, &addr);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_block_read(PLAT_FLASH, addr + fota_request->offset, fota_response->chunk);
+    EGL_RESULT_CHECK(result);
+
+    result = protocol_packet_build(response, PROTOCOL_CMD_FOTA_RESPONSE_CHUNK, NULL, sizeof(fota_response_chunk_t));
     EGL_RESULT_CHECK(result);
 
     result = radio_packet_send(response);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+egl_result_t fota_response_chunk_handle(protocol_packet_t *packet)
+{
+    egl_result_t result;
+
+    result = protocol_packet_validate(packet, PROTOCOL_CMD_FOTA_RESPONSE_CHUNK, sizeof(fota_response_chunk_t));
+    EGL_RESULT_CHECK(result);
+
+    fota_response_chunk_t *fota_response = (fota_response_chunk_t *)packet->payload;
+
+    EGL_LOG_INFO("[INPUT] Response. Size = %u, offset = %u", fota_response->size, fota_response->offset);
+
+    uint32_t addr;
+    result = egl_value_u32_get(SLOT_B_ADDR, &addr);
+    EGL_RESULT_CHECK(result);
+
+    result = egl_block_write(PLAT_FLASH, addr + fota_response->offset, fota_response->chunk);
+    EGL_RESULT_CHECK(result);
+
+    result = fota_complete(EGL_SUCCESS);
     EGL_RESULT_CHECK(result);
 
     return result;
@@ -211,7 +262,7 @@ egl_result_t fota_start(void)
 {
     egl_result_t result;
 
-    result = egl_os_flags_set(SYSOS, flags_handle, FOTA_START_FLAG);
+    result = egl_os_flags_set(SYSOS, flags_handle, FOTA_REQUEST_META_FLAG);
     EGL_RESULT_CHECK(result);
 
     return EGL_SUCCESS;
@@ -223,7 +274,7 @@ egl_result_t fota_init(void)
 
     static egl_os_flags_ctx flags_ctx;
     static egl_os_thread_ctx thread_ctx;
-    static uint8_t stack[4096];
+    static uint8_t stack[1024];
 
     result = egl_os_flags_create(SYSOS, &flags_handle, "fota_flags", &flags_ctx);
     EGL_RESULT_CHECK(result);

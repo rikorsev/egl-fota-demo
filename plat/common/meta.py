@@ -12,7 +12,9 @@ CRC_POSITION=8
 def process_size(args):
     stats = os.stat(args.filename)
 
-    size = stats.st_size - int(args.meta_size)
+    # size = stats.st_size - int(args.meta_size)
+    size = stats.st_size
+    print(f'SIZE: {int(size)}')
     size = size.to_bytes(4, "little")
 
     with open(args.filename, 'rb+') as f:
