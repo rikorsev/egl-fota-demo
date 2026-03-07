@@ -9,15 +9,23 @@ static plat_boot_config_t boot_config = {0};
 /* Required for ThreadX */
 void _tx_initialize_low_level(void)
 {
-    
+
 }
 
 static egl_result_t init(void)
 {
+    egl_result_t result;
     extern uint32_t __Vectors;
     SCB->VTOR = (uint32_t) &__Vectors;
 
     NVIC_SetPriority(PendSV_IRQn, 1);
+
+#if CONFIG_EGL_OS_ENABLED
+    result = egl_log_frontend_set(SYSLOG, EGL_LOG_OS);
+#else
+    result = egl_log_frontend_set(SYSLOG, EGL_LOG_BARE);
+#endif
+    EGL_RESULT_CHECK(result);
 
     __enable_irq();
 

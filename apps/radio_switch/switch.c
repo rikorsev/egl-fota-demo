@@ -30,7 +30,7 @@ static void switch_thread_entry(void *param)
     while(1)
     {
         result = egl_os_flags_wait(SYSOS, flags_handle, SWITCH_TOGGLE_RECV_FLAG | SWITCH_TOGGLE_SEND_FLAG, &flags,
-                                   EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREWER);
+                                   EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREVER);
         EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 
         if(flags & SWITCH_TOGGLE_RECV_FLAG)

@@ -34,5 +34,6 @@ if(TARGET_RFM STREQUAL "rfm66" OR TARGET_RFM STREQUAL "rfm69")
 endif()
 
 if(CONFIG_EGL_OS_ENABLED EQUAL 1)
+    set(TX_USER_FILE ${CMAKE_CURRENT_LIST_DIR}/config/tx_user.h)
     add_subdirectory(threadx)
 endif()

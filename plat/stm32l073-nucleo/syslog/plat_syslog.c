@@ -11,7 +11,6 @@ static char syslog_buff[CONFIG_PLAT_SYSLOG_BUFF_SIZE];
 #if CONFIG_EGL_OS_ENABLED
 static void *syslog_thread = NULL;
 static void *syslog_queue = NULL;
-static void *syslog_mux = NULL;
 #endif
 
 static void init_tx_pin(void)
@@ -80,9 +79,6 @@ static egl_result_t write_queue(void *data, size_t *len)
 {
     egl_result_t result;
 
-    result = egl_os_mux_lock(SYSOS, syslog_mux, EGL_OS_WAIT_FOREWER);
-    EGL_RESULT_CHECK(result);
-
     for(unsigned int i = 0; i < *len; i += SYSLOG_MSG_CHUNK_SIZE)
     {
         uint8_t chunk[SYSLOG_MSG_CHUNK_SIZE] = {0};
@@ -90,13 +86,9 @@ static egl_result_t write_queue(void *data, size_t *len)
 
         memcpy(chunk, &((uint8_t *)data)[i], size);
 
-        result = egl_os_queue_put(SYSOS, syslog_queue, chunk, EGL_OS_WAIT_FOREWER);
-        EGL_RESULT_CHECK_EXIT(result);
+        result = egl_os_queue_put(SYSOS, syslog_queue, chunk, EGL_OS_WAIT_FOREVER);
+        EGL_RESULT_CHECK(result);
     }
-    
-exit:
-    result = egl_os_mux_unlock(SYSOS, syslog_mux);
-    EGL_RESULT_CHECK(result);
 
     return result;
 }
@@ -107,7 +99,7 @@ static void plat_syslog_thread_entry(void *data)
     {
         uint8_t chunk[SYSLOG_MSG_CHUNK_SIZE] = {0};
         size_t size = sizeof(chunk);
-        egl_os_queue_get(SYSOS, syslog_queue, &chunk, EGL_OS_WAIT_FOREWER);
+        egl_os_queue_get(SYSOS, syslog_queue, &chunk, EGL_OS_WAIT_FOREVER);
         write_uart(chunk, &size);
     }
 }
@@ -117,13 +109,8 @@ static egl_result_t init_thread(void)
     egl_result_t result;
     static egl_os_thread_ctx thread_ctx;
     static egl_os_queue_ctx queue_ctx;
-    static egl_os_mux_ctx mux_ctx;
     static uint8_t stack[1024];
     static uint8_t queue[CONFIG_PLAT_SYSLOG_BUFF_SIZE];
-
-    result = egl_os_mux_create(SYSOS, &syslog_mux, "syslog_mux",
-                               EGL_OS_MUX_TYPE_REGULAR, &mux_ctx);
-    EGL_RESULT_CHECK(result);
 
     result = egl_os_queue_create(SYSOS, &syslog_queue, "syslog_queue",
                                  sizeof(queue) / SYSLOG_MSG_CHUNK_SIZE,
@@ -183,14 +170,8 @@ static const egl_iface_t plat_syslog_iface =
 egl_log_t plat_syslog_inst =
 {
     .iface = (egl_iface_t *)&plat_syslog_iface,
-#if CONFIG_EGL_OS_ENABLED
-    .frontend = egl_log_frontend_default_os,
-#else
-    .frontend = egl_log_frontend_default_bare,
-#endif
-    .timer = &plat_systimer_inst,
     .buff = syslog_buff,
-    .size = sizeof(syslog_buff)
+    .size = sizeof(syslog_buff),
 };
 
 egl_log_t *plat_syslog_get(void)

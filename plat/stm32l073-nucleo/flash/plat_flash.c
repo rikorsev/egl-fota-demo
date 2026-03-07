@@ -16,7 +16,7 @@ static egl_result_t read(uint32_t addr, void *data)
 
 static egl_result_t write(uint32_t addr, void *data)
 {
-    EGL_LOG_DEBUG("flash write page. Addr: %u", addr);
+    EGL_LOG_DEBUG("flash write page. Addr: %08x", addr);
 
     return EGL_SUCCESS;
 }
