@@ -185,6 +185,11 @@ static inline egl_result_t fota_state_complete_step(void)
     result = fota_state_set(FOTA_STATE_IDLE);
     EGL_RESULT_CHECK(result);
 
+    /* Boot bootloader */
+    plat_boot_config_t config = { .slot = PLAT_SLOT_BOOT, .task = PLAT_BOOT_TASK_SWAP };
+    result = egl_plat_cmd_exec(PLATFORM, PLAT_CMD_BOOT, &config, NULL);
+    EGL_RESULT_CHECK(result);
+
     return result;
 }
 
@@ -445,7 +450,7 @@ egl_result_t fota_init(void)
 
     static egl_os_sem_ctx step_sem_ctx;
     static egl_os_thread_ctx thread_ctx;
-    static uint8_t stack[1024];
+    static uint8_t stack[2048];
 
     result = egl_os_sem_create(SYSOS, &step_sem_handle, "fota_step_sem",
                                                        1, 0, &step_sem_ctx);
