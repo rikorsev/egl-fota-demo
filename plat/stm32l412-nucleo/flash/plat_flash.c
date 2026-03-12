@@ -16,8 +16,8 @@ static egl_result_t read(uint32_t addr, void *data)
 
 static egl_result_t unlock(void)
 {
-    #define FLASH_KEY1 (0x45670123U)
-    #define FLASH_KEY2 (0xCDEF89ABU)
+    #define FLASH_KEY1 (0x45670123)
+    #define FLASH_KEY2 (0xCDEF89AB)
 
     /* Unlock flash memory by writing the keys to the FLASH_KEYR register */
     if(FLASH->CR & FLASH_CR_LOCK)
