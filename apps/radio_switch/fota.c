@@ -8,7 +8,6 @@
 #define FOTA_STEP_WAIT_TIMEOUT   (1000U)
 
 static void *thread_handle = NULL;
-// static void *flags_handle = NULL;
 static void *step_sem_handle = NULL;
 
 enum
@@ -158,7 +157,7 @@ static inline egl_result_t fota_state_get_chunk_step(void)
 {
     egl_result_t result;
 
-    EGL_LOG_INFO("Step: Get chunk %u/%u. Attempt %u", fota_meta.current_chunk,
+    EGL_LOG_INFO("Step: Get chunk %u/%u. Attempt %u", fota_meta.current_chunk + 1,
                                                       fota_meta.total_chunks,
                                                       fota_meta.repeat_count);
 
@@ -231,7 +230,7 @@ static void fota_thread_entry(void *param)
     }
 }
 
-egl_result_t fota_request_meta_handle(protocol_packet_t *packet)
+static egl_result_t fota_request_meta_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
     PROTOCOL_PACKET_DECLARE(response, sizeof(app_info_t));
@@ -264,7 +263,7 @@ egl_result_t fota_request_meta_handle(protocol_packet_t *packet)
     return result;
 }
 
-egl_result_t fota_response_meta_handle(protocol_packet_t *packet)
+static egl_result_t fota_response_meta_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
 
@@ -295,7 +294,7 @@ egl_result_t fota_response_meta_handle(protocol_packet_t *packet)
         return fota_complete_set(EGL_INVALID_PARAM);
     }
 
-    fota_meta.total_chunks = (fota_meta.app_info.size / PLAT_FLASH_PAGE_SIZE) + 1;
+    fota_meta.total_chunks = (fota_meta.app_info.size / PLAT_FLASH_PAGE_SIZE);
 
     result = fota_state_set(FOTA_STATE_GET_CHUNK);
     EGL_RESULT_CHECK(result);
@@ -303,7 +302,7 @@ egl_result_t fota_response_meta_handle(protocol_packet_t *packet)
     return result;
 }
 
-egl_result_t fota_request_chunk_handle(protocol_packet_t *packet)
+static egl_result_t fota_request_chunk_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
     static PROTOCOL_PACKET_DECLARE(response, sizeof(fota_response_chunk_t));
@@ -322,7 +321,7 @@ egl_result_t fota_request_chunk_handle(protocol_packet_t *packet)
     result = egl_value_u32_get(SLOT_B_ADDR, &addr);
     EGL_RESULT_CHECK(result);
 
-    result = egl_block_read(PLAT_FLASH, addr + fota_request->chunk_num * PLAT_FLASH_PAGE_SIZE, fota_response->chunk);
+    result = egl_block_read(PLAT_FLASH, (void *)(addr + fota_request->chunk_num * PLAT_FLASH_PAGE_SIZE), fota_response->chunk);
     EGL_RESULT_CHECK(result);
 
     result = protocol_packet_build(response, PROTOCOL_CMD_FOTA_RESPONSE_CHUNK, NULL, sizeof(fota_response_chunk_t));
@@ -334,7 +333,7 @@ egl_result_t fota_request_chunk_handle(protocol_packet_t *packet)
     return result;
 }
 
-egl_result_t fota_response_chunk_handle(protocol_packet_t *packet)
+static egl_result_t fota_response_chunk_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
 
@@ -355,7 +354,7 @@ egl_result_t fota_response_chunk_handle(protocol_packet_t *packet)
     result = egl_value_u32_get(SLOT_B_ADDR, &addr);
     EGL_RESULT_CHECK(result);
 
-    result = egl_block_write(PLAT_FLASH, addr + fota_response->chunk_num * PLAT_FLASH_PAGE_SIZE, fota_response->chunk);
+    result = egl_block_write(PLAT_FLASH, (void *)(addr + fota_response->chunk_num * PLAT_FLASH_PAGE_SIZE), fota_response->chunk);
     EGL_RESULT_CHECK(result);
 
     if(++fota_meta.current_chunk < fota_meta.total_chunks)
@@ -372,7 +371,7 @@ egl_result_t fota_response_chunk_handle(protocol_packet_t *packet)
     return result;
 }
 
-egl_result_t fota_complete_handle(protocol_packet_t *packet)
+static egl_result_t fota_complete_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
     egl_result_t fota_result;
@@ -385,6 +384,40 @@ egl_result_t fota_complete_handle(protocol_packet_t *packet)
     EGL_LOG_INFO("[INPUT] FOTA complete. Result: %s", EGL_RESULT(fota_result));
 
     result = fota_state_set(FOTA_STATE_IDLE);
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+egl_result_t fota_request_handle(protocol_packet_t *packet)
+{
+    egl_result_t result;
+
+    switch(packet->cmd)
+    {
+        case PROTOCOL_CMD_FOTA_REQUEST_META:
+            result = fota_request_meta_handle(packet);
+            break;
+
+        case PROTOCOL_CMD_FOTA_RESPONSE_META:
+            result = fota_response_meta_handle(packet);
+            break;
+
+        case PROTOCOL_CMD_FOTA_REQUEST_CHUNK:
+            result = fota_request_chunk_handle(packet);
+            break;
+
+        case PROTOCOL_CMD_FOTA_RESPONSE_CHUNK:
+            result = fota_response_chunk_handle(packet);
+            break;
+
+        case PROTOCOL_CMD_FOTA_COMPLETE:
+            result = fota_complete_handle(packet);
+            break;
+
+        default:
+            result = EGL_NOT_SUPPORTED;
+    }
     EGL_RESULT_CHECK(result);
 
     return result;

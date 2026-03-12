@@ -54,8 +54,8 @@ static egl_result_t radio_recv_handle(void)
 
     EGL_LOG_DEBUG("RSSI: %d, freq_error: %d", rssi, freq_error);
 
-    result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "recv", packet_buff, 8, 8);
-    EGL_RESULT_CHECK_EXIT(result);
+    // result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "recv", packet_buff, len, 8);
+    // EGL_RESULT_CHECK_EXIT(result);
 
     result = recv_handler(packet);
     EGL_RESULT_CHECK_EXIT(result);
@@ -92,8 +92,8 @@ egl_result_t radio_packet_send(protocol_packet_t *packet)
     egl_result_t result;
     size_t packet_len = PROTOCOL_PACKET_SIZE(packet);
 
-    result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "send", (uint8_t *)packet, 8, 8);
-    EGL_RESULT_CHECK(result);
+    // result = egl_log_buff(SYSLOG, EGL_LOG_LEVEL_DEBUG, "send", (uint8_t *)packet, packet_len, 8);
+    // EGL_RESULT_CHECK(result);
 
     result = egl_os_mux_lock(SYSOS, mux_handle, EGL_OS_WAIT_FOREVER);
     EGL_RESULT_CHECK(result);

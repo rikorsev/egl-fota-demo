@@ -33,12 +33,6 @@ static void switch_thread_entry(void *param)
                                    EGL_OS_FLAGS_OPT_WAIT_ANY, EGL_OS_WAIT_FOREVER);
         EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 
-        if(flags & SWITCH_TOGGLE_RECV_FLAG)
-        {
-            result = egl_pio_toggle(SYSLED);
-            EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
-        }
-
         if(flags & SWITCH_TOGGLE_SEND_FLAG)
         {
             result = switch_toggle_send_cmd_handle();
@@ -47,24 +41,42 @@ static void switch_thread_entry(void *param)
     }
 }
 
-egl_result_t switch_toggle_recv_cmd_handle(protocol_packet_t *packet)
+static egl_result_t switch_toggle_recv_cmd_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
 
     result = protocol_packet_validate(packet, PROTOCOL_CMD_SWITCH, 0);
     EGL_RESULT_CHECK(result);
 
-    result = switch_flag_set(SWITCH_TOGGLE_RECV_FLAG);
+    result = egl_pio_toggle(SYSLED);
     EGL_RESULT_CHECK(result);
 
     return result;
 }
 
-egl_result_t switch_flag_set(unsigned int flag)
+egl_result_t switch_request_handle(protocol_packet_t *packet)
 {
     egl_result_t result;
 
-    result = egl_os_flags_set(SYSOS, flags_handle, flag);
+    switch(packet->cmd)
+    {
+        case PROTOCOL_CMD_SWITCH:
+            result = switch_toggle_recv_cmd_handle(packet);
+            break;
+
+        default:
+            result = EGL_NOT_SUPPORTED;
+    }
+    EGL_RESULT_CHECK(result);
+
+    return result;
+}
+
+egl_result_t switch_request(void)
+{
+    egl_result_t result;
+
+    result = egl_os_flags_set(SYSOS, flags_handle, SWITCH_TOGGLE_SEND_FLAG);
     EGL_RESULT_CHECK(result);
 
     return EGL_SUCCESS;

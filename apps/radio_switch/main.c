@@ -22,42 +22,23 @@ static egl_result_t error_handler_func(egl_result_t result, char *file, unsigned
 static void user_button_callback(void *data)
 {
     egl_result_t result;
-    result = switch_flag_set(SWITCH_TOGGLE_SEND_FLAG);
+    result = switch_request();
     EGL_ASSERT_CHECK(result == EGL_SUCCESS, RETURN_VOID);
 }
 
 static egl_result_t recv_handler(protocol_packet_t *packet)
 {
-    egl_result_t result;
+    egl_result_t result = EGL_NOT_SUPPORTED;
 
-    switch(packet->cmd)
+    if(packet->cmd >= PROTOCOL_SWITCH_CMD_RANGE_START && 
+       packet->cmd <= PROTOCOL_SWITCH_CMD_RANGE_END)
     {
-        case PROTOCOL_CMD_SWITCH:
-            result = switch_toggle_recv_cmd_handle(packet);
-            break;
-
-        case PROTOCOL_CMD_FOTA_REQUEST_META:
-            result = fota_request_meta_handle(packet);
-            break;
-
-        case PROTOCOL_CMD_FOTA_RESPONSE_META:
-            result = fota_response_meta_handle(packet);
-            break;
-
-        case PROTOCOL_CMD_FOTA_REQUEST_CHUNK:
-            result = fota_request_chunk_handle(packet);
-            break;
-
-        case PROTOCOL_CMD_FOTA_RESPONSE_CHUNK:
-            result = fota_response_chunk_handle(packet);
-            break;
-
-        case PROTOCOL_CMD_FOTA_COMPLETE:
-            result = fota_complete_handle(packet);
-            break;
-
-        default:
-            result = EGL_NOT_SUPPORTED;
+        result = switch_request_handle(packet);
+    }
+    else if(packet->cmd >= PROTOCOL_FOTA_CMD_RANGE_START &&
+            packet->cmd <= PROTOCOL_FOTA_CMD_RANGE_END)
+    {
+        result = fota_request_handle(packet);
     }
     EGL_RESULT_CHECK(result);
 
